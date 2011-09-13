@@ -1,0 +1,229 @@
+#!/bin/bash
+#
+# rerun
+#
+
+SH=/bin/bash
+PROG=`basename $0`
+USAGE="
+Usage: $PROG -m module -c command [ -- command_args]
+"
+SYNTAX="$PROG: option syntax error."
+PAD="  "
+# print error message
+error() {
+    echo "ERROR: $*" >&2
+}
+
+# print USAGE and exit
+syntax_error() {
+    echo "$USAGE" >&2
+    echo "$SYNTAX $*" >&2
+    exit 2
+}
+
+# check option has its argument
+arg_syntax_check() {
+    [ "$1" -lt 2 ] && syntax_error
+}
+
+
+# 
+# utility functions -
+#
+
+# get system OS name
+rerun_platforminfo() {
+    uname -s
+}
+# get module dir for specified module 
+rerun_lookupModule() {
+    mod=$1
+    echo $RERUN_MODULES/$mod
+}
+# lookup a handler for specified command in module
+rerun_lookupHandler() {
+    mod=$1
+    cmd=$2
+    mod_dir=`rerun_lookupModule $mod`
+    cmd_dir=$mod_dir/commands
+    os=`rerun_platforminfo`
+    if [ -f  "$cmd_dir/${cmd}-${os}.sh" ]
+    then
+	echo $cmd_dir/${cmd}-${os}.sh; # found an os-specific handler
+    else
+	echo $cmd_dir/${cmd}.sh; # return the generic one
+    fi
+}
+# Checks if handler exists by attempting to look it up. 
+# return 0 if exists, 1 otherwise
+rerun_existsHandler() {
+    mod=$1
+    cmd=$2
+    handler=`rerun_lookupHandler $mod $cmd`
+    if [ -f "$handler" ]
+    then return 0
+    else return 1
+    fi
+}
+
+# List the modules
+rerun_modules() {
+    echo "[modules]"
+    for mod in $1/*; do
+       [ -d "$mod" -a -f "$mod/etc/module" ] && {
+	   mod_name=`basename $mod`
+	   mod_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $mod/etc/module`
+	   printf "%s%s: %s\n" "$PAD" "${mod_name}" "${mod_desc}"
+       }
+    done
+}
+
+# List the commands in a module
+rerun_commands() {
+    cmdir=$1/$2/commands
+    shopt -s nullglob # enable
+    echo "[commands]"
+    for cmd in $cmdir/*.sh; do
+	cmd_name=`basename $cmd | sed 's/.sh$//'`
+	cmd_metadata=$1/$2/etc/commands/${cmd_name}/${cmd_name}.command
+	[ -f $cmd_metadata ] && {
+	    cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
+	}
+	printf " %s: %s\n" "${cmd_name}" "${cmd_desc}"
+	rerun_options $1 $2
+    done
+}
+
+# List the options for a command
+rerun_options() {
+    if [ -d $1/$2/etc/commands/${cmd_name} ]; then
+	printf "%s%s\n" "$PAD" "[options]"
+	shopt -s nullglob # enable
+	for opt_metadata in $1/$2/etc/commands/${cmd_name}/*.option; do
+	    cmd_param=$(basename $(echo ${opt_metadata%%.option}))
+	    #echo "DEBUG: processing param: $cmd_param"
+	    opt_name=`awk -F= '/^NAME/ {print $2}' $opt_metadata`
+	    opt_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $opt_metadata`
+	    opt_arg=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata`
+	    opt_req=`awk -F= '/^REQUIRED/ {print $2}' $opt_metadata`
+	    opt_def=`awk -F= '/^DEFAULT/ {print $2}' $opt_metadata`
+	    
+	    opt_usage=$(printf " -%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
+	    [ "true" != "${opt_req}" ] && {
+		opt_usage=$(printf "[-%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
+	    }
+	    printf "%s %s\n" "$PAD" "$opt_usage"
+	done
+    fi
+}
+
+
+bindir=$(dirname "$0")
+
+# Use env var property if it exists otherwise...
+# ...the default modules base directory is cwd.
+[ -n "$RERUN_MODULES" ] || {
+    RERUN_MODULES=$(dirname .)/modules
+}
+
+#
+# process command line options
+#
+MODULE="" COMMAND=""
+
+while [ "$#" -gt 0 ]; do
+    OPT="$1"
+    case "$OPT" in
+	  # options without arguments
+	-h)
+	    echo "$USAGE"
+	    exit 0
+	    ;;
+  	-v)
+	    OPTS_VERBOSE="-vx"
+	    ;;
+  	-V)
+	    OPTS_VERBOSE=1
+	    set -vx
+	    ;;
+
+	# options with arguments
+	-M)
+	    arg_syntax_check "$#"
+	    RERUN_MODULES="$2"
+	    shift
+	    ;;
+	-m)
+	    arg_syntax_check "$#"
+	    MODULE="$2"
+	    shift
+	    ;;
+	-c)
+	    arg_syntax_check "$#"
+	    COMMAND="$2"
+	    shift
+	    ;;
+	--)
+	    shift
+	    break
+	    ;;
+	  # unknown option
+	-?)
+	    syntax_error
+	    ;;
+	  # end of options, just arguments left
+	*)
+	    break
+    esac
+    shift
+done
+
+
+[ -d "$RERUN_MODULES" ] || {
+    error RERUN_MODULES variable not set or it is not a directory: $RERUN_MODULES
+    exit 1
+}
+
+[ -z "$MODULE" -a -z "$COMMAND" ] && {
+    rerun_modules $RERUN_MODULES
+    exit
+}
+
+[ -n "$MODULE" -a -z "$COMMAND" ] && {
+    cmdir=$RERUN_MODULES/$MODULE/commands
+    [ -d "$cmdir" ] || {
+        echo ERROR: module missing commands dir: $cmdir  >&2
+        exit 1
+    }
+    echo "$MODULE:"
+    rerun_commands $RERUN_MODULES $MODULE
+    exit
+}
+
+
+
+[ -z $MODULE  ]  && syntax_error -m not specified
+[ -z $COMMAND ]  && syntax_error -c not specified
+
+#
+#  If the handler exists for the named command, execute it
+#
+if ( rerun_existsHandler $MODULE $COMMAND )
+then
+    export RERUN_MODULES
+    MODULE_DIR=`rerun_lookupModule $MODULE`
+    export MODULE_DIR 
+    CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
+    . $MODULE_DIR/etc/module
+    [ -r $MODULE_DIR/commands/${cmd_name}.profile ] && {
+	. $MODULE_DIR/commands/${cmd_name}.profile
+    }
+    $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
+else 
+    error command not found: \"$COMMAND\"
+fi
+
+exit $?
+
+

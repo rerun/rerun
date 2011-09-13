@@ -1,0 +1,6 @@
+NAME=arg
+DESCRIPTION="option argument?"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=false
+

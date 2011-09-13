@@ -1,0 +1,6 @@
+NAME=name
+DESCRIPTION="the option name"
+ARGUMENTS=true
+REQUIRED=true
+DEFAULT=
+

@@ -1,0 +1,6 @@
+NAME=name
+DESCRIPTION="the module name"
+ARGUMENTS=true
+REQUIRED=true
+DEFAULT=
+

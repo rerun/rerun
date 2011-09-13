@@ -1,0 +1,6 @@
+NAME=required
+DESCRIPTION="the option required?"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=false
+
