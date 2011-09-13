@@ -1,29 +1,37 @@
 # NAME
 
-rerun - modular command runner
+rerun - a simple command runner because it's easy to forget normal procedure.
 
 # SYNOPSYS
 
-rerun [-M dir] [-m module [-c command]] [-- command_options]
+rerun [-M modules_dir] [-m module [-c command]] [-- command_options]
 
 # DESCRIPTION
 
-Rerun is a simple module dispatching mechanism that looks up named
-commands and executes them.
+Rerun implements a simple dispatching mechanism that looks up named
+commands and executes them. *Commands* are logically named and
+have a corresponding script, `rerun` executes.
+
+Commands reside in a module and can have named paramaters called *options*.
+
+Rerun modules can optionally declare metadata describing name, description
+and other aspects of each command. Rerun makes use of this metadata
+to support a listing mode, a feature where modules and command usage
+are summarized for end users.
 
 # OPTIONS
 
 -h
-: Print help and usage
+: Print help and usage.
 
 -m *MODULE*
-: Module name
+: Module name.
 
 -c *COMMAND*
-: Command name
+: Command name.
 
 -M *DIRECTORY*
-: Module library directory path
+: Module library directory path.
 
 # MODULES
 
@@ -115,6 +123,9 @@ would be:
 
     rerun -M /var/rerun -m freddy -c study
 
+# SEE ALSO
+
+To create modules, see the `stubbs` command set.
 
 # ERROR CODE
 
