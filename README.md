@@ -4,7 +4,7 @@ rerun - modular command runner
 
 # SYNOPSYS
 
-rerun [-M dir] [-m module [-c command]] [-- <command-options>]
+rerun [-M dir] [-m module [-c command]] [-- command_options]
 
 # DESCRIPTION
 
@@ -29,52 +29,59 @@ commands and executes them.
 
 A rerun module assumes the following structure:
 
-    <module>/
-     |
-     |- profile   (module metadata)
-     |
-     +-commands/
-     |    |
-     |    |- cmdA.sh (generic)
-     |    `- cmdA-`uname -s`.sh (os-specific implementation)
-     |
-     +-lib/ (your own shell function definitions, etc)
+    <module>
+    ├── README.md
+    ├── commands
+    │   ├── cmdA.sh (generic)
+    │   └── cmdA-`uname -s`.sh (os-specific)
+    ├── etc
+    │   ├── commands
+    │   │   └── cmdA
+    │   │       ├── arg1.option (option metadata)
+    │   │       └── arg2.option
+    │   └── module (module metadata)
+    └── lib
+        └── command.sh (optional shell functions)
 
 The format of the metadata.sh uses key=value pairs to define standard
-module metadata. For example, a module named `init`:
+module metadata. For example, a module named `fitz`:
 
-    module_name="init"
-    module_description="Utility module containing various commands for managing services"
-    module_commands="stop start"
+    NAME="fitz"
+    DESCRIPTION="A yellow dog that barks and walks"
 
 # EXAMPLES
 
 *Listing*
 
-Without arguments (and a valid module lib) running `rerun` without arguments
+Without arguments, running `rerun` without arguments
 will list existing modules:
 
     $ rerun
-    Available modules:
-    init
+    [modules]
+      fitz: "A yellow dog that barks and walks"
 
-To list the commands available from the 'init' module add the '-m module' parameter
+To list the commands available from the 'fitz' module add the '-m module' parameter
 
-    $ rerun -m init
-    Available init commands:
-    start
-    stop
+    $ rerun -m fitz
+    fitz:
+    [commands]
+     walk: "go some where"
+      [options]
+       -place <doghouse>: "the destination"
+     bark: "say something"
+      [options]
+       -message <woof>: "vocalize what"
 
 *Executing*
 
-To run the 'start' command, add the '-c command' parameter.
+To run the 'walk' command, add the '-c command' parameter.
 
-    rerun -m init -c start
+    rerun -m fitz -c walk
 
-If the 'init' module is stored in /var/rerun, then the command usage
+If the 'fitz' module is stored in /var/rerun, then the command usage
 would be:
 
-    rerun -M /var/rerun -m init -c start
+    rerun -M /var/rerun -m fitz -c walk
 
 
 # ERROR CODE
