@@ -47,7 +47,7 @@ The format of the metadata.sh uses key=value pairs to define standard
 module metadata. For example, a module named `freddy`:
 
     NAME="freddy"
-    DESCRIPTION="A yellow dog that dances and studies"
+    DESCRIPTION="A dancer in a red beret and matching suspenders"
 
 The format for command data.
 
@@ -56,22 +56,25 @@ The format for command data.
     
 The format for option data.
 
-    NAME=place
-    DESCRIPTION="the destination"
+    NAME=subject
+    DESCRIPTION="the summer school subject"
     ARGUMENTS=true
     REQUIRED=true
-    DEFAULT=doghouse
+    DEFAULT=math
 
 Example directory structure:
 
     freddy
     ├── README.md
     ├── commands
-    │   └── study.sh
+    ├── |-- dance.sh
+    │   └── study.sh
     ├── etc
     │   ├── commands
+    │   │   └── dance
+    │   │       └── jumps.option    
     │   │   └── study
-    │   │       └── place.option
+    │   │       └── subject.option
     │   └── module 
     └── lib
 
@@ -79,8 +82,7 @@ Example directory structure:
 
 ## Listing
 
-Without arguments, running `rerun` without arguments
-will list existing modules:
+Without arguments, `rerun` will list existing modules:
 
     $ rerun
     [modules]
