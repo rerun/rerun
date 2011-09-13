@@ -86,7 +86,7 @@ rerun_commands() {
     echo "[commands]"
     for cmd in $cmdir/*.sh; do
 	cmd_name=`basename $cmd | sed 's/.sh$//'`
-	cmd_metadata=$1/$2/etc/commands/${cmd_name}/${cmd_name}.command
+	cmd_metadata=$1/$2/etc/commands/${cmd_name}/command
 	[ -f $cmd_metadata ] && {
 	    cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
 	}
@@ -216,8 +216,8 @@ then
     export MODULE_DIR 
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/etc/module
-    [ -r $MODULE_DIR/commands/${cmd_name}.profile ] && {
-	. $MODULE_DIR/commands/${cmd_name}.profile
+    [ -r $MODULE_DIR/etc/commands/${cmd.name}/command ] && {
+	. $MODULE_DIR/etc/commands/${cmd_name}/command
     }
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
 else 

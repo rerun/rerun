@@ -108,6 +108,30 @@ To list the commands available from the 'freddy' module add the '-m module' para
       [options]
        -jumps <1>: "jump #num times"
 
+### Bash completion
+
+If you are a bash user be sure to source the `bash_completion.sh` file. 
+It provides listing via the tab key.
+
+Type `rerun` and then the tab key. The shell will generate
+the "-m" and then a list of existing modules.
+
+    $ rerun[TAB][TAB]
+
+Will display:
+
+    $ rerun -m stubbs
+
+Typing the tab key again will show the commands inside the stubbs module:
+
+    $ rerun -m stubbs -c add-
+    add-command  add-module   add-option     
+
+After selecting a command, typing the tab key will show arguments.
+
+    $ rerun -m stubbs -c add-command --
+    module name
+    
 ## Executing
 
 To run the 'study' command, add the '-c command' parameter.

@@ -127,7 +127,7 @@ NAME=$NAME
 DESCRIPTION=$DESC
 
 EOF
-) > $RERUN_MODULES/$MODULE/etc/commands/$NAME/$NAME.command || error
+) > $RERUN_MODULES/$MODULE/etc/commands/$NAME/command || error
 
 # Done
 echo "Created command handler: $RERUN_MODULES/$MODULE/commands/$NAME.sh"
