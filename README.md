@@ -44,44 +44,74 @@ A rerun module assumes the following structure:
         └── command.sh (optional shell functions)
 
 The format of the metadata.sh uses key=value pairs to define standard
-module metadata. For example, a module named `fitz`:
+module metadata. For example, a module named `freddy`:
 
-    NAME="fitz"
-    DESCRIPTION="A yellow dog that barks and walks"
+    NAME="freddy"
+    DESCRIPTION="A yellow dog that dances and studies"
 
-# EXAMPLES
+The format for command data.
 
-*Listing*
+    NAME="study"
+    DESCRIPTION="tell freddy to study"
+    
+The format for option data.
+
+    NAME=place
+    DESCRIPTION="the destination"
+    ARGUMENTS=true
+    REQUIRED=true
+    DEFAULT=doghouse
+
+Example directory structure:
+
+    freddy
+    ├── README.md
+    ├── commands
+    │   └── study.sh
+    ├── etc
+    │   ├── commands
+    │   │   └── study
+    │   │       └── place.option
+    │   └── module 
+    └── lib
+
+# USING
+
+## Listing
 
 Without arguments, running `rerun` without arguments
 will list existing modules:
 
     $ rerun
     [modules]
-      fitz: "A yellow dog that barks and walks"
+      freddy: "A dancer in a red beret and matching suspenders"
 
-To list the commands available from the 'fitz' module add the '-m module' parameter
+To list the commands available from the 'freddy' module add the '-m module' parameter
 
-    $ rerun -m fitz
-    fitz:
+    $ rerun -m freddy
+    freddy:
     [commands]
-     walk: "go some where"
+     study: "tell freddy to study"
       [options]
-       -place <doghouse>: "the destination"
-     bark: "say something"
+       -subject <math>: "the summer school subject"
+     dance: "tell freddy to dance"
       [options]
-       -message <woof>: "vocalize what"
+       -jumps <1>: "jump #num times"
 
-*Executing*
+## Executing
 
-To run the 'walk' command, add the '-c command' parameter.
+To run the 'study' command, add the '-c command' parameter.
 
-    rerun -m fitz -c walk
+    rerun -m freddy -c study
+    
+Tell freddy to study to the house
 
-If the 'fitz' module is stored in /var/rerun, then the command usage
+    rerun -m freddy -c study -- -place outside    
+
+If the 'freddy' module is stored in /var/rerun, then the command usage
 would be:
 
-    rerun -M /var/rerun -m fitz -c walk
+    rerun -M /var/rerun -m freddy -c study
 
 
 # ERROR CODE
