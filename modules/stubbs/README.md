@@ -6,15 +6,23 @@ Use `stubbs` to define new *rerun* modules and commands.
 
 ### add-module
 
+Create a new rerun module.
+
 Usage
 
-    rerun -m stubs -c add-module -- [-name <>]
+    rerun -m stubs -c add-module -- [-name <>] [-description <>]
     
 Example: Make a new module named "freddy":
 
     rerun -m stubbs -c add-module  -- -name freddy -description "A dancer in a red beret and matching suspenders"
 
+The add-module command will print:
+
+    Created module structure: /Users/alexh/.rerun/modules/freddy
+
 ### add-command
+
+Create a command in the specified module.
 
 Usage
 
@@ -24,11 +32,13 @@ Example: Add a command named "dance" to the freddy module:
 
     rerun -m stubbs -c add-command -- -name dance -description "tell freddy to dance" -module freddy
 
-You will see output similar to:
+The add-command module will generate a boilerplate script you can edit.
 
-    Created command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
+    Wrote command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
 ### add-option
+
+Define a command option for the specified module.
 
 Usage
 
@@ -42,8 +52,8 @@ You will see output similar to:
 
     Created option: /Users/alexh/.rerun/modules/freddy/commands/dance/jumps.option
 
-Besides the `jumps.option` file, `add-option` will also create an
-option parser script in `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
+Besides the `jumps.option` file, `add-option` will also generate an
+option parser script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
 ## Command implementation
 
@@ -69,7 +79,7 @@ The stub implementation for the "dance" command is shown below:
     # Parse the command options     
     . $RERUN_MODULES/freddy/commands/dance/options.sh
      
-    # Option values available in variables: JUMPS
+    # Available option variables: [JUMPS]
      
     # ------------------------------
     # Your implementation goes here.
