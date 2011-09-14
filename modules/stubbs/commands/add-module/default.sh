@@ -61,7 +61,7 @@ NAME=$NAME
 DESCRIPTION="$DESC"
 
 EOF
-) > $RERUN_MODULES/$NAME/etc/module || error
+) > $RERUN_MODULES/$NAME/metadata || error
 
 
 # Done

@@ -108,7 +108,7 @@ NAME=$NAME
 DESCRIPTION=$DESC
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$NAME/command || error
+) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || error
 
 # Done
 echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"

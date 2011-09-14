@@ -71,9 +71,9 @@ rerun_existsHandler() {
 rerun_modules() {
     echo "[modules]"
     for mod in $1/*; do
-       [ -d "$mod" -a -f "$mod/etc/module" ] && {
+       [ -d "$mod" -a -f "$mod/metadata" ] && {
 	   mod_name=`basename $mod`
-	   mod_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $mod/etc/module`
+	   mod_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $mod/metadata`
 	   printf "%s%s: %s\n" "$PAD" "${mod_name}" "${mod_desc}"
        }
     done
@@ -86,7 +86,7 @@ rerun_commands() {
     echo "[commands]"
     for cmd in $cmdir/*/default.sh; do
 	cmd_name=$(basename $(dirname $cmd))
-	cmd_metadata=$1/$2/commands/${cmd_name}/command
+	cmd_metadata=$1/$2/commands/${cmd_name}/metadata
 	[ -f $cmd_metadata ] && {
 	    cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
 	}
@@ -216,8 +216,8 @@ then
     export MODULE_DIR 
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/etc/module
-    [ -r $MODULE_DIR/commands/${cmd_name}/command ] && {
-	. $MODULE_DIR/commands/${cmd_name}/command
+    [ -r $MODULE_DIR/commands/${cmd_name}/metadata ] && {
+	. $MODULE_DIR/commands/${cmd_name}/metadata
     }
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
 else 
