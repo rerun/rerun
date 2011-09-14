@@ -216,7 +216,7 @@ then
     export MODULE_DIR 
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/etc/module
-    [ -r $MODULE_DIR/etc/commands/${cmd.name}/command ] && {
+    [ -r $MODULE_DIR/etc/commands/${cmd_name}/command ] && {
 	. $MODULE_DIR/etc/commands/${cmd_name}/command
     }
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"

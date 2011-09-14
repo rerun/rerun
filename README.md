@@ -37,7 +37,7 @@ are summarized for end users.
 
 A rerun module assumes the following structure:
 
-    <module>
+    <MODULE_DIR>
     ├── README.md
     ├── commands
     │   ├── cmdA.sh (generic)
@@ -49,20 +49,24 @@ A rerun module assumes the following structure:
     │   │       └── arg2.option
     │   └── module (module metadata)
     └── lib
-        └── command.sh (optional shell functions)
+        └── options.sh (options parsing script)
 
-The format of the metadata.sh uses key=value pairs to define standard
-module metadata. For example, a module named `freddy`:
+The format metadata file format uses KEY=value pairs to define standard
+attributes. For example, a module named `freddy` and can be named
+and described as such in a file called `MODULE_DIR/etc/module`:
 
     NAME="freddy"
     DESCRIPTION="A dancer in a red beret and matching suspenders"
 
-The format for command data.
+A command can also be named and described in a file called
+`MODULE_DIR`/etc/commands/<command>/command`:
 
     NAME="study"
     DESCRIPTION="tell freddy to study"
     
-The format for option data.
+Options can be additionally described in a file called
+`MODULE_DIR/etc/commands/<command>/<option>.option`.
+Here's one for an option named "subject":
 
     NAME=subject
     DESCRIPTION="the summer school subject"
@@ -73,17 +77,20 @@ The format for option data.
 Example directory structure:
 
     freddy
-    ├── README.md
     ├── commands
-    ├── |-- dance.sh
-    │   └── study.sh
+    │   ├── dance.sh
+    │   └── study.sh
     ├── etc
     │   ├── commands
-    │   │   └── dance
-    │   │       └── jumps.option    
+    │   │   ├── dance
+    │   │   │   ├── command
+    │   │   │   ├── jumps.option
+    │   │   │   └── options.sh
     │   │   └── study
+    │   │       ├── command
+    │   │       ├── options.sh
     │   │       └── subject.option
-    │   └── module 
+    │   └── module
     └── lib
 
 # USING
@@ -96,7 +103,7 @@ Without arguments, `rerun` will list existing modules:
     [modules]
       freddy: "A dancer in a red beret and matching suspenders"
 
-To list the commands available from the 'freddy' module add the '-m module' parameter
+To list the commands available from the 'freddy' module add `-m module`:
 
     $ rerun -m freddy
     freddy:
@@ -124,28 +131,33 @@ Will display:
 
 Typing the tab key again will show the commands inside the stubbs module:
 
-    $ rerun -m stubbs -c add-
+    $ rerun -m stubbs -c add-[TAB]
     add-command  add-module   add-option     
 
 After selecting a command, typing the tab key will show arguments.
 
-    $ rerun -m stubbs -c add-command --
+    $ rerun -m stubbs -c add-command --[TAB]
     module name
     
 ## Executing
 
-To run the 'study' command, add the '-c command' parameter.
+To run the 'study' command, add `-c command`:
 
     rerun -m freddy -c study
     
-Tell freddy to study to the house
+Tell freddy to study the subject, "biology":
 
-    rerun -m freddy -c study -- -place outside    
+    rerun -m freddy -c study -- -subject biology
 
-If the 'freddy' module is stored in /var/rerun, then the command usage
+If the 'freddy' module is stored in `/var/rerun`, then the command usage
 would be:
 
     rerun -M /var/rerun -m freddy -c study
+
+# ENVIRONMENT
+
+RERUN_MODULES
+: Path to directory containing rerun modules
 
 # SEE ALSO
 

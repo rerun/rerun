@@ -63,6 +63,9 @@ done
 # Create command structure
 mkdir -p $RERUN_MODULES/$MODULE/commands || error 
 
+
+options=$(echo $(rerun_options $RERUN_MODULES $MODULE $NAME)|sort|tr '[:lower:]' '[:upper:]')
+
 # Generate a boiler plate implementation
 (
 cat <<EOF
@@ -75,36 +78,17 @@ cat <<EOF
 # DESCRIPTION
 #
 #   $DESC
+#
 
-# utility functions 
-error() {
+# Function to print error message and exit
+die() {
     echo "ERROR: \$* " ; exit 1;
 }
-syntax_error() {
-    echo "SYNTAX ERROR" >&2 ; exit 2;
-}
-# check option has its argument
-arg_syntax_check() {
-    [ "\$1" -lt 2 ] && syntax_error
-}
 
-# options: [$(rerun_options $RERUN_MODULES $MODULE $NAME)]
-while [ "\$#" -gt 0 ]; do
-    OPT="\$1"
-    case "\$OPT" in
-$(for o in $(rerun_options $RERUN_MODULES $MODULE $NAME); do printf "%8s\n" "$(rerun_optionparser $o)"; done)
-        # unknown option
-        -?)
-            syntax_error
-            ;;
-        # end of options, just arguments left
-        *)
-          break
-    esac
-    shift
-done
+# Parse the command options
+. \$RERUN_MODULES/$MODULE/etc/commands/$NAME/options.sh
 
-# Post process the options
+# Available option variables: [$options]
 
 # ------------------------------
 # Your implementation goes here.
@@ -130,4 +114,4 @@ EOF
 ) > $RERUN_MODULES/$MODULE/etc/commands/$NAME/command || error
 
 # Done
-echo "Created command handler: $RERUN_MODULES/$MODULE/commands/$NAME.sh"
+echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME.sh"
