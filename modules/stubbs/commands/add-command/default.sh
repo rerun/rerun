@@ -86,7 +86,9 @@ die() {
 }
 
 # Parse the command options
-. \$RERUN_MODULES/$MODULE/commands/$NAME/options.sh
+[ -r \$RERUN_MODULES/$MODULE/commands/$NAME/options.sh ] && {
+  . \$RERUN_MODULES/$MODULE/commands/$NAME/options.sh
+}
 
 # Available option variables: [$options]
 
