@@ -39,30 +39,29 @@ A rerun module assumes the following structure:
 
     <MODULE>
     ├── commands
-    │   ├── cmdA
-    │   │   ├── command (command metadata)
-    │   │   ├── default.sh (generic)
+    │   ├── cmdA (directory for cmdA files)
+    │   │   ├── metadata (command metadata)
+    │   │   ├── default.sh (generic script)
     │   │   ├── optX.option ("optX" metadata)
     │   │   └── options.sh (option parsing script)
     │   └── cmdB
     │       ├── Darwin.sh (OS specific script)
-    │       ├── command
+    │       ├── metadata
     │       ├── default.sh
     │       ├── options.sh
     │       └── optY.option
-    ├── etc
-    │   └── module (module metadata)
+    ├── metadata (module metadata)
     └── lib
 
 The format metadata file format uses KEY=value pairs to define standard
 attributes. For example, a module named `freddy` and can be named
-and described as such in a file called `MODULE_DIR/etc/module`:
+and described as such in a file called `MODULE_DIR/metadata`:
 
     NAME="freddy"
     DESCRIPTION="A dancer in a red beret and matching suspenders"
 
 A command can also be named and described in a file called
-`MODULE_DIR`/commands/<command>/command`:
+`MODULE_DIR/commands/<command>/metadata`:
 
     NAME="study"
     DESCRIPTION="tell freddy to study"
@@ -82,17 +81,16 @@ Example directory structure:
     freddy
     ├── commands
     │   ├── dance
-    │   │   ├── command
+    │   │   ├── metadata
     │   │   ├── default.sh
     │   │   ├── jumps.option
     │   │   └── options.sh
     │   └── study
-    │       ├── command
+    │       ├── metadata
     │       ├── default.sh
     │       ├── options.sh
     │       └── subject.option
-    ├── etc
-    │   └── module
+    ├── metadata
     └── lib
 
 # USING
