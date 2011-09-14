@@ -3,7 +3,7 @@
 EXEC_DIR=$(dirname $(dirname $0))
 echo $EXEC_DIR
 # Source common function library
-. $EXEC_DIR/lib/command.sh
+. $RERUN_MODULES/stubbs/lib/command.sh
 
 rerun_init
 

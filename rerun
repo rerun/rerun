@@ -215,7 +215,7 @@ then
     MODULE_DIR=`rerun_lookupModule $MODULE`
     export MODULE_DIR 
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
-    . $MODULE_DIR/etc/module
+    . $MODULE_DIR/metadata
     [ -r $MODULE_DIR/commands/${cmd_name}/metadata ] && {
 	. $MODULE_DIR/commands/${cmd_name}/metadata
     }
