@@ -1,16 +1,23 @@
-# stubbs: Utility to create rerun modules
+# stubbs: A module and command set to create rerun modules
 
 Use `stubbs` to define new *rerun* modules and commands.
+
+Stubbs provides a small set of commands that 
+help you define and organize modules according to
+rerun layout conventions and metadata format. 
+
+It won't write your implementations for you but
+helps you stay in between the guard rails.
 
 ## Commands
 
 ### add-module
 
-Create a new rerun module.
+Create a new rerun module file structure.
 
 Usage
 
-    rerun -m stubs -c add-module -- [-name <>] [-description <>]
+    rerun -m stubbs -c add-module -- [-name <>] [-description <>]
     
 Example: Make a new module named "freddy":
 
