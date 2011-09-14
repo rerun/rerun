@@ -46,13 +46,13 @@ rerun_lookupHandler() {
     mod=$1
     cmd=$2
     mod_dir=`rerun_lookupModule $mod`
-    cmd_dir=$mod_dir/commands
+    cmd_dir=$mod_dir/commands/${cmd}
     os=`rerun_platforminfo`
-    if [ -f  "$cmd_dir/${cmd}-${os}.sh" ]
+    if [ -f  "$cmd_dir/${os}.sh" ]
     then
-	echo $cmd_dir/${cmd}-${os}.sh; # found an os-specific handler
+	echo $cmd_dir/${os}.sh; # found an os-specific handler
     else
-	echo $cmd_dir/${cmd}.sh; # return the generic one
+	echo $cmd_dir/default.sh; # return the generic one
     fi
 }
 # Checks if handler exists by attempting to look it up. 
@@ -84,9 +84,9 @@ rerun_commands() {
     cmdir=$1/$2/commands
     shopt -s nullglob # enable
     echo "[commands]"
-    for cmd in $cmdir/*.sh; do
-	cmd_name=`basename $cmd | sed 's/.sh$//'`
-	cmd_metadata=$1/$2/etc/commands/${cmd_name}/command
+    for cmd in $cmdir/*/default.sh; do
+	cmd_name=$(basename $(dirname $cmd))
+	cmd_metadata=$1/$2/commands/${cmd_name}/command
 	[ -f $cmd_metadata ] && {
 	    cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
 	}
@@ -97,10 +97,10 @@ rerun_commands() {
 
 # List the options for a command
 rerun_options() {
-    if [ -d $1/$2/etc/commands/${cmd_name} ]; then
+    if [ -d $1/$2/commands/${cmd_name} ]; then
 	printf "%s%s\n" "$PAD" "[options]"
 	shopt -s nullglob # enable
-	for opt_metadata in $1/$2/etc/commands/${cmd_name}/*.option; do
+	for opt_metadata in $1/$2/commands/${cmd_name}/*.option; do
 	    cmd_param=$(basename $(echo ${opt_metadata%%.option}))
 	    #echo "DEBUG: processing param: $cmd_param"
 	    opt_name=`awk -F= '/^NAME/ {print $2}' $opt_metadata`
@@ -216,8 +216,8 @@ then
     export MODULE_DIR 
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/etc/module
-    [ -r $MODULE_DIR/etc/commands/${cmd_name}/command ] && {
-	. $MODULE_DIR/etc/commands/${cmd_name}/command
+    [ -r $MODULE_DIR/commands/${cmd_name}/command ] && {
+	. $MODULE_DIR/commands/${cmd_name}/command
     }
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
 else 

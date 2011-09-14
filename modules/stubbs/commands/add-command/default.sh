@@ -61,7 +61,7 @@ done
 }
 
 # Create command structure
-mkdir -p $RERUN_MODULES/$MODULE/commands || error 
+mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || error 
 
 
 options=$(echo $(rerun_options $RERUN_MODULES $MODULE $NAME)|sort|tr '[:lower:]' '[:upper:]')
@@ -86,7 +86,7 @@ die() {
 }
 
 # Parse the command options
-. \$RERUN_MODULES/$MODULE/etc/commands/$NAME/options.sh
+. \$RERUN_MODULES/$MODULE/commands/$NAME/options.sh
 
 # Available option variables: [$options]
 
@@ -97,10 +97,7 @@ die() {
 exit \$?
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$NAME.sh || error
-
-# Create directory for command profiles
-mkdir -p $RERUN_MODULES/$MODULE/etc/commands/$NAME || error
+) > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || error
 
 # Generate a boiler plate implementation
 (
@@ -111,7 +108,7 @@ NAME=$NAME
 DESCRIPTION=$DESC
 
 EOF
-) > $RERUN_MODULES/$MODULE/etc/commands/$NAME/command || error
+) > $RERUN_MODULES/$MODULE/commands/$NAME/command || error
 
 # Done
-echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME.sh"
+echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"

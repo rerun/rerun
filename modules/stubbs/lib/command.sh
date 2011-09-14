@@ -38,10 +38,9 @@ rerun_modules() {
 
 rerun_commands() {
     commands=
-    for c in `echo $1/$2/commands/*.sh`; do
+    for c in `echo $1/$2/commands/*/default.sh`; do
 	[ -f $c ] && {
-	    cmd_hdlr=$(basename $c)
-	    cmd_name=${cmd_hdlr%.sh}
+	    cmd_name=$(basename $(dirname $c))
 	    commands="$commands $cmd_name"
 	}
     done
@@ -50,7 +49,7 @@ rerun_commands() {
 
 rerun_options() {
     options=
-    for o in `echo $1/$2/etc/commands/$3/*.option`; do
+    for o in `echo $1/$2/commands/$3/*.option`; do
 	[ -f $o ] && {
 	    opt_def=$(basename $o)
 	    opt_name=${opt_def%.option}
@@ -61,7 +60,7 @@ rerun_options() {
 }
 
 rerun_optionDefault() {
-    awk -F= '/DEFAULT/ {print $2}' $1/$2/etc/commands/$3/$opt.option
+    awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$opt.option
 }
 
 rerun_optionparser() {

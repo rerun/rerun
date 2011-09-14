@@ -37,19 +37,22 @@ are summarized for end users.
 
 A rerun module assumes the following structure:
 
-    <MODULE_DIR>
-    ├── README.md
+    <MODULE>
     ├── commands
-    │   ├── cmdA.sh (generic)
-    │   └── cmdA-`uname -s`.sh (os-specific)
+    │   ├── cmdA
+    │   │   ├── command (command metadata)
+    │   │   ├── default.sh (generic)
+    │   │   ├── optX.option ("optX" metadata)
+    │   │   └── options.sh (option parsing script)
+    │   └── cmdB
+    │       ├── Darwin.sh (OS specific script)
+    │       ├── command
+    │       ├── default.sh
+    │       ├── options.sh
+    │       └── optY.option
     ├── etc
-    │   ├── commands
-    │   │   └── cmdA
-    │   │       ├── arg1.option (option metadata)
-    │   │       └── arg2.option
     │   └── module (module metadata)
     └── lib
-        └── options.sh (options parsing script)
 
 The format metadata file format uses KEY=value pairs to define standard
 attributes. For example, a module named `freddy` and can be named
@@ -59,13 +62,13 @@ and described as such in a file called `MODULE_DIR/etc/module`:
     DESCRIPTION="A dancer in a red beret and matching suspenders"
 
 A command can also be named and described in a file called
-`MODULE_DIR`/etc/commands/<command>/command`:
+`MODULE_DIR`/commands/<command>/command`:
 
     NAME="study"
     DESCRIPTION="tell freddy to study"
-    
-Options can be additionally described in a file called
-`MODULE_DIR/etc/commands/<command>/<option>.option`.
+
+Besides NAME and DESCRIPTION, options can be
+described in a file called `MODULE_DIR/commands/<command>/<option>.option`.
 Here's one for an option named "subject":
 
     NAME=subject
@@ -78,18 +81,17 @@ Example directory structure:
 
     freddy
     ├── commands
-    │   ├── dance.sh
-    │   └── study.sh
+    │   ├── dance
+    │   │   ├── command
+    │   │   ├── default.sh
+    │   │   ├── jumps.option
+    │   │   └── options.sh
+    │   └── study
+    │       ├── command
+    │       ├── default.sh
+    │       ├── options.sh
+    │       └── subject.option
     ├── etc
-    │   ├── commands
-    │   │   ├── dance
-    │   │   │   ├── command
-    │   │   │   ├── jumps.option
-    │   │   │   └── options.sh
-    │   │   └── study
-    │   │       ├── command
-    │   │       ├── options.sh
-    │   │       └── subject.option
     │   └── module
     └── lib
 

@@ -63,9 +63,9 @@ _rerunListCommands()
 {
     local  modulesdir module found
     modulesdir=$1 module=$2 found="" 
-    for hdlr in $modulesdir/$module/commands/*.sh; do
+    for hdlr in $modulesdir/$module/commands/*/default.sh; do
 	[ -f $hdlr ] && {
-	    cmd_name=`basename $hdlr | sed 's/.sh$//'`
+	    cmd_name=$(basename $(dirname $hdlr))
 	    found="$found $cmd_name"	
 	}
     done    
@@ -78,7 +78,7 @@ _rerunListOpts()
     local modulesdir module command options founddir
     modulesdir=$1 module=$2 command=$3 options="" founddir=""
 
-    for opt_md in $modulesdir/$module/etc/commands/$command/*.option; do
+    for opt_md in $modulesdir/$module/commands/$command/*.option; do
 	opt=$(basename $(echo ${opt_md%%.option}))
 	options="$options $opt"
     done
@@ -89,7 +89,7 @@ _rerunGetOptsDefault()
 {
     local opt module command modulesdir opt_def
     modulesdir=$1 module=$2 command=$3 opt=$4
-    opt_md=$modulesdir/$module/etc/commands/$command/${opt##*-}.option
+    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option
     awk -F= '/^DEFAULT/ {print $2}' $opt_md
 }
 # check if option takes an argument
@@ -97,7 +97,7 @@ _rerunHasOptsArgument()
 {
     local opt module command modulesdir founddir
     modulesdir=$1 module=$2 command=$3 opt=$4
-    opt_md=$modulesdir/$module/etc/commands/$command/${opt##*-}.option
+    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option
     opt_def=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_md`
     [ "$opt_def" = "true" ] && return 0
     return 1
@@ -167,14 +167,14 @@ _rerun()
     }
     # Command context: List command-specific args for a module context
     [ -n "$opts_command" -a "$prev" == "--" -a -n "$opts_module" ] && {
-        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}.sh ] && {
+        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
             COMPREPLY=( $(compgen -W "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" -- ${cur}) )
             return 0
     	}
     }
     # Command context: List command-specific args for a module context
     [ -n "$opts_command" -a "$prev" == "--" -a -n "$opts_module" ] && {
-        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}.sh ] && {
+        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
             COMPREPLY=( $(compgen -W "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" -- ${cur}) )
             return 0
     	}
