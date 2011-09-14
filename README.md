@@ -1,6 +1,7 @@
 # NAME
 
-rerun - a simple command runner because it's easy to forget normal procedure.
+rerun - a simple command runner because it's easy to forget 
+standard operating procedure.
 
 # SYNOPSYS
 

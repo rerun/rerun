@@ -25,7 +25,7 @@ Make a new module named "freddy":
 
     rerun -m stubbs -c add-module  -- -name freddy -description "A dancer in a red beret and matching suspenders"
 
-The add-module command will print:
+The `add-module` command will print:
 
     Created module structure: /Users/alexh/.rerun/modules/freddy
 
@@ -35,7 +35,7 @@ Create a command in the specified module.
 
 *Usage*
 
-    rerun -m stubbs -c add-command -- -name <> -description <> -module <>
+    rerun -m stubbs -c add-command -- -name <> -description <> -module <> [-ovewrite <false>]
 
 *Example*
 
@@ -43,7 +43,7 @@ Add a command named "dance" to the freddy module:
 
     rerun -m stubbs -c add-command -- -name dance -description "tell freddy to dance" -module freddy
 
-The add-command module will generate a boilerplate script you can edit.
+The `add-command `module will generate a boilerplate script you can edit.
 
     Wrote command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
@@ -102,7 +102,8 @@ The dance command's `default.sh` stub is shown below:
      
     exit $?
 
-The supplied name and description are shown in the top comment.
+The name and description supplied via `add-command` options
+are shown in the top comment.
 
 A `die` function is provided for convenience in case things go awry.
 
