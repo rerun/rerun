@@ -1,7 +1,5 @@
 #!/bin/bash
 
-EXEC_DIR=$(dirname $(dirname $0))
-echo $EXEC_DIR
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/command.sh
 
@@ -27,6 +25,11 @@ while [ "$#" -gt 0 ]; do
 	-module)
 	    arg_syntax_check "$#"
 	    MODULE="$2"
+	    shift
+	    ;;
+	-overwrite)
+	    arg_syntax_check "$#"
+	    OVERWRITE="$2"
 	    shift
 	    ;;
         # unknown option
@@ -67,6 +70,7 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || error
 options=$(echo $(rerun_options $RERUN_MODULES $MODULE $NAME)|sort|tr '[:lower:]' '[:upper:]')
 
 # Generate a boiler plate implementation
+[ ! -f $RERUN_MODULES/$MODULE/commands/$NAME/default.sh -o -n "$OVEWRITE" ] && {
 (
 cat <<EOF
 #!/bin/bash
@@ -100,6 +104,8 @@ exit \$?
 
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || error
+echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"
+}
 
 # Generate a boiler plate implementation
 (
@@ -113,4 +119,3 @@ EOF
 ) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || error
 
 # Done
-echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"

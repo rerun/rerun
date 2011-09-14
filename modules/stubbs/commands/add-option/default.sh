@@ -1,7 +1,5 @@
 #!/bin/bash
 
-EXEC_DIR=$(dirname $(dirname $0))
-echo $EXEC_DIR
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/command.sh
 
@@ -144,7 +142,6 @@ while [ "\$#" -gt 0 ]; do
     esac
     shift
 done
-
 
 # If cli options unset, set them to default value
 $(for opt in $(echo $optionsWithDefaults|sort|tr '[:lower:]' '[:upper:]'); do
