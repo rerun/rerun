@@ -13,7 +13,7 @@ helps you stay in between the guard rails!
 
 ### add-module
 
-Create a new rerun module file structure.
+Create a new rerun module.
 
 *Usage*
 
@@ -200,3 +200,25 @@ from the main implementation logic in `default.sh`, facilates
 "stubbs" commands from preserving your code.
 
 
+### OS specific command implementations
+
+Rerun will look for an operating system specific implementation
+and run it instead, if it exists.
+Effectively, it looks for a file called: 
+`$MODULE/commands/$COMMAND/$(uname -s).sh`
+
+For example, on a centos host running `uname -s` returns "Linux".
+
+    $ uname -s
+    Linux
+
+Therefore to create a Linux OS specific implmentation,
+create a script called `Linux.sh` in the command directory.
+
+    freddy
+    └── commands
+        └── dance
+            ├── Linux.sh (os-specific implementation)
+            └── default.sh (generic one)
+	    
+	    
