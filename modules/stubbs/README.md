@@ -6,13 +6,21 @@ Use `stubbs` to define new *rerun* modules and commands.
 
 ### add-module
 
-Make a new module named "freddy":
+Usage
+
+    rerun -m stubs -c add-module -- [-name <>]
+    
+Example: Make a new module named "freddy":
 
     rerun -m stubbs -c add-module  -- -name freddy -description "A dancer in a red beret and matching suspenders"
 
 ### add-command
 
-Add a command named "dance" to the freddy module:
+Usage
+
+    rerun -m stubbs -c add-command -- -name <> -description <> -module <>
+
+Example: Add a command named "dance" to the freddy module:
 
     rerun -m stubbs -c add-command -- -name dance -description "tell freddy to dance" -module freddy
 
@@ -22,7 +30,11 @@ You will see output similar to:
 
 ### add-option
 
-Define an option named "jumps":
+Usage
+
+    rerun -m stubbs -c add-option  -- [-arg <true>] -name <> -description <> -module <> -command <> [-required <false>]
+
+Example: Define an option named "jumps":
 
     rerun -m stubbs -c add-option  -- -name jumps -description "jump #num times" -module freddy -command dance
 
@@ -103,6 +115,7 @@ Run the "dance" command again but this time without the "jumps" option:
     $ rerun -m freddy -c dance
     jumps (1)
     
-To support this, the "dance" command's `options.sh` script is re-written.
+Behind the scenes, the "dance" command's `options.sh` script is re-generated
+by `add-options`.
 
 
