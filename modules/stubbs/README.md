@@ -1,4 +1,4 @@
-# stubs: Utility to create rerun modules
+# stubbs: Utility to create rerun modules
 
 Use `stubbs` to define new *rerun* modules and commands.
 
