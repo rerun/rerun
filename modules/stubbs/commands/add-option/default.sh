@@ -104,7 +104,7 @@ EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option || error
 
 
-options=$(echo $(rerun_options $RERUN_MODULES $MODULE $COMMAND)|sort|tr '[:lower:]' '[:upper:]')
+#options=$(echo $(rerun_options $RERUN_MODULES $MODULE $COMMAND)|sort|tr '[:lower:]' '[:upper:]')
 optionsWithDefaults=
 for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
     default=$(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
@@ -144,8 +144,8 @@ while [ "\$#" -gt 0 ]; do
 done
 
 # If cli options unset, set them to default value
-$(for opt in $(echo $optionsWithDefaults|sort|tr '[:lower:]' '[:upper:]'); do
-printf "[ -z \"$%s\" ] && { %s=%s ; }" $opt $opt $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
+$(for opt in $(echo $optionsWithDefaults|sort); do
+printf "[ -z \"$%s\" ] && { %s=%s ; }" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
 done)
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || error

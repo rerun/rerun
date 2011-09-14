@@ -15,7 +15,8 @@ arg_syntax_check() {
     [ "$1" -lt 2 ] && syntax_error
 }
 
-
+# Upper case the string
+caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
 
 # Bootstrap a command handler
 rerun_init() {
@@ -63,6 +64,7 @@ rerun_optionDefault() {
     awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$opt.option
 }
 
+# Used to generate an entry inside options.sh
 rerun_optionparser() {
     oU=$(echo $1 | tr "[:lower:]" "[:upper:]")
     printf " -%s) arg_syntax_check \$# ; %s=\$2 ; shift ;;\n" "$1" "$oU"
