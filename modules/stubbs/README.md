@@ -18,7 +18,7 @@ Add a command named "dance" to the freddy module:
 
 You will see output similar to:
 
-    Created command handler: /Users/alexh/.rerun/modules/freddy/commands/dance.sh
+    Created command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
 ### add-option
 
@@ -28,10 +28,10 @@ Define an option named "jumps":
 
 You will see output similar to:
 
-    Created option: /Users/alexh/.rerun/modules/freddy/etc/commands/dance/jumps.option
+    Created option: /Users/alexh/.rerun/modules/freddy/commands/dance/jumps.option
 
 Besides the `jumps.option` file, `add-option` will also create an
-option parser script in `$RERUN_MODULES/$MODULE/etc/commands/$COMMAND/options.sh`.
+option parser script in `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
 ## Command implementation
 
@@ -55,7 +55,7 @@ The stub implementation for the "dance" command is shown below:
     }
      
     # Parse the command options     
-    . $RERUN_MODULES/freddy/lib/options.sh
+    . $RERUN_MODULES/freddy/commands/dance/options.sh
      
     # Option values available in variables: JUMPS
      
