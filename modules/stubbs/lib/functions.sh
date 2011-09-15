@@ -1,22 +1,18 @@
-error() {
-    echo "ERROR: $* " ;
-    exit 1;
-}
+#
+# common rerun functions
+#
 
 # print USAGE and exit
-syntax_error() {
-    echo "$USAGE" >&2
-    echo "$SYNTAX $*" >&2
+rerun_syntax_error() {
+    [ -z "$USAGE"  ] && echo "$USAGE" >&2
+    [ -z "$SYNTAX" ] && echo "$SYNTAX $*" >&2
     exit 2
 }
 
 # check option has its argument
-arg_syntax_check() {
-    [ "$1" -lt 2 ] && syntax_error
+rerun_syntax_check() {
+    [ "$1" -lt 2 ] && rerun_syntax_error
 }
-
-# Upper case the string
-caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
 
 # Bootstrap a command handler
 rerun_init() {
@@ -62,19 +58,4 @@ rerun_options() {
 
 rerun_optionDefault() {
     awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$opt.option
-}
-
-# Used to generate an entry inside options.sh
-rerun_optionparser() {
-    oU=$(echo $1 | tr "[:lower:]" "[:upper:]")
-    printf " -%s) arg_syntax_check \$# ; %s=\$2 ; shift ;;\n" "$1" "$oU"
-}
-
-rerun_optionsparser() {
-    options=
-    for o in $(rerun_options $1 $2 $3); do
-	stanza=$(printf "%s\n" $(rerun_optionparser $o))
-	 options="$options $stanza"
-    done
-    echo $options
 }

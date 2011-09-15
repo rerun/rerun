@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/command.sh
+. $RERUN_MODULES/stubbs/lib/functions.sh
+
+# print an error and exit
+die() { echo "ERROR: \$* " ; exit 1 ; }
 
 # Init the handler
 rerun_init 
@@ -13,28 +16,28 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-name)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
 	-description)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
 	-module)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    MODULE="$2"
 	    shift
 	    ;;
 	-overwrite)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    OVERWRITE="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    syntax_error
+	    rerun_syntax_error
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -64,7 +67,7 @@ done
 }
 
 # Create command structure
-mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || error 
+mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || die
 
 
 options=$(echo $(rerun_options $RERUN_MODULES $MODULE $NAME)|sort|tr '[:lower:]' '[:upper:]')
@@ -103,7 +106,7 @@ die() {
 exit \$?
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || error
+) > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || die
 echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"
 }
 
@@ -116,6 +119,6 @@ NAME=$NAME
 DESCRIPTION=$DESC
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || error
+) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || die
 
 # Done

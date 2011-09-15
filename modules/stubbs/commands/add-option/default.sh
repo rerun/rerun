@@ -1,7 +1,19 @@
 #!/bin/bash
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/command.sh
+. $RERUN_MODULES/stubbs/lib/functions.sh
+
+# print an error and exit
+die() { echo "ERROR: \$* " ; exit 1 ; }
+
+# Upper case the string
+caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
+
+# Used to generate an entry inside options.sh
+add_optionparser() {
+    oU=$(echo $1 | tr "[:lower:]" "[:upper:]")
+    printf " -%s) rerun_syntax_check \$# ; %s=\$2 ; shift ;;\n" "$1" "$oU"
+}
 
 # Init the handler
 rerun_init 
@@ -13,43 +25,43 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-name)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
 	-description)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
 	-command)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    COMMAND="$2"
 	    shift
 	    ;;
 	-module)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    MODULE="$2"
 	    shift
 	    ;;
 	-req)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    REQ="$2"
 	    shift
 	    ;;
 	-args)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    ARGS="$2"
 	    shift
 	    ;;
 	-default)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    DEFAULT="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    syntax_error
+	    rerun_syntax_error
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -101,10 +113,10 @@ REQUIRED=${REQ:-true}
 DEFAULT=$DEFAULT
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option || error
+) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option || die
 
 
-#options=$(echo $(rerun_options $RERUN_MODULES $MODULE $COMMAND)|sort|tr '[:lower:]' '[:upper:]')
+# list the options that set a default
 optionsWithDefaults=
 for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
     default=$(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
@@ -119,22 +131,22 @@ cat <<EOF
 # $(date)
 
 # print error message and exit non-zero
-arg_syntax_error() {
+rerun_syntax_error() {
     echo "SYNTAX ERROR" >&2 ; exit 2;
 }
 # check option has its argument
-arg_syntax_check() {
-    [ "\$1" -lt 2 ] && syntax_error
+rerun_syntax_check() {
+    [ "\$1" -lt 2 ] && rerun_syntax_error
 }
 
 # options: [$(rerun_options $RERUN_MODULES $MODULE $COMMAND)]
 while [ "\$#" -gt 0 ]; do
     OPT="\$1"
     case "\$OPT" in
-       $(for o in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do printf "%8s\n" "$(rerun_optionparser $o)"; done)
+       $(for o in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do printf "%8s\n" "$(add_optionparser $o)"; done)
         # unknown option
         -?)
-            arg_syntax_error
+            rerun_syntax_error
             ;;
         # end of options, just arguments left
         *)
@@ -143,12 +155,12 @@ while [ "\$#" -gt 0 ]; do
     shift
 done
 
-# If cli options unset, set them to default value
+# If defaultable options variables are unset, set them to their DEFAULT
 $(for opt in $(echo $optionsWithDefaults|sort); do
 printf "[ -z \"$%s\" ] && { %s=%s ; }" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
 done)
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || error
+) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || die
 
 # Done
 echo "Wrote option: $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option"

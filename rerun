@@ -10,27 +10,28 @@ Usage: $PROG -m module -c command [ -- command_args]
 "
 SYNTAX="$PROG: option syntax error."
 PAD="  "
-# print error message
-error() {
+
+
+# 
+# utility functions -
+#
+
+# print error message and exit
+die() {
     echo "ERROR: $*" >&2
 }
 
 # print USAGE and exit
-syntax_error() {
+rerun_syntax_error() {
     echo "$USAGE" >&2
     echo "$SYNTAX $*" >&2
     exit 2
 }
 
 # check option has its argument
-arg_syntax_check() {
-    [ "$1" -lt 2 ] && syntax_error
+rerun_syntax_check() {
+    [ "$1" -lt 2 ] && rerun_syntax_error
 }
-
-
-# 
-# utility functions -
-#
 
 # get system OS name
 rerun_platforminfo() {
@@ -55,6 +56,7 @@ rerun_lookupHandler() {
 	echo $cmd_dir/default.sh; # return the generic one
     fi
 }
+
 # Checks if handler exists by attempting to look it up. 
 # return 0 if exists, 1 otherwise
 rerun_existsHandler() {
@@ -150,17 +152,17 @@ while [ "$#" -gt 0 ]; do
 
 	# options with arguments
 	-M)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    RERUN_MODULES="$2"
 	    shift
 	    ;;
 	-m)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    MODULE="$2"
 	    shift
 	    ;;
 	-c)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    COMMAND="$2"
 	    shift
 	    ;;
@@ -170,7 +172,7 @@ while [ "$#" -gt 0 ]; do
 	    ;;
 	  # unknown option
 	-?)
-	    syntax_error
+	    rerun_syntax_error
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -181,7 +183,7 @@ done
 
 
 [ -d "$RERUN_MODULES" ] || {
-    error RERUN_MODULES variable not set or it is not a directory: $RERUN_MODULES
+    die RERUN_MODULES variable not set or it is not a directory: $RERUN_MODULES
     exit 1
 }
 
@@ -193,8 +195,7 @@ done
 [ -n "$MODULE" -a -z "$COMMAND" ] && {
     cmdir=$RERUN_MODULES/$MODULE/commands
     [ -d "$cmdir" ] || {
-        echo ERROR: module missing commands dir: $cmdir  >&2
-        exit 1
+        die module missing commands dir: $cmdir
     }
     echo "$MODULE:"
     rerun_commands $RERUN_MODULES $MODULE
@@ -203,8 +204,8 @@ done
 
 
 
-[ -z $MODULE  ]  && syntax_error -m not specified
-[ -z $COMMAND ]  && syntax_error -c not specified
+[ -z $MODULE  ]  && rerun_syntax_error -m not specified
+[ -z $COMMAND ]  && rerun_syntax_error -c not specified
 
 #
 #  If the handler exists for the named command, execute it
@@ -221,7 +222,7 @@ then
     }
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
 else 
-    error command not found: \"$COMMAND\"
+    die command not found: \"$COMMAND\"
 fi
 
 exit $?

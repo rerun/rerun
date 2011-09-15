@@ -194,17 +194,22 @@ command and possibly options.
 To run freddy module's "study" command, type:
 
     rerun -m freddy -c study
+    math
+
+The string "math" is the printed result (and subject's default value).
     
-Arguments to the called command are passed after
+Arguments to a called command are passed after
 two dashes `--`. 
 Tell freddy to study the subject, "biology":
 
     rerun -m freddy -c study -- -subject biology
+    studying (biology)
 
 If the 'freddy' module is stored in `/var/rerun`, then the command usage
 would be:
 
     rerun -M /var/rerun -m freddy -c study
+    studying (math)
 
 # ENVIRONMENT
 

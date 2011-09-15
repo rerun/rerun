@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/command.sh
+. $RERUN_MODULES/stubbs/lib/functions.sh
+
+# print an error and exit
+die() { echo "ERROR: \$* " ; exit 1; }
 
 rerun_init
 
@@ -12,18 +15,18 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-name)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
 	-description)
-	    arg_syntax_check "$#"
+	    rerun_syntax_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    syntax_error
+	    rerun_syntax_error
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -44,11 +47,11 @@ done
 }
 
 # Create module structure
-mkdir -p $RERUN_MODULES/$NAME || error 
+mkdir -p $RERUN_MODULES/$NAME || die
 # Create etc/ subdirectory
-mkdir -p $RERUN_MODULES/$NAME/etc || error
+mkdir -p $RERUN_MODULES/$NAME/etc || die
 # Create commands/ subdirectory
-mkdir -p $RERUN_MODULES/$NAME/commands || error
+mkdir -p $RERUN_MODULES/$NAME/commands || die
 
 # Generate a profile for metadata
 (
@@ -59,7 +62,7 @@ NAME=$NAME
 DESCRIPTION="$DESC"
 
 EOF
-) > $RERUN_MODULES/$NAME/metadata || error
+) > $RERUN_MODULES/$NAME/metadata || die
 
 
 # Done
