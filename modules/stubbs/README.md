@@ -71,6 +71,19 @@ option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 The `default.sh` script sources the `options.sh` script to take care of
 command line option parsing.
 
+Users will now be able to specify a "-jumps" argument to freddy's "dance" command:
+
+    $ rerun -m freddy
+    freddy:
+    [commands]
+     dance: tell freddy to dance
+      [options]
+        -jumps <>: "jump #num times"
+
+It would be invoked like so:
+
+    rerun -m freddy -c dance -- -jumps 3
+
 ## Command implementation
 
 Running `add-command` as shown above will generate a stub default implementation
