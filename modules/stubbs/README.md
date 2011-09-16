@@ -47,6 +47,11 @@ The `add-command `module will generate a boilerplate script you can edit.
 
     Wrote command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
+Of course, stubb doesn't write the implementation for you, merely a stub.
+
+See the "Command implementation" section below to learn about 
+the `default.sh` script.
+
 ### add-option
 
 Define a command option for the specified module and generate options parser script.
@@ -79,10 +84,6 @@ Users will now be able to specify a "-jumps" argument to freddy's "dance" comman
      dance: tell freddy to dance
       [options]
         -jumps <>: "jump #num times"
-
-It would be invoked like so:
-
-    rerun -m freddy -c dance -- -jumps 3
 
 ### archive
 
@@ -131,7 +132,9 @@ It works like a normal `rerun` command. Amazing !
 Running `add-command` as shown above will generate a stub default implementation
 for the new command: `$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh`:
 
-The dance command's `default.sh` stub is shown below:
+The dance command's `default.sh` stub is shown below.
+
+File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
 
     #!/bin/bash
     #

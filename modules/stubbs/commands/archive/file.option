@@ -4,5 +4,5 @@ NAME=file
 DESCRIPTION="self extracting archive file"
 ARGUMENTS=true
 REQUIRED=true
-DEFAULT=rerun.bsx
+DEFAULT=
 

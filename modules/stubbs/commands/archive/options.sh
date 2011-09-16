@@ -29,5 +29,4 @@ while [ "$#" -gt 0 ]; do
 done
 
 # If defaultable options variables are unset, set them to their DEFAULT
-[ -z "$FILE" ] && FILE=rerun.bsx
 [ -z "$MODULES" ] && MODULES="*"

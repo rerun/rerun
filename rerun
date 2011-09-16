@@ -203,8 +203,8 @@ done
 
 
 
-[ -z $MODULE  ]  && rerun_syntax_error -m not specified
-[ -z $COMMAND ]  && rerun_syntax_error -c not specified
+[ -z $MODULE  ]  && rerun_syntax_error "-m not specified"
+[ -z $COMMAND ]  && rerun_syntax_error "-c not specified"
 
 #
 #  If the handler exists for the named command, execute it
@@ -219,11 +219,15 @@ then
     [ -r $MODULE_DIR/commands/${cmd_name}/metadata ] && {
 	. $MODULE_DIR/commands/${cmd_name}/metadata
     }
+    #
+    # execute the handler
+    #
     $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
+    RETVAL=$?
 else 
     die command not found: \"$COMMAND\"
 fi
 
-exit $?
+exit ${RETVAL:-0}
 
 

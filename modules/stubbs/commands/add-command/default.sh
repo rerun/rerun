@@ -106,8 +106,6 @@ die() {
   . \$RERUN_MODULES/$MODULE/commands/$NAME/options.sh
 }
 
-# Available option variables: [$options]
-
 # ------------------------------
 # Your implementation goes here.
 # ------------------------------

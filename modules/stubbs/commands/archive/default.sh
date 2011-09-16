@@ -17,8 +17,9 @@ die() { echo "ERROR: $* " ; exit 1 ; }
   . $RERUN_MODULES/stubbs/commands/archive/options.sh
 }
 
+CWD=$(pwd); #remember current working directory
 [ -n "${LIST}" ] && VERB=v 
-
+[ -z "${FILE}"  ] && FILE=$CWD/rerun.bsx
 
 export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
 
@@ -46,7 +47,7 @@ if [ -e "payload.tar" ]; then
     if [ -e "payload.tar.gz" ]; then
 	#
 	# Prepend the extract script to the payload
-        cat extract payload.tar.gz > ${FILE:=rerun.bsx} || die
+        cat extract payload.tar.gz > ${FILE} || die
     else
         die "payload.tar.gz does not exist"
     fi
