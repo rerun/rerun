@@ -118,7 +118,7 @@ will see freddy's command listed:
 
 Now run freddy's "dance" command.
 
-    $ bash rerun -m freddy -c dance -- -jumps 10
+    $ bash rerun.bsx -m freddy -c dance -- -jumps 10
     jumps (10)
 
 It works like a normal `rerun` command. Amazing !
