@@ -1,4 +1,13 @@
 #!/bin/bash
+#
+# NAME
+#
+#   add-module
+#
+# DESCRIPTION
+#
+#   add a new module
+#
 
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/functions.sh

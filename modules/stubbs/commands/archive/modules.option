@@ -4,5 +4,5 @@ NAME=modules
 DESCRIPTION="module glob list"
 ARGUMENTS=true
 REQUIRED=true
-DEFAULT=*
+DEFAULT="*"
 

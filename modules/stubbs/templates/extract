@@ -1,21 +1,38 @@
 #!/bin/bash
 #
-# the self extracting rerun 
+# this is a self contained self extracting rerun 
 #
-export TMPDIR=`mktemp -d /tmp/selfextract.XXXXXX`
+
+# Function to print error message and exit
+die() { echo "ERROR: $* " ; exit 1 ; }
+
+# extracted payload goes in here
+export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die 
 
 ARCHIVE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0`
 
-tail -n+$ARCHIVE $0 | tar xz -C $TMPDIR
+# Extraction time!
+# - read lines from delimiter and pass to tar unarchive
+tail -n+$ARCHIVE $0 | tar xz -C $TMPDIR || die
 
-export CDIR=`pwd`
+# CWD and TMDIR are passed to launcher as env variables
+export CWD=`pwd`
 export TMPDIR
-cd $TMPDIR
-bash ./launcher $*
 
-cd $CDIR
+# Change directory to the temp directory
+cd $TMPDIR || die
+
+# Run the launcher !
+bash ./launcher $*
+RETVAL=$?
+
+# Go back to original working directory
+cd $CWD
+
+# Clean up after ourselves
 rm -rf $TMPDIR
 
-exit 0
+# Stop this script from executing before we reach the binary archive!
+exit ${RETVAL:=0}
 
 __ARCHIVE_BELOW__

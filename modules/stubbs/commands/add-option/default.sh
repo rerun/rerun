@@ -1,4 +1,13 @@
 #!/bin/bash
+#
+# NAME
+#
+#   add-option
+#
+# DESCRIPTION
+#
+#   add a command option
+#
 
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/functions.sh
@@ -157,12 +166,13 @@ done
 
 # If defaultable options variables are unset, set them to their DEFAULT
 $(for opt in $(echo $optionsWithDefaults|sort); do
-printf "[ -z \"$%s\" ] && { %s=%s ; }" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
+printf "[ -z \"$%s\" ] && %s=%s\n" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
 done)
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || die
 
 # Done
-echo "Wrote option: $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option"
+echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
+echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option"
 
 

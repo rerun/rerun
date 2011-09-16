@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-    rerun [-M modules_dir] [-m module [-c command]] [-- command_options]
+    rerun [-v] [-M modules_dir] [-m module [-c command]] [-- command_options]
 
 # DESCRIPTION
 
@@ -42,6 +42,9 @@ for additional documentation including:
 
 -M *DIRECTORY*
 : Module library directory path.
+
+-v 
+: Execute command in verbose mode. (enables -vx mode)
 
 # MODULES
 

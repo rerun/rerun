@@ -87,11 +87,14 @@ It would be invoked like so:
 ### archive
 
 Create a self extracting archive script 
-useful for launching a rerun environment.
+useful for launching a self contained rerun environment.
+Use `archive` to save a set of specified modules and
+the `rerun` executable into a single file that can easily
+be copied across the network.
 
 `archive` generates a script that takes the same argument
-list as `rerun`. It basically is a wrapper around launching
-`rerun` from the context of an extracted archive.
+list as `rerun`. This generated script basically acts
+like a `rerun` launcher.
 
 *Usage*
 
@@ -313,3 +316,11 @@ Run freddy's "dance" command:
     I'm a locker
 
 The result comes from the execution of the new Linux.sh script.
+
+### Verbosity?
+
+What happens when your command implementation fails and
+all you see is one line of cryptic error text?
+Shed more light by enabling verbose output using rerun's `-v` flag.
+
+Adding '-v' effectively turns on bash's "-vx" flags. 

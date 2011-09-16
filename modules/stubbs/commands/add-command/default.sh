@@ -1,4 +1,13 @@
 #!/bin/bash
+#
+# NAME
+#
+#   archive
+#
+# DESCRIPTION
+#
+#   build a self extracting rerun
+#
 
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/functions.sh

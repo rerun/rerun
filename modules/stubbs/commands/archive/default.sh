@@ -10,29 +10,30 @@
 #
 
 # Function to print error message and exit
-die() {
-    echo "ERROR: $* " ; exit 1;
-}
+die() { echo "ERROR: $* " ; exit 1 ; }
 
 # Parse the command options
 [ -r $RERUN_MODULES/stubbs/commands/archive/options.sh ] && {
   . $RERUN_MODULES/stubbs/commands/archive/options.sh
 }
 
-export TMPDIR=`mktemp -d /tmp/selfextract.XXXXXX` || die
+[ -n "${LIST}" ] && VERB=v 
+
+
+export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
 
 #
 # Create rerun home environment
-mkdir -vp $TMPDIR/rerun/modules || die
-cp -vr $RERUN_MODULES/$MODULES $TMPDIR/rerun/modules || die
-cp -v $RERUN $TMPDIR/rerun || die
+mkdir -p $TMPDIR/rerun/modules || die
+cp -r $RERUN_MODULES/$MODULES $TMPDIR/rerun/modules || die
+cp $RERUN $TMPDIR/rerun || die
 # Add launcher script
-cp -v $RERUN_MODULES/stubbs/templates/launcher $TMPDIR || die
+cp $RERUN_MODULES/stubbs/templates/launcher $TMPDIR || die
 # Add extract script
-cp -v $RERUN_MODULES/stubbs/templates/extract $TMPDIR || die
+cp $RERUN_MODULES/stubbs/templates/extract $TMPDIR || die
 # Make the archive
 cd $TMPDIR
-tar cvf payload.tar launcher extract rerun || die
+tar c${VERB}f payload.tar launcher extract rerun || die
 
 if [ -e "payload.tar" ]; then
     gzip payload.tar || die
@@ -48,6 +49,6 @@ else
     die "payload.tar does not exist"
 fi
 
-echo "${FILE} created"
+echo "Wrote self extracting script: ${FILE}"
 exit 0
 
