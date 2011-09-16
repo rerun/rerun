@@ -323,4 +323,17 @@ What happens when your command implementation fails and
 all you see is one line of cryptic error text?
 Shed more light by enabling verbose output using rerun's `-v` flag.
 
-Adding '-v' effectively turns on bash's "-vx" flags. 
+Adding '-v' effectively has `rerun` call the command
+implementation script with bash's "-vx" flags. 
+
+    rerun -v -m freddy -c dance
+    .
+    . <verbose output ... >
+    .
+    # ------------------------------
+    echo "jumps ($JUMPS)"
+    + echo 'jumps (3)'
+    jumps (3)
+    # ------------------------------
+    exit $?
+    + exit 0
