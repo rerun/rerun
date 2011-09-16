@@ -1,14 +1,17 @@
 #!/bin/bash
 #
-# Launches rerun from an self extracting archive script
+# launcher - Launch rerun from an self extracting archive script
 #
+# generator: @GENERATOR@
+# date: @DATE@
+# user: @USER@
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " ; exit 1 ; }
 
 # Check for required environment variables 
-[ -z "${CWD}" ] && die "CWD not set" ;# current working directory
-[ -z "${TMPDIR}" ] && die "TMPDIR not set" ;# archive artifacts 
+[ -z "${CWD}" ] && die "CWD not set" ;# user's current working directory
+[ -z "${PAYLOAD}" ] && die "PAYLOAD not set" ;# archive artifacts 
 
 # Verify the extracted artifact contents
 [ -d ./rerun ] || die "rerun subdirectory not found"
@@ -17,12 +20,12 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 [ -x ./rerun/rerun ] || { chmod +x ./rerun || die "couldn't set rerun executable" ; }
 
 # set the module directory base
-export RERUN_MODULES=$TMPDIR/rerun/modules
+export RERUN_MODULES=$PAYLOAD/rerun/modules
 
 # move into the current working directory
 cd $CWD || die "couldn't change to cwd: $CWD"
 
 # launch it!
-exec $TMPDIR/rerun/rerun $*
+exec $PAYLOAD/rerun/rerun $*
 
 # Done

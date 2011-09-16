@@ -27,10 +27,15 @@ export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
 mkdir -p $TMPDIR/rerun/modules || die
 cp -r $RERUN_MODULES/$MODULES $TMPDIR/rerun/modules || die
 cp $RERUN $TMPDIR/rerun || die
-# Add launcher script
-cp $RERUN_MODULES/stubbs/templates/launcher $TMPDIR || die
-# Add extract script
-cp $RERUN_MODULES/stubbs/templates/extract $TMPDIR || die
+for template in $RERUN_MODULES/stubbs/templates/{extract,launcher}
+do
+    # substitute tokens
+    sed -e "s/@GENERATOR@/stubbs#archive/" \
+	-e "s/@DATE@/$(date)/" \
+	-e "s/@USER@/$USER/" \
+	$template > $TMPDIR/$(basename $template) || die
+done
+
 # Make the archive
 cd $TMPDIR
 tar c${VERB}f payload.tar launcher extract rerun || die

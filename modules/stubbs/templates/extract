@@ -1,26 +1,29 @@
 #!/bin/bash
 #
-# this is a self contained self extracting rerun 
+# extract - this is a self contained self extracting rerun 
 #
+# generator: @GENERATOR@
+# date: @DATE@
+# user: @USER@
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " ; exit 1 ; }
 
 # extracted payload goes in here
-export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die 
+export PAYLOAD=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die "failed making payload extraction directory"
 
-ARCHIVE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0`
+SIZE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0` || die "error sizing payload content"
 
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
-tail -n+$ARCHIVE $0 | tar xz -C $TMPDIR || die
+tail -n+$SIZE $0 | tar xvz -C $PAYLOAD || die "unarchiving failed. (tar=$(which tar). size=$SIZE)"
 
 # CWD and TMDIR are passed to launcher as env variables
 export CWD=`pwd`
-export TMPDIR
+export PAYLOAD
 
 # Change directory to the temp directory
-cd $TMPDIR || die
+cd $PAYLOAD || die
 
 # Run the launcher !
 bash ./launcher $*
@@ -30,7 +33,7 @@ RETVAL=$?
 cd $CWD
 
 # Clean up after ourselves
-rm -rf $TMPDIR
+rm -rf $PAYLOAD
 
 # Stop this script from executing before we reach the binary archive!
 exit ${RETVAL:=0}

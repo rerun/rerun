@@ -98,7 +98,7 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun -m stubbs -c archive -- [-file <rerun.bsx>] [-modules<*>]
+    rerun -m stubbs -c archive -- [-file <rerun.bsx>] [-modules<"*">]
 
 *Example*
 
@@ -195,8 +195,8 @@ Run "dance" again but this time without options.
     $ rerun -m freddy -c dance
     jumps ()
 
-This time an empty pair of parenthesis are printed.
-The problem here is the `$JUMPS` variable was not set
+This time an empty pair of parenthesis is printed.
+The problem is this: the `$JUMPS` variable was not set
 so an empty string is printed instead.
     
 ### Option defaults
@@ -217,7 +217,7 @@ Here the "jumps" option is set to a default value, "1":
 The `add-option` will update the `jumps.option` metadata file with the
 new default value and extend the `options.sh` script.
 
-Run the "dance" command again but this time without the "jumps" option:
+Run the "dance" command again but this time without the "-jumps" option:
 
     $ rerun -m freddy -c dance
     jumps (1)
@@ -267,7 +267,7 @@ to the value of the "-jumps" argument.
     [ -z "$JUMPS" ] && { JUMPS=1 ; }
      
 Below the `while` loop, you can see a test for the
-JUMPS variable (check for a non empty string).
+JUMPS variable (check for empty string).
 A statement like this is added for options that declare 
 `DEFAULT` metadata.
 
@@ -287,7 +287,8 @@ command implementation and run it instead, if it exists.
 Effectively, rerun checks for a file named: 
 `$MODULE/commands/$COMMAND/$(uname -s).sh`
 
-For example, run `uname -s` on a centos host. It returns "Linux".
+For example, run `uname -s` on a centos host to see the name of the
+operating system. It returns "Linux".
 
     $ uname -s
     Linux
@@ -308,14 +309,14 @@ Running the `tree` command shows the directory structure.
 	    
 Inside the Linux.sh script, replace the implementation with:
 
-     "echo I'm a locker"
+     echo "I'm a locker"
      
 Run freddy's "dance" command:
 
     $ rerun -m freddy -c dance
     I'm a locker
 
-The result comes from the execution of the new Linux.sh script.
+The result comes from rerun's execution of the new Linux.sh script.
 
 ### Verbosity?
 
@@ -326,9 +327,11 @@ Shed more light by enabling verbose output using rerun's `-v` flag.
 Adding '-v' effectively has `rerun` call the command
 implementation script with bash's "-vx" flags. 
 
+Here's a snippet of freddy's "dance" command with verbose output:
+
     rerun -v -m freddy -c dance
     .
-    . <verbose output ... >
+    . <spipping out most of the verbose output ... >
     .
     # ------------------------------
     echo "jumps ($JUMPS)"
