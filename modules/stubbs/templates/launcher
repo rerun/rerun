@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# Launches rerun from an self extracting archive script
+#
+
+# Function to print error message and exit
+die() {
+    echo "ERROR: $* " ; exit 1;
+}
+
+# Check for required environment variables 
+[ -z "${CDIR}" ] && die "CDIR not set" ;# current working directory
+[ -z "${TMPDIR}" ] && die "TMPDIR not set" ;# archive artifacts 
+
+# Check the extracted artifact contents
+[ -d ./rerun ] || die "rerun subdirectory not found"
+[ -d ./rerun/modules ] || "missing modules subdirectory"
+[ -f ./rerun/rerun ] || die "missing rerun script"
+[ -x ./rerun/rerun ] || { chmod +x ./rerun || die ; }
+
+export RERUN_MODULES=$TMPDIR/rerun/modules
+
+# move into the cwd directory
+cd $CDIR || die
+
+exec $TMPDIR/rerun/rerun $*
+
+# Done
