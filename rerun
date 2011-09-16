@@ -2,7 +2,6 @@
 #
 # rerun
 #
-
 SH=/bin/bash
 PROG=`basename $0`
 USAGE="
@@ -10,7 +9,7 @@ Usage: $PROG -m module -c command [ -- command_args]
 "
 SYNTAX="$PROG: option syntax error."
 PAD="  "
-
+export RERUN=$0
 
 # 
 # utility functions -
@@ -182,8 +181,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 
-[ -d "$RERUN_MODULES" ] || {
-    die RERUN_MODULES variable not set or it is not a directory: $RERUN_MODULES
+[ -n "$RERUN_MODULES" -a -d "$RERUN_MODULES" ] || {
+    die RERUN_MODULES not set to an existing directory: $RERUN_MODULES
     exit 1
 }
 

@@ -84,6 +84,45 @@ It would be invoked like so:
 
     rerun -m freddy -c dance -- -jumps 3
 
+### archive
+
+Create a self extracting archive script 
+useful for launching a rerun environment.
+
+`archive` generates a script that takes the same argument
+list as `rerun`. It basically is a wrapper around launching
+`rerun` from the context of an extracted archive.
+
+*Usage*
+
+    rerun -m stubbs -c archive -- [-file <rerun.bsx>] [-modules<*>]
+
+*Example*
+
+Create an archive containing the "freddy" module:
+
+    rerun -m stubbs -c archive -- -modules "freddy"
+
+The `archive` command generates a rerun.bsx script 
+in the current directory.
+
+Run the self extracting archive script without options and you
+will see freddy's command listed:
+
+    $ bash rerun.bsx
+    freddy:
+    [commands]
+     dance: tell freddy to dance
+      [options]
+        -jumps <>: "jump #num times"
+
+Now run freddy's "dance" command.
+
+    $ bash rerun -m freddy -c dance -- -jumps 10
+    jumps (10)
+
+It works like a normal `rerun` command. Amazing !
+
 ## Command implementation
 
 Running `add-command` as shown above will generate a stub default implementation

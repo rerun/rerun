@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-rerun [-M modules_dir] [-m module [-c command]] [-- command_options]
+    rerun [-M modules_dir] [-m module [-c command]] [-- command_options]
 
 # DESCRIPTION
 
