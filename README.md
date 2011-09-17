@@ -47,7 +47,6 @@ for additional documentation including:
 * [stubbs module tool](https://github.com/dtolabs/rerun/tree/master/modules/stubbs)
 * [Why rerun?](https://github.com/dtolabs/rerun/wiki/Why-rerun%3F)
 
-
 # OPTIONS
 
 -h
@@ -64,6 +63,90 @@ for additional documentation including:
 
 -v 
 : Execute command in verbose mode. (enables -vx shell opts)
+
+
+# USING
+
+## Listing
+
+Without arguments, `rerun` will list existing modules:
+
+    $ rerun
+    [modules]
+      freddy: "A dancer in a red beret and matching suspenders"
+
+To list the commands available from the 'freddy' module add `-m module`:
+
+    $ rerun -m freddy
+    freddy:
+    [commands]
+     study: "tell freddy to study"
+      [options]
+       -subject <math>: "the summer school subject"
+     dance: "tell freddy to dance"
+      [options]
+       -jumps <1>: "jump #num times"
+
+The listing also includes option info including default
+values if they were described with option metadata.
+
+Options that declare a default value are shown
+with a string between the "<>" characters.
+
+For example, notice how "-jumps" option shows `<1>`.
+The "1" is the default value assigned to the "jumps" option.
+
+### Bash completion
+
+If you are a bash shell user, be sure to source the `bash_completion.sh` file. 
+It provides listing via the tab key.
+
+Type `rerun` and then the tab key. The shell will generate
+the `-m` option and then a list of existing modules.
+
+    $ rerun[TAB][TAB]
+
+Will display:
+
+    $ rerun -m stubbs
+
+Typing the tab key again will show the commands inside the "stubbs" module:
+
+    $ rerun -m stubbs -c add-[TAB]
+    add-command  add-module   add-option     
+
+In this case, three commands are found and listed.
+After accepting a command, typing the tab key will show arguments.
+
+    $ rerun -m stubbs -c add-command --[TAB]
+    module name
+
+The "add-command" command accepts two options (module and name).
+    
+## Executing
+
+Commands are executed by supplying the module,
+command and possibly options.
+
+To run freddy module's "study" command, type:
+
+    rerun -m freddy -c study
+    math
+
+The string "math" is the printed result (and subject's default value).
+    
+Arguments to a called command are passed after
+two dashes `--`. 
+Tell freddy to study the subject, "biology":
+
+    rerun -m freddy -c study -- -subject biology
+    studying (biology)
+
+If the 'freddy' module is stored in `/var/rerun`, then the command usage
+would be:
+
+    rerun -M /var/rerun -m freddy -c study
+    studying (math)
 
 # MODULES
 
@@ -155,89 +238,6 @@ is illustrated here:
     │       └── subject.option
     ├── metadata
     └── lib
-
-# USING
-
-## Listing
-
-Without arguments, `rerun` will list existing modules:
-
-    $ rerun
-    [modules]
-      freddy: "A dancer in a red beret and matching suspenders"
-
-To list the commands available from the 'freddy' module add `-m module`:
-
-    $ rerun -m freddy
-    freddy:
-    [commands]
-     study: "tell freddy to study"
-      [options]
-       -subject <math>: "the summer school subject"
-     dance: "tell freddy to dance"
-      [options]
-       -jumps <1>: "jump #num times"
-
-The listing also includes option info including default
-values if they were described with option metadata.
-
-Options that declare a default value are shown
-with a string between the "<>" characters.
-
-For example, notice how "-jumps" option shows `<1>`.
-The "1" is the default value assigned to the "jumps" option.
-
-### Bash completion
-
-If you are a bash shell user, be sure to source the `bash_completion.sh` file. 
-It provides listing via the tab key.
-
-Type `rerun` and then the tab key. The shell will generate
-the `-m` option and then a list of existing modules.
-
-    $ rerun[TAB][TAB]
-
-Will display:
-
-    $ rerun -m stubbs
-
-Typing the tab key again will show the commands inside the "stubbs" module:
-
-    $ rerun -m stubbs -c add-[TAB]
-    add-command  add-module   add-option     
-
-In this case, three commands are found and listed.
-After accepting a command, typing the tab key will show arguments.
-
-    $ rerun -m stubbs -c add-command --[TAB]
-    module name
-
-The "add-command" command accepts two options (module and name).
-    
-## Executing
-
-Commands are executed by supplying the module,
-command and possibly options.
-
-To run freddy module's "study" command, type:
-
-    rerun -m freddy -c study
-    math
-
-The string "math" is the printed result (and subject's default value).
-    
-Arguments to a called command are passed after
-two dashes `--`. 
-Tell freddy to study the subject, "biology":
-
-    rerun -m freddy -c study -- -subject biology
-    studying (biology)
-
-If the 'freddy' module is stored in `/var/rerun`, then the command usage
-would be:
-
-    rerun -M /var/rerun -m freddy -c study
-    studying (math)
 
 # ENVIRONMENT
 
