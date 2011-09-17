@@ -20,12 +20,12 @@ Rerun provides two interfaces:
 1. Lising: `rerun` lists modules and commands. Listing
 information includes name, description and command line usage syntax.
 2. Execution: Rerun provides option processing (possibly defaulting
-unspecified arguments) and execute the specified module command.
+unspecified arguments) and executes the specified module command.
 
-For the module developer, rerun is trivial framework following
+For the module developer, rerun is a trivial framework following
 simple conventions that easily fit in a shell context.
 Rerun includes a module development tool called "stubbs" that
-helps create and evolve rerun modules. It contains
+helps create and evolve rerun modules. Stubbs contains
 commands to automate option processing code and metadata definition.
 
 Internally, rerun implements a simple dispatching mechanism to look up named
@@ -102,8 +102,8 @@ but can also invoke an OS specific script, if present.
 
 ## Metadata
 
-The metadata file format uses KEY=value pairs to define standard
-attributes. 
+The metadata file format uses line separated KEY=value 
+pairs to define module attributes. 
 
 * NAME: Declare name displayed to user.
 * DESCRIPTION: Brief explanation of use.
@@ -181,6 +181,12 @@ To list the commands available from the 'freddy' module add `-m module`:
 The listing also includes option info including default
 values if they were described with option metadata.
 
+Options that declare a default value are shown
+with a string between the "<>" characters.
+
+For example, notice how "-jumps" option shows `<1>`.
+The "1" is the default value assigned to the "jumps" option.
+
 ### Bash completion
 
 If you are a bash shell user, be sure to source the `bash_completion.sh` file. 
@@ -235,22 +241,23 @@ would be:
 
 # ENVIRONMENT
 
-RERUN_MODULES
+`RERUN_MODULES`
 : Path to directory containing rerun modules
 
 # SEE ALSO
 
-To create modules, see the `stubbs` command set.
+To create modules, see
+[stubbs](https://github.com/dtolabs/rerun/tree/master/modules/stubbs).
 
 # ERROR CODE
 
-0
+`0`
 : All commands executed successfully
 
-1
+`1`
 : One or more commands failed
 
-127
+`127`
 : Unknown error case
 
 # LICENSE
