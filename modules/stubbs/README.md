@@ -127,6 +127,24 @@ Now run freddy's "dance" command.
 
 It works like a normal `rerun` command. Amazing !
 
+*Internal details*
+
+The archive format is a gzip'd tar file appended to a bash shell script
+(e.g., cat EXTRACTSCRIPT PAYLOAD.TGZ > RERUN.BSX).
+
+The tar file contains payload content, specifically rerun and modules.
+
+When the archive file is executed, 
+the shell script reads the binary "attachment",
+decompresses and unarchives the payload and then invokes
+the rerun launcher.
+
+The rerun launcher creates an ephemeral workspace to load
+the included modules and then executes the included `rerun`
+executable in the user's current working directory.
+
+Refer to the source code implementation for further details.
+
 ## Command implementation
 
 Running `add-command` as shown above will generate a stub default implementation

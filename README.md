@@ -148,6 +148,24 @@ would be:
     rerun -M /var/rerun -m freddy -c study
     studying (math)
 
+### Bash self extracting archive executable
+
+A set of modules and rerun itself can be archived into a self extracting
+script. If the execute bit is set, just invoke the script directly:
+
+    $ ./rerun.bsx
+    [modules]
+    .
+    .
+    . listing output ommitted
+
+If the execute bit is not set, run it via bash:
+
+    $ bash rerun.bsx -m <module> -c <command> -- -your other options
+
+Note, ".bsx" is just a suffix naming convention for a "bash self-eXtracing" script.
+The file can be named anything you wish.
+
 # MODULES
 
 ## Layout
