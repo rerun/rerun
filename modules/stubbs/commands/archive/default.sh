@@ -18,35 +18,53 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 }
 
 CWD=$(pwd); #remember current working directory
-[ -n "${LIST}" ] && VERB=v 
+[ -n "${LIST}"  ] && VERB=v 
 [ -z "${FILE}"  ] && FILE=$CWD/rerun.bsx
 
-export TMPDIR=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
+# create a work directory the archive content
+export PAYLOAD=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
 
 #
-# Create rerun home environment
-mkdir -p $TMPDIR/rerun/modules || die
-cp -r $RERUN_MODULES/$MODULES $TMPDIR/rerun/modules || die
-cp $RERUN $TMPDIR/rerun || die
+# Start adding payload content
+
+# Copy in the specified modules
+mkdir -p $PAYLOAD/rerun/modules || die
+for module in $MODULES
+do
+    cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || die
+done
+
+# Copy rerun itself
+cp $RERUN $PAYLOAD/rerun || die
+
+# Copy in the extract and launcher scripts used during execution
 for template in $RERUN_MODULES/stubbs/templates/{extract,launcher}
 do
-    # substitute tokens
+    # replace the template substitution tokens ...
     sed -e "s/@GENERATOR@/stubbs#archive/" \
 	-e "s/@DATE@/$(date)/" \
 	-e "s/@USER@/$USER/" \
-	$template > $TMPDIR/$(basename $template) || die
+	$template > $PAYLOAD/$(basename $template) || die
+    # ... and save it to the payload --^
 done
 
-# Make the archive
-cd $TMPDIR
+#
+# Archive the content
+#
+
+# make the payload.tar file
+cd $PAYLOAD
 tar c${VERB}f payload.tar launcher extract rerun || die
 
+# compress the tar
 if [ -e "payload.tar" ]; then
     gzip payload.tar || die
 
     if [ -e "payload.tar.gz" ]; then
 	#
-	# Prepend the extract script to the payload
+	# Prepend the extract script to the payload.
+	#    and thus turn the thing into a shell script!
+	#
         cat extract payload.tar.gz > ${FILE} || die
     else
         die "payload.tar.gz does not exist"
@@ -55,6 +73,8 @@ else
     die "payload.tar does not exist"
 fi
 
-echo "Wrote self extracting script: ${FILE}"
+echo "Wrote self extracting archive script: ${FILE}"
 exit 0
+
+# Done
 

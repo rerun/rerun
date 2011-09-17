@@ -87,7 +87,7 @@ Users will now be able to specify a "-jumps" argument to freddy's "dance" comman
 
 ### archive
 
-Create a self extracting archive script 
+Create a bash self extracting archive script (aka. a .bsx file)
 useful for launching a self contained rerun environment.
 Use `archive` to save a set of specified modules and
 the `rerun` executable into a single file that can easily
@@ -99,7 +99,7 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun -m stubbs -c archive -- [-file <rerun.bsx>] [-modules<"*">]
+    rerun -m stubbs -c archive -- [-file <>] [-modules<"*">]
 
 *Example*
 
@@ -107,7 +107,7 @@ Create an archive containing the "freddy" module:
 
     rerun -m stubbs -c archive -- -modules "freddy"
 
-The `archive` command generates a rerun.bsx script 
+The `archive` command generates a "rerun.bsx" script 
 in the current directory.
 
 Run the self extracting archive script without options and you
@@ -267,7 +267,7 @@ to the value of the "-jumps" argument.
     done
           
     # If defaultable options variables are unset, set them to their DEFAULT
-    [ -z "$JUMPS" ] && { JUMPS=1 ; }
+    [ -z "$JUMPS" ] && JUMPS=1 
      
 Below the `while` loop, you can see a test for the
 JUMPS variable (check for empty string).
@@ -277,7 +277,8 @@ A statement like this is added for options that declare
 Separating options processing into the `options.sh` script,
 away from the command implementation logic in `default.sh`, facilates
 additonal options being created. It also helps "stubbs"
-preserve changes you make to `default.sh`.
+preserve changes you make to `default.sh` or other scripts
+that source `options.sh`.
 
 ### OS specific command implementations
 
@@ -343,3 +344,5 @@ Here's a snippet of freddy's "dance" command with verbose output:
     # ------------------------------
     exit $?
     + exit 0
+
+

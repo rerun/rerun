@@ -9,9 +9,28 @@ standard operating procedure.
 
 # DESCRIPTION
 
-Rerun implements a simple dispatching mechanism that looks up named
-commands and executes them. *Commands* are logically named and
-have a corresponding script, `rerun` executes.
+Rerun is a lightweight tool building framework useful for those that 
+implement management procedure with shell scripts. Rerun will help you
+organize your implementation into well defined modular interfaces.
+Collections of management modules can be archived and delivered as
+a single executable to facilitate team hand offs.
+
+Rerun provides two interfaces:
+
+1. Lising: `rerun` lists modules and commands. Listing
+information includes name, description and command line usage syntax.
+2. Execution: Rerun provides option processing (possibly defaulting
+unspecified arguments) and execute the specified module command.
+
+For the module developer, rerun is trivial framework following
+simple conventions that easily fit in a shell context.
+Rerun includes a module development tool called "stubbs" that
+helps create and evolve rerun modules. It contains
+commands to automate option processing code and metadata definition.
+
+Internally, rerun implements a simple dispatching mechanism to look up named
+commands and execute them. *Commands* are logically named and
+have a corresponding script.
 
 Commands reside in a module and can have named paramaters called *options*.
 
@@ -44,7 +63,7 @@ for additional documentation including:
 : Module library directory path.
 
 -v 
-: Execute command in verbose mode. (enables -vx mode)
+: Execute command in verbose mode. (enables -vx shell opts)
 
 # MODULES
 
