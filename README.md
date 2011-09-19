@@ -17,7 +17,7 @@ a single executable to facilitate team hand offs.
 
 Rerun provides two interfaces:
 
-1. Lising: `rerun` lists modules and commands. Listing
+1. Listing: `rerun` lists modules and commands. Listing
 information includes name, description and command line usage syntax.
 2. Execution: Rerun provides option processing (possibly defaulting
 unspecified arguments) and executes the specified module command.
@@ -32,7 +32,10 @@ Internally, rerun implements a simple dispatching mechanism to look up named
 commands and execute them. *Commands* are logically named and
 have a corresponding script.
 
-Commands reside in a module and can have named paramaters called *options*.
+Commands reside in a module and can have named command line 
+parameters called *options*. Each option is named and 
+described and also be defined to have a default value 
+or whether it is required input.
 
 Rerun modules can optionally declare metadata describing name, description
 and other aspects of each command. Rerun makes use of this metadata
@@ -49,19 +52,19 @@ for additional documentation including:
 
 # OPTIONS
 
--h
+`-h`
 : Print help and usage.
 
--m *MODULE*
+`-m` *MODULE*
 : Module name.
 
--c *COMMAND*
+`-c` *COMMAND*
 : Command name.
 
--M *DIRECTORY*
+`-M` *DIRECTORY*
 : Module library directory path.
 
--v 
+`-v` 
 : Execute command in verbose mode. (enables -vx shell opts)
 
 
@@ -153,7 +156,7 @@ would be:
 A set of modules and rerun itself can be archived into a self extracting
 script. If the execute bit is set, just invoke the script directly:
 
-    $ ./rerun.bsx
+    $ ./rerun.bin
     [modules]
     .
     .
@@ -161,9 +164,9 @@ script. If the execute bit is set, just invoke the script directly:
 
 If the execute bit is not set, run it via bash:
 
-    $ bash rerun.bsx -m <module> -c <command> -- -your other options
+    $ bash rerun.bin -m <module> -c <command> -- -your other options
 
-Note, ".bsx" is just a suffix naming convention for a "bash self-eXtracing" script.
+Note, ".bin" is just a suffix naming convention for a bash self-extracing script.
 The file can be named anything you wish.
 
 # MODULES
@@ -196,7 +199,7 @@ described above to find and execute scripts for each command.
 Rerun expects a default implementation script for each command
 but can also invoke an OS specific script, if present.
 
-* default.sh: Generic implmentation.
+* default.sh: Generic implementation.
 * `uname -s`.sh: OS specific implementation
 * options.sh: Script sourceable by default and OS specific scripts
   to parse options.

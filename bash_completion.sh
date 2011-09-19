@@ -3,9 +3,7 @@
 #
 # Source this file from your login shell. 
 #
-# @author: <a href="mailto:alex@dtolabs.com">alex@dtolabs.com</a>
-
-
+# @author: <a href="mailto:alex@dtosolutions.com">alex@dtosolutions.com</a>
 
 [ -n "${RERUN_MODULES}" -a -d "${RERUN_MODULES}" ] || {
     export RERUN_MODULES=$(pwd)

@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# rerun
+# rerun - a simple command runner because it's easy to forget 
+#         standard operating procedure.
 #
 SH=/bin/bash
 PROG=`basename $0`

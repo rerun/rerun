@@ -19,10 +19,10 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 
 CWD=$(pwd); #remember current working directory
 [ -n "${LIST}"  ] && VERB=v 
-[ -z "${FILE}"  ] && FILE=$CWD/rerun.bsx
+[ -z "${FILE}"  ] && FILE=$CWD/rerun.bin
 
 # create a work directory the archive content
-export PAYLOAD=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die
+export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die
 
 #
 # Start adding payload content

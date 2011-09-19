@@ -87,7 +87,7 @@ Users will now be able to specify a "-jumps" argument to freddy's "dance" comman
 
 ### archive
 
-Create a bash self extracting archive script (aka. a .bsx file)
+Create a bash self extracting archive script (aka. a .bin file)
 useful for launching a self contained rerun environment.
 Use `archive` to save a set of specified modules and
 the `rerun` executable into a single file that can easily
@@ -99,7 +99,7 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun -m stubbs -c archive -- [-file <>] [-modules<"*">]
+    rerun -m stubbs -c archive -- [-file <>] [-modules <"*">]
 
 *Example*
 
@@ -107,13 +107,13 @@ Create an archive containing the "freddy" module:
 
     rerun -m stubbs -c archive -- -modules "freddy"
 
-The `archive` command generates a "rerun.bsx" script 
+The `archive` command generates a "rerun.bin" script 
 in the current directory.
 
 Run the self extracting archive script without options and you
 will see freddy's command listed:
 
-    $ bash rerun.bsx
+    $ bash rerun.bin
     freddy:
     [commands]
      dance: tell freddy to dance
@@ -122,7 +122,7 @@ will see freddy's command listed:
 
 Now run freddy's "dance" command.
 
-    $ bash rerun.bsx -m freddy -c dance -- -jumps 10
+    $ bash rerun.bin -m freddy -c dance -- -jumps 10
     jumps (10)
 
 It works like a normal `rerun` command. Amazing !
