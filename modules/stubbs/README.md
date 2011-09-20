@@ -130,7 +130,7 @@ It works like a normal `rerun` command. Amazing !
 *Internal details*
 
 The archive format is a gzip'd tar file appended to a bash shell script
-(e.g., cat EXTRACTSCRIPT PAYLOAD.TGZ > RERUN.BSX).
+(e.g., cat EXTRACTSCRIPT PAYLOAD.TGZ > RERUN.BIN).
 
 The tar file contains payload content, specifically rerun and modules.
 
