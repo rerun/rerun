@@ -105,20 +105,20 @@ the `-m` option and then a list of existing modules.
 
 Will display:
 
-    $ rerun stubbs
+    $ rerun freddy
 
-Typing the tab key again will show the commands inside the "stubbs" module:
+Typing the tab key again will show the commands inside the "freddy" module:
 
-    $ rerun stubbs: add-[TAB]
-    add-command  add-module   add-option     
+    $ rerun freddy: [TAB]
+    dance  study     
 
-In this case, three commands are found and listed.
+In this case, two commands are found and listed.
 After accepting a command, typing the tab key will show arguments.
 
-    $ rerun stubbs:add-command [TAB]
-    module name
+    $ rerun freddy:study [TAB]
+    subject
 
-The "add-command" command accepts two options (module and name).
+The "study" command accepts one option (subject).
     
 ## Executing
 
