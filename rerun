@@ -6,7 +6,7 @@
 SH=/bin/bash
 PROG=`basename $0`
 USAGE="
-Usage: $PROG -m module -c command [ -- command_args]
+Usage: $PROG -m module::command [command_args]
 "
 SYNTAX="$PROG: option syntax error."
 PAD="  "
@@ -149,26 +149,11 @@ while [ "$#" -gt 0 ]; do
 	    OPTS_VERBOSE=1
 	    set -vx
 	    ;;
-
 	# options with arguments
 	-M)
 	    rerun_syntax_check "$#"
 	    RERUN_MODULES="$2"
 	    shift
-	    ;;
-	-m)
-	    rerun_syntax_check "$#"
-	    MODULE="$2"
-	    shift
-	    ;;
-	-c)
-	    rerun_syntax_check "$#"
-	    COMMAND="$2"
-	    shift
-	    ;;
-	--)
-	    shift
-	    break
 	    ;;
 	  # unknown option
 	-?)
@@ -180,13 +165,42 @@ while [ "$#" -gt 0 ]; do
     esac
     shift
 done
+#
+# Read the module:command context
+#
+#regex='([^:]+)([: ]*)([^:-]*)'
+#if [[ "$@" =~ $regex ]]
+#then
+#	MODULE=${BASH_REMATCH[1]}
+#	COMMAND=${BASH_REMATCH[3]/ /}
+#	[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
+#else
+#    MODULE=${1/:/}
+#fi
+# Define regex pattern to parse command line input
+regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_]*)([ ]*)(.*)'
+if [[ "$@" =~ $regex ]]
+then
+	MODULE=${BASH_REMATCH[1]};    # module
+	[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
+	COMMAND=${BASH_REMATCH[3]/ /}; # command
+	# BASH_REMATCH[4] contains the whitespace separating command and options
+	# BASH_REMATCH[5] contains command options
+else
+    MODULE=${1/:/}                # module (minus colon)
+fi
+shift; # Shift over to the command options
 
-
+#
+# ensure module dir is set
 [ -n "$RERUN_MODULES" -a -d "$RERUN_MODULES" ] || {
     die RERUN_MODULES not set to an existing directory: $RERUN_MODULES
     exit 1
 }
 
+#
+# Listing mode
+#
 [ -z "$MODULE" -a -z "$COMMAND" ] && {
     rerun_modules $RERUN_MODULES
     exit
@@ -202,10 +216,11 @@ done
     exit
 }
 
-
-
-[ -z $MODULE  ]  && rerun_syntax_error "-m not specified"
-[ -z $COMMAND ]  && rerun_syntax_error "-c not specified"
+#
+# Execution mode
+#
+[ -z $MODULE  ]  && rerun_syntax_error "module not specified"
+[ -z $COMMAND ]  && rerun_syntax_error "command not specified"
 
 #
 #  If the handler exists for the named command, execute it

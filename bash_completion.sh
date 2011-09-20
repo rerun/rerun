@@ -38,9 +38,7 @@ _lremove()
     list=$2 item=$1 retlist=""
     for e in $(eval echo $list)
     do
-	[ "$e" = "$item" ] || {
-	    retlist="$retlist $e"
-	}
+	[ "$e" = "$item" ] || retlist="$retlist $e"
     done
     echo $retlist
 }
@@ -50,9 +48,7 @@ _lsubtract()
     local list1="$1" list2="$2" retlist=""
     for item in $(eval echo $list1)
     do
-	_lexists $item "$list2" || {
-	    retlist="$retlist $item"
-	}
+	_lexists $item "$list2" || retlist="$retlist $item"
     done
     echo $retlist    
 }
@@ -104,91 +100,73 @@ _rerunHasOptsArgument()
 
 
 # program completion for the 'rerun' command.
-_rerun() 
-{
+_rerun() {
     [ -z "${RERUN_MODULES}" -o ! \( -d "${RERUN_MODULES}" \) ] && { 
-	return 0 ; 
+		return 0 ; 
     }
-    local cur prev context comp_line opts_module opts_command opts_module opts_args OPT
+    local cur prev context comp_line opts_module opts_command opts_module opts_args OPT 
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    comp_line=$COMP_LINE
     context=()
     eval set $COMP_LINE
     shift; # shift once to drop the "rerun" from the argline
-    while [ "$#" -gt 0 ]; do
-	OPT="$1"
-	case "$OPT" in
-            -m)	[ -n "$2" ] && { context[0]="$2"; shift ; }
-		;;
-            -c) [ -n "$2" ] && { context[1]="$2" ; shift ; } 
-		;;
-	    --) [ -n "$2" ] && { context[2]="$2" ; shift ; }
-		;;
-	    *)	break
-		;;
-	esac
-	shift
-    done
 
-    # 0. If just the "rerun" command was typed, offer the first clopt
-    [ ${#context[@]} -lt 1  -a ${prev} != "-m" ] && {
-	COMPREPLY=( "-m" )
-	return 0
-    }
+    #
+    # Set up the context array...
 
-    # 1. see if an existing module was specified
+	# Define regex pattern to parse command line input
+	regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_]*)([ ]*)(.*)'
+	if [[ "$@" =~ $regex ]]
+	then
+		context[0]=${BASH_REMATCH[1]};    # module
+		[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
+		context[1]=${BASH_REMATCH[3]/ /}; # command
+		# BASH_REMATCH[4] contains the whitespace between command and options
+		capture[2]=${BASH_REMATCH[5]};    # options
+	else
+	    context[0]=${1/:/}                # module (minus colon)
+	fi
+
+    # Shift over to the command options
+    shift;
+  
+    # 1. see if an existing module was specified. Set it, if so
     [ ${#context[@]} -gt 0 -a -n "${context[0]}" ] && {
-	[ -n "${context[0]}" -a -d $RERUN_MODULES/${context[0]} ] && {	
-	    opts_module=${context[0]}	    
-	}
+		[ -n "${context[0]}" -a -d $RERUN_MODULES/${context[0]} ] && {	
+	    	opts_module=${context[0]}	    
+		}
     }
-
-    # 2. see if an existing command was specified for a module
+    # 2. see if an existing command was specified for a module. Set it, if so
     [ ${#context[@]} -gt 1 -a -n "$opts_module" ] && {
-	_lexists ${context[1]} "$(_rerunListCommands ${RERUN_MODULES} ${opts_module})"  && opts_command=${context[1]}
+		_lexists ${context[1]} "$(_rerunListCommands ${RERUN_MODULES} ${opts_module})"  && {
+	    	opts_command=${context[1]}
+		}
     }
-
-    # 3. see if a command arg was specified
-    [ ${#context[@]} -gt 2 -a -n "$opts_command" ] && {
-	opts_args=${context[2]}
+    # 3. see if command options are specified
+    [ ${#context[@]} -eq 2 -a -n "$opts_command" ] && {
+		opts_args=${context[2]}
     }    
 
     # List information pertaining to current context level. 
     # Context-level ordering goes from most qualified to least (command,module,empty)
 
-    # Command context but no "--". Show it.
-    [ -n "$opts_command" -a "$prev" != "--" -a -z "$opts_args" ] && {
-	COMPREPLY=( $(compgen -W "--" -- ${cur}) )
-    	return 0
-    }
-    # Command context: List command-specific args for a module context
-    [ -n "$opts_command" -a "$prev" == "--" -a -n "$opts_module" ] && {
+    # Command context: List command-specific args 
+    [ -n "$opts_command" -a -n "$opts_module" ] && {
         [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
-            COMPREPLY=( $(compgen -W "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" -- ${cur}) )
-            return 0
-    	}
-    }
-    # Command context: List command-specific args for a module context
-    [ -n "$opts_command" -a "$prev" == "--" -a -n "$opts_module" ] && {
-        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
-            COMPREPLY=( $(compgen -W "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" -- ${cur}) )
+			local options=$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})
+            COMPREPLY=( $(compgen -W "$options" -P "-" -- ${cur}) )
             return 0
     	}
     }
 
     # Arg context: Process the command-specific arg(s)
     [ -n "$opts_args" ] && {
-	local mod_ctx 
-        [ -z "$mod_ctx" -a -n "$opts_module" ] && {
-            mod_ctx=$opts_module
-        }
-        [ -n "$mod_ctx" ] && {
+        [ -n "$opts_module" ] && {
             # check if current option takes an argument, and that prev matches -.*
-            echo $prev | grep -q '^\-[^-].*' && $(_rerunHasOptsArgument ${RERUN_MODULES} ${mod_ctx} ${opts_command} ${prev}) && {
+            echo $prev | grep -q '^\-[^-].*' && $(_rerunHasOptsArgument ${RERUN_MODULES} ${opts_module} ${opts_command} ${prev}) && {
                 local default
-                default=$(_rerunGetOptsDefault ${RERUN_MODULES} ${mod_ctx} ${opts_command} ${prev})
+                default=$(_rerunGetOptsDefault ${RERUN_MODULES} ${opts_module} ${opts_command} ${prev})
                 [ -n "$default" ] && {
                     COMPREPLY=( $(compgen -W "$default" -- ${cur}) )
                     return 0
@@ -208,8 +186,8 @@ _rerun()
         	    echo $arg | grep -q '\-[^-]*' && usedargs="$usedargs ${arg}"
             	done
 
-                [ -n "$mod_ctx" ] && {
-                    remaningargs=$(_lsubtract "$(_rerunListOpts ${RERUN_MODULES} ${mod_ctx} ${opts_command})" "$usedargs")
+                [ -n "$opts_module" ] && {
+                    remaningargs=$(_lsubtract "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" "$usedargs")
                     COMPREPLY=( $(compgen -W "$remaningargs" -- ${cur}) )
     	        }
             }
@@ -217,22 +195,17 @@ _rerun()
 	return 0
     }
     
-    # Module context: list commands after the -c
-    [ -n "$opts_module" -a "$prev" = "-c" ] && {
-        COMPREPLY=( $(compgen -W "$(_rerunListCommands ${RERUN_MODULES} ${opts_module})" -- ${cur}) )
+    # Module context: list commands
+    [ -n "$opts_module" -a -z "$opts_command" ] && {
+		local commands=$(_rerunListCommands ${RERUN_MODULES} ${opts_module})
+        COMPREPLY=( $(compgen -W "$commands" -- ${cur}) )
         return 0
-    }
-
-    # Module context but no command flag yet. Offer -c.
-    [ -n "$opts_module" -a "$prev" != "-c" -a -z "$opts_command" ] && {
-	COMPREPLY=( $(compgen -W "-c" -- ${cur}) )
-	return 0
     }
     
     # Empty context: list modules
     [ -z "$opts_module" ]  && {
-	modules=$(_listdirnames $RERUN_MODULES)
-        COMPREPLY=( $(compgen -W "$modules" -- ${cur}) )
+		local modules=$(_listdirnames $RERUN_MODULES)
+        COMPREPLY=( $(compgen -W "$modules" -S ':' -o nospace -- ${cur}) )
         return 0
     }    
 }

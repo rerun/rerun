@@ -1,2 +1,2 @@
-NAME=mkmod
+NAME=stubbs
 DESCRIPTION="Simple rerun module builder"

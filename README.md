@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-    rerun [-v] [-M modules_dir] [-m module [-c command]] [-- command_options]
+    rerun [-v] [-M modules_dir] [module[:command]] [command_options]
 
 # DESCRIPTION
 
@@ -55,12 +55,6 @@ for additional documentation including:
 `-h`
 : Print help and usage.
 
-`-m` *MODULE*
-: Module name.
-
-`-c` *COMMAND*
-: Command name.
-
 `-M` *DIRECTORY*
 : Module library directory path.
 
@@ -80,7 +74,7 @@ Without arguments, `rerun` will list existing modules:
 
 To list the commands available from the 'freddy' module add `-m module`:
 
-    $ rerun -m freddy
+    $ rerun freddy
     freddy:
     [commands]
      study: "tell freddy to study"
@@ -111,17 +105,17 @@ the `-m` option and then a list of existing modules.
 
 Will display:
 
-    $ rerun -m stubbs
+    $ rerun stubbs
 
 Typing the tab key again will show the commands inside the "stubbs" module:
 
-    $ rerun -m stubbs -c add-[TAB]
+    $ rerun stubbs: add-[TAB]
     add-command  add-module   add-option     
 
 In this case, three commands are found and listed.
 After accepting a command, typing the tab key will show arguments.
 
-    $ rerun -m stubbs -c add-command --[TAB]
+    $ rerun stubbs:add-command [TAB]
     module name
 
 The "add-command" command accepts two options (module and name).
@@ -133,22 +127,22 @@ command and possibly options.
 
 To run freddy module's "study" command, type:
 
-    rerun -m freddy -c study
+    rerun freddy:study
     math
 
 The string "math" is the printed result (and subject's default value).
     
 Arguments to a called command are passed after
-two dashes `--`. 
+the module:command:
 Tell freddy to study the subject, "biology":
 
-    rerun -m freddy -c study -- -subject biology
+    rerun freddy:study -subject biology
     studying (biology)
 
 If the 'freddy' module is stored in `/var/rerun`, then the command usage
 would be:
 
-    rerun -M /var/rerun -m freddy -c study
+    rerun -M /var/rerun freddy:study
     studying (math)
 
 ### Bash self extracting archive executable
@@ -164,7 +158,7 @@ script. If the execute bit is set, just invoke the script directly:
 
 If the execute bit is not set, run it via bash:
 
-    $ bash rerun.bin -m <module> -c <command> -- -your other options
+    $ bash rerun.bin <module>:<command> -your other options
 
 Note, ".bin" is just a suffix naming convention for a bash self-extracing script.
 The file can be named anything you wish.

@@ -17,13 +17,13 @@ Create a new rerun module.
 
 *Usage*
 
-    rerun -m stubbs -c add-module -- [-name <>] [-description <>]
+    rerun stubbs:add-module [-name <>] [-description <>]
     
 *Example*
 
 Make a new module named "freddy":
 
-    rerun -m stubbs -c add-module  -- -name freddy -description "A dancer in a red beret and matching suspenders"
+    rerun stubbs:add-module -name freddy -description "A dancer in a red beret and matching suspenders"
 
 The `add-module` command will print:
 
@@ -35,13 +35,13 @@ Create a command in the specified module and generate a default implementation.
 
 *Usage*
 
-    rerun -m stubbs -c add-command -- -name <> -description <> -module <> [-ovewrite <false>]
+    rerun stubbs:add-command -name <> -description <> -module <> [-ovewrite <false>]
 
 *Example*
 
 Add a command named "dance" to the freddy module:
 
-    rerun -m stubbs -c add-command -- -name dance -description "tell freddy to dance" -module freddy
+    rerun stubbs:add-command -name dance -description "tell freddy to dance" -module freddy
 
 The `add-command `module will generate a boilerplate script you can edit.
 
@@ -58,13 +58,13 @@ Define a command option for the specified module and generate options parser scr
 
 *Usage*
 
-    rerun -m stubbs -c add-option  -- [-arg <true>] -name <> -description <> -module <> -command <> [-required <false>]
+    rerun stubbs:add-option [-arg <true>] -name <> -description <> -module <> -command <> [-required <false>]
 
 *Example*
 
 Define an option named "jumps":
 
-    rerun -m stubbs -c add-option  -- -name jumps -description "jump #num times" -module freddy -command dance
+    rerun stubbs:add-option -name jumps -description "jump #num times" -module freddy -command dance
 
 You will see output similar to:
 
@@ -78,7 +78,7 @@ command line option parsing.
 
 Users will now be able to specify a "-jumps" argument to freddy's "dance" command:
 
-    $ rerun -m freddy
+    $ rerun freddy
     freddy:
     [commands]
      dance: tell freddy to dance
@@ -99,13 +99,13 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun -m stubbs -c archive -- [-file <>] [-modules <"*">]
+    rerun stubbs:archive [-file <>] [-modules <"*">]
 
 *Example*
 
 Create an archive containing the "freddy" module:
 
-    rerun -m stubbs -c archive -- -modules "freddy"
+    rerun stubbs:archive -modules "freddy"
 
 The `archive` command generates a "rerun.bin" script 
 in the current directory.
@@ -122,7 +122,7 @@ will see freddy's command listed:
 
 Now run freddy's "dance" command.
 
-    $ bash rerun.bin -m freddy -c dance -- -jumps 10
+    $ bash rerun.bin freddy:dance -jumps 10
     jumps (10)
 
 It works like a normal `rerun` command. Amazing !
@@ -206,14 +206,14 @@ Always faithfully check and return useful exit codes!
 
 Try running the command:
 
-    $ rerun -m freddy -c dance -- -jumps 3
+    $ rerun freddy:dance -jumps 3
     jumps (3)
 
 The "jumps (3)" is written to the console stdout.
 
 Run "dance" again but this time without options.
 
-    $ rerun -m freddy -c dance
+    $ rerun freddy:dance
     jumps ()
 
 This time an empty pair of parenthesis is printed.
@@ -231,7 +231,7 @@ time use its `-default <>` parameter to set the default value.
 
 Here the "jumps" option is set to a default value, "1":
 
-    rerun -m stubbs -c add-option  -- \
+    rerun stubbs:add-option \
       -name jumps -description "jump #num times" -module freddy -command dance \
       -default 1
 
@@ -240,7 +240,7 @@ new default value and extend the `options.sh` script.
 
 Run the "dance" command again but this time without the "-jumps" option:
 
-    $ rerun -m freddy -c dance
+    $ rerun freddy:dance
     jumps (1)
 
 We see the default value "1" printed.
@@ -335,7 +335,7 @@ Inside the Linux.sh script, replace the implementation with:
      
 Run freddy's "dance" command:
 
-    $ rerun -m freddy -c dance
+    $ rerun freddy:dance
     I'm a locker
 
 The result comes from rerun's execution of the new Linux.sh script.
@@ -351,7 +351,7 @@ implementation script with bash's "-vx" flags.
 
 Here's a snippet of freddy's "dance" command with verbose output:
 
-    rerun -v -m freddy -c dance
+    rerun -v freddy:dance
     .
     . <spipping out most of the verbose output ... >
     .
