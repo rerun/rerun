@@ -27,7 +27,7 @@ rerun_init() {
 rerun_modules() {
     names=
     for f in `echo $1/*/metadata`; do
-	mod_name=$(basename $(dirname $(dirname $f)))
+	mod_name=$(basename $(dirname $f))
 	names="$names $mod_name"
     done
     echo $names
