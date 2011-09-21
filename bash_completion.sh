@@ -116,14 +116,14 @@ _rerun() {
     # Set up the context array...
 
 	# Define regex pattern to parse command line input
-	regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_]*)([ ]*)(.*)'
+	regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_-]*)([ ]*)(.*)'
 	if [[ "$@" =~ $regex ]]
 	then
 		context[0]=${BASH_REMATCH[1]};    # module
 		[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
 		context[1]=${BASH_REMATCH[3]/ /}; # command
 		# BASH_REMATCH[4] contains the whitespace between command and options
-		capture[2]=${BASH_REMATCH[5]};    # options
+		context[2]=${BASH_REMATCH[5]};    # options
 	else
 	    context[0]=${1/:/}                # module (minus colon)
 	fi
