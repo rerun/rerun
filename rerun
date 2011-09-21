@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # rerun - a simple command runner because it's easy to forget 
 #         standard operating procedure.
@@ -6,11 +6,37 @@
 SH=/bin/bash
 PROG=`basename $0`
 USAGE="
-Usage: $PROG -m module::command [command_args]
+Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--checklog <file>] [module:[command [command_args]]]
 "
-SYNTAX="$PROG: option syntax error."
 PAD="  "
+DIFF=diff
 export RERUN=$0
+
+examples() {
+echo "Examples:
+| \$ $PROG 
+| => List all modules.
+| \$ $PROG freddy
+| => List all freddy commands.
+| \$ $PROG freddy:dance -jumps 3
+| => Execute the freddy dance command."
+}
+
+#
+# colorizing functions
+#
+# bold - bold the given text
+bold() { echo -e "\033[1m$*\033[0m" ; reset ; }
+# reset the terminal
+reset () { tput sgr0 ; }
+# print a ascii art banner with version info
+banner() {
+echo " _ __ ___ _ __ _   _ _ __
+| '__/ _ \ '__| | | | '_ \ 
+| | |  __/ |  | |_| | | | |
+|_|  \___|_|   \__,_|_| |_|
+Version: v0.1. License: Apache 2.0."
+}
 
 # 
 # utility functions -
@@ -18,14 +44,13 @@ export RERUN=$0
 
 # print error message and exit
 die() {
-    echo "ERROR: $*" >&2
+	[[ "$RERUN_COLOR" == "true" ]] && bold "ERROR: $*" >&2 || echo "ERROR: $*" >&2
+	exit 1
 }
 
 # print USAGE and exit
 rerun_syntax_error() {
-    echo "$USAGE" >&2
-    echo "$SYNTAX $*" >&2
-    exit 2
+	die "$USAGE"
 }
 
 # check option has its argument
@@ -69,65 +94,25 @@ rerun_existsHandler() {
     fi
 }
 
-# List the modules
-rerun_modules() {
-    echo "[modules]"
-    for mod in $1/*; do
-       [ -d "$mod" -a -f "$mod/metadata" ] && {
-	   mod_name=`basename $mod`
-	   mod_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $mod/metadata`
-	   printf "%s%s: %s\n" "$PAD" "${mod_name}" "${mod_desc}"
-       }
-    done
+# Check if module exists
+rerun_existsModule() {
+	[ -f $RERUN_MODULES/$1/metadata ] && return 0 || return 1
 }
 
-# List the commands in a module
-rerun_commands() {
-    cmdir=$1/$2/commands
-    shopt -s nullglob # enable
-    echo "[commands]"
-    for cmd in $cmdir/*/default.sh; do
-	cmd_name=$(basename $(dirname $cmd))
-	cmd_metadata=$1/$2/commands/${cmd_name}/metadata
-	[ -f $cmd_metadata ] && {
-	    cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
-	}
-	printf " %s: %s\n" "${cmd_name}" "${cmd_desc}"
-	rerun_options $1 $2
-    done
+rerun_extractLog() {
+	file=$1
+	[ -f $file ] || die "file does not exist: $file"
+	SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
+	tail -n+$SIZE $file || die "failed extracting log"
 }
 
-# List the options for a command
-rerun_options() {
-    if [ -d $1/$2/commands/${cmd_name} ]; then
-	printf "%s%s\n" "$PAD" "[options]"
-	shopt -s nullglob # enable
-	for opt_metadata in $1/$2/commands/${cmd_name}/*.option; do
-	    cmd_param=$(basename $(echo ${opt_metadata%%.option}))
-	    #echo "DEBUG: processing param: $cmd_param"
-	    opt_name=`awk -F= '/^NAME/ {print $2}' $opt_metadata`
-	    opt_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $opt_metadata`
-	    opt_arg=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata`
-	    opt_req=`awk -F= '/^REQUIRED/ {print $2}' $opt_metadata`
-	    opt_def=`awk -F= '/^DEFAULT/ {print $2}' $opt_metadata`
-	    
-	    opt_usage=$(printf " -%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
-	    [ "true" != "${opt_req}" ] && {
-		opt_usage=$(printf "[-%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
-	    }
-	    printf "%s %s\n" "$PAD" "$opt_usage"
-	done
-    fi
-}
-
-
-bindir=$(dirname "$0")
+#
+# Main body of the script. 
+#
 
 # Use env var property if it exists otherwise...
 # ...the default modules base directory is cwd.
-[ -n "$RERUN_MODULES" ] || {
-    RERUN_MODULES=$(dirname .)/modules
-}
+[ -n "$RERUN_MODULES" ] || RERUN_MODULES=$(pwd)/modules
 
 #
 # process command line options
@@ -138,15 +123,17 @@ while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
 	  # options without arguments
-	-h)
-	    echo "$USAGE"
+	-h*)
+		banner
+	    bold "$USAGE"
+	    examples
 	    exit 0
 	    ;;
   	-v)
-	    OPTS_VERBOSE="-vx"
+	    VERBOSE="-vx"
 	    ;;
   	-V)
-	    OPTS_VERBOSE=1
+	    VERBOSE="-vx"
 	    set -vx
 	    ;;
 	# options with arguments
@@ -155,6 +142,16 @@ while [ "$#" -gt 0 ]; do
 	    RERUN_MODULES="$2"
 	    shift
 	    ;;
+	-L)
+	    rerun_syntax_check "$#"
+	    RERUN_LOGS="$2"
+	    shift
+	    ;;	
+	--checklog)
+	    rerun_syntax_check "$#"
+	    CHECKLOG="$2"
+	    shift
+	    ;;	
 	  # unknown option
 	-?)
 	    rerun_syntax_error
@@ -165,20 +162,11 @@ while [ "$#" -gt 0 ]; do
     esac
     shift
 done
-#
+
 # Read the module:command context
 #
-#regex='([^:]+)([: ]*)([^:-]*)'
-#if [[ "$@" =~ $regex ]]
-#then
-#	MODULE=${BASH_REMATCH[1]}
-#	COMMAND=${BASH_REMATCH[3]/ /}
-#	[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
-#else
-#    MODULE=${1/:/}
-#fi
 # Define regex pattern to parse command line input
-regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_]*)([ ]*)(.*)'
+regex='([^:]+)([:]?[ ]?)([-A-Za-z0-9_]*)([ ]*)(.*)'
 if [[ "$@" =~ $regex ]]
 then
 	MODULE=${BASH_REMATCH[1]};    # module
@@ -192,28 +180,62 @@ fi
 shift; # Shift over to the command options
 
 #
-# ensure module dir is set
+# ensure modules directory is set and exists
 [ -n "$RERUN_MODULES" -a -d "$RERUN_MODULES" ] || {
     die RERUN_MODULES not set to an existing directory: $RERUN_MODULES
-    exit 1
 }
 
 #
 # Listing mode
 #
+
+# Module listing
 [ -z "$MODULE" -a -z "$COMMAND" ] && {
-    rerun_modules $RERUN_MODULES
-    exit
+	bold "[modules]"
+    for mod in $RERUN_MODULES/*
+	do
+       	$(rerun_existsModule $(basename $mod)) && {
+	   		mod_name=$(basename $mod)
+	   		mod_desc=$(awk -F= '/^DESCRIPTION/ {print $2}' $mod/metadata)
+	   		echo "${PAD}${mod_name}: ${mod_desc}" 
+        }
+    done
+    exit 0
 }
 
+# Command listing
 [ -n "$MODULE" -a -z "$COMMAND" ] && {
-    cmdir=$RERUN_MODULES/$MODULE/commands
-    [ -d "$cmdir" ] || {
-        die module missing commands dir: $cmdir
-    }
-    echo "$MODULE:"
-    rerun_commands $RERUN_MODULES $MODULE
-    exit
+	$(rerun_existsModule $MODULE) || die "module not found: $MODULE"
+    bold "[commands]"
+    shopt -s nullglob # enable
+    for cmd in $RERUN_MODULES/$MODULE/commands/*/default.sh
+	do
+		cmd_name=$(basename $(dirname $cmd))
+		cmd_metadata=$RERUN_MODULES/$MODULE/commands/${cmd_name}/metadata
+		[ -f $cmd_metadata ] && cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
+  	    echo " ${cmd_name}: ${cmd_desc}" 
+		# List the options
+		if [ -d $RERUN_MODULES/$MODULE/commands/${cmd_name} ]
+		then
+			printf "%s%s\n" "$PAD" "[options]"
+			shopt -s nullglob # enable
+			for opt_metadata in $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option; do
+		    	cmd_param=$(basename $(echo ${opt_metadata%%.option}))
+		    	opt_name=`awk -F= '/^NAME/ {print $2}' $opt_metadata`
+		    	opt_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $opt_metadata`
+		    	opt_arg=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata`
+		    	opt_req=`awk -F= '/^REQUIRED/ {print $2}' $opt_metadata`
+		    	opt_def=`awk -F= '/^DEFAULT/ {print $2}' $opt_metadata`
+				# option usage summary
+		    	opt_usage=$(printf " -%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
+		    	[ "true" != "${opt_req}" ] && {
+					opt_usage=$(printf "[-%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
+		    	}
+		    	printf "%s %s\n" "$PAD" "$opt_usage"
+			done
+	    fi
+    done
+    exit 0
 }
 
 #
@@ -223,7 +245,7 @@ shift; # Shift over to the command options
 [ -z $COMMAND ]  && rerun_syntax_error "command not specified"
 
 #
-#  If the handler exists for the named command, execute it
+#  If the script exists for the specified command, execute it
 #
 if ( rerun_existsHandler $MODULE $COMMAND )
 then
@@ -233,17 +255,51 @@ then
     CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/metadata
     [ -r $MODULE_DIR/commands/${cmd_name}/metadata ] && {
-	. $MODULE_DIR/commands/${cmd_name}/metadata
+	  . $MODULE_DIR/commands/${cmd_name}/metadata
     }
     #
-    # execute the handler
+    # execute the command implementation
     #
-    $SH $OPTS_VERBOSE $CMD_HANDLER "$@"
-    RETVAL=$?
+	if [ -n "$RERUN_LOGS" -a -d "$RERUN_LOGS" ]
+	then
+	    # set up a log file
+		TSTAMP=$(date '+%Y-%m%d-%H%M%S')
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.log
+		(
+		cat <<-EOF
+		#
+		# Rerun command execution log
+		#
+		RERUN="$0"
+		MODULE="$MODULE"
+		COMMAND="$COMMAND"
+		OPTIONS="$*"
+		USER="$USER"
+		DATE="$TSTAMP"
+		__LOG_BELOW__
+
+		EOF
+		) > $LOG
+	    $SH $VERBOSE $CMD_HANDLER "$@" | tee -a $LOG
+		if [ -n "$CHECKLOG" ]
+		then
+			# extract the log content from checklog
+			rerun_extractLog $CHECKLOG > $RERUN_LOGS/rerun-$$.checklog
+			rerun_extractLog $LOG > $RERUN_LOGS/rerun-$$.log
+			$DIFF $RERUN_LOGS/rerun-$$.checklog $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
+			RETVAL=$?
+			[ $RETVAL -eq 1 ] && {
+				bold "[diff]"
+				cat $RERUN_LOGS/rerun-$$.diff
+			}
+			rm $RERUN_LOGS/rerun-$$.{log,checklog}
+		fi
+	else
+    	$SH $VERBOSE $CMD_HANDLER "$@"	
+	    RETVAL=$?
+	fi
 else 
     die command not found: \"$COMMAND\"
 fi
 
 exit ${RETVAL:-0}
-
-

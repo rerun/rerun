@@ -10,7 +10,7 @@
 die() { echo "ERROR: $* " ; exit 1 ; }
 
 # extracted payload goes in here
-export PAYLOAD=`mktemp -d /tmp/rerun.bsx.XXXXXX` || die "failed making payload extraction directory"
+export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die "failed making payload extraction directory"
 
 SIZE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0` || die "error sizing payload content"
 

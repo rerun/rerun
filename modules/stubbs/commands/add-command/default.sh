@@ -95,7 +95,16 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || die
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
 	$TEMPLATE > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || die
-    echo "Wrote command handler: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"
+    echo "Wrote command script: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"
+}
+
+# Generate a unit test script
+[ ! -f $RERUN_MODULES/$MODULE/commands/$NAME/test.sh -o -n "$OVEWRITE" ] && {
+    sed -e "s/@NAME@/$NAME/g" \
+	-e "s/@MODULE@/$MODULE/g" \
+	-e "s/@COMMAND@/$NAME/g" \
+	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/commands/$NAME/test.sh || die
+    echo "Wrote test script: $RERUN_MODULES/$MODULE/commands/$NAME/test.sh"
 }
 
 # Generate command metadata
