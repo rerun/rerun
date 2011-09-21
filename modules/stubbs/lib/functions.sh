@@ -19,9 +19,7 @@ rerun_init() {
     # Shell modules reside in current directory, by default. 
     homedir=$(dirname .)
     # Use env var property if it exists otherwise set it to default.
-    [ -n "$RERUN_MODULES" ] || {
-	RERUN_MODULES=$homedir/modules
-    }
+    [ -n "$RERUN_MODULES" ] || RERUN_MODULES=$homedir/modules    
 }
 
 rerun_modules() {
@@ -57,5 +55,5 @@ rerun_options() {
 }
 
 rerun_optionDefault() {
-    awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$opt.option
+    awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$4.option
 }
