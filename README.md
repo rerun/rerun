@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-    rerun [-v] [-M modules_dir] [module[:command]] [command_options]
+	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--checklog <file>] [module:[command [command_args]]]
 
 # DESCRIPTION
 
@@ -53,7 +53,7 @@ for additional documentation including:
 # OPTIONS
 
 `-h`
-: Print help and usage.
+: Print help and usage then exit.
 
 `--checklog *LOG*`
 : Compare the results of an execution to those of a previous command log and show the diff
