@@ -257,7 +257,7 @@ can set a default value.
 Call the `add-option` command again but this
 time use its `-default <>` parameter to set the default value. 
 
-Here the "jumps" option is set to a default value, "1":
+Here the "-jumps" option is set to a default value, "1":
 
     rerun stubbs:add-option \
       -name jumps -description "jump #num times" -module freddy -command dance \

@@ -110,7 +110,6 @@ Without arguments, `rerun` will list existing modules:
 To list the commands available from the 'freddy' module run:
 
     $ rerun freddy
-    freddy:
     [commands]
      study: "tell freddy to study"
       [options]
@@ -119,8 +118,8 @@ To list the commands available from the 'freddy' module run:
       [options]
        -jumps <1>: "jump #num times"
 
-The listing also includes option info including default
-values if they were described with option metadata.
+The listing consists of info about command options 
+including default values if they were described with option metadata.
 
 Options that declare a default value are shown
 with a string between the "<>" characters.
@@ -130,7 +129,7 @@ The "1" is the default value assigned to the "-jumps" option.
 
 ### Bash completion
 
-If you are a bash shell user, be sure to source the `bash_completion.sh` file. 
+If you are a Bash shell user, be sure to source the `bash_completion.sh` file. 
 It provides listing via the tab key.
 
 Type `rerun` and then the tab key. The shell will generate
@@ -150,26 +149,27 @@ Typing the tab key again will show the commands inside the "freddy" module:
 In this case, two commands are found and listed.
 After accepting a command, typing the tab key will show arguments.
 
-    $ rerun freddy:study [TAB]
-    subject
+    $ rerun freddy:study -[TAB]
+    -subject
 
-The `freddy:study` command accepts one option (subject).
+The `freddy:study` command accepts one option (-subject <>).
     
 ## Executing
 
 Commands are executed by supplying the module,
-command and possibly options.
+command and possibly options. The basic usage form is
+"module:command [args]".
 
 To run freddy module's "study" command, type:
 
     rerun freddy:study
-    math
+    studying (math)
 
-The string "math" is the printed result (and subject's default value).
+The string "studying (math)" is the printed result. 
+And, "math" is the subject option's default value.
     
 Arguments to a called command are passed after
-the module:command:
-Tell freddy to study the subject, "biology":
+the "module:command". Tell freddy to study the subject, "biology":
 
     rerun freddy:study -subject biology
     studying (biology)
@@ -195,13 +195,24 @@ If the execute bit is not set, run it via bash:
 
     $ bash rerun.bin <module>:<command> -your other options
 
-Note, ".bin" is just a suffix naming convention for a bash self-extracing script.
+Note, ".bin" is just a suffix naming convention for a bash self-extracting script.
 The file can be named anything you wish.
 
 ### Checklog
 
+Rerun supports basic command execution logging (See "Logs" section below). 
+It's possible to have rerun compare the results of a previous execution
+to a new command execution.
+
 Use the `--checklog <log>` option to compare execution output from a command log.
-	
+Command logs are normally found in the directory specified by the `RERUN_LOGS`
+environment variable (or the `-L <dir>` option).
+
+Below you can see the results of `freddy:dance -jumps 2` compared
+against an earlier command execution. After the command completes,
+rerun uses the `diff` command to compare the results to those found
+in the specified log.
+
 	$ ./rerun --checklog $RERUN_LOGS/freddy-dance-2011-0921-140744.log freddy:dance -jumps 2
 	jumps (2)
 	[diff]
@@ -210,7 +221,10 @@ Use the `--checklog <log>` option to compare execution output from a command log
 	---
 	> jumps (2)
 
-If a difference is detected, `rerun` will exit with a non-zero exit status.
+In this case the previous execution printed "jumps ()" while the new
+execution printed "jumps (2)".
+When a difference is detected, `rerun` will print the differences
+and exit with a non-zero exit status.
 
 # LOGS
 
@@ -220,11 +234,11 @@ Be sure to set `RERUN_LOGS` to a writable directory.
 
 *Log file names*
 
-Each command execution is logged in a file named using the following pattern:
+Each command execution log is named using the following pattern:
 
     $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.log
 
-To list all logs for the `freddy:dance` command run:
+To list all logs for the `freddy:dance` command use `ls`:
 
 	$ ls -l $RERUN_LOGS/freddy-dance*.log
 	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-0921-195402.log
@@ -232,7 +246,17 @@ To list all logs for the `freddy:dance` command run:
 
 *Log file format*
 
-Command logs use the following format.
+Command logs use a simple format that combines execution
+metadata and log output.
+
+* RERUN: The rerun executable
+* MODULE: The module name
+* COMMAND: The command name
+* OPTIONS: The command options
+* USER: The user executing the command
+* DATE: The timestamp for the execution
+
+Here's the basic template:
 
 	#
 	# Rerun command execution log
@@ -261,6 +285,22 @@ Here's an example log for the `freddy:dance` command:
 	__LOG_BELOW__
 
 	jumps (1)
+
+Here's a simple shell function that will parse the content for a given 
+command execution log:
+
+	rerun_extractLog() {
+		[ -f $1 ] || die "file does not exist: $1"
+		SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $1) || die "failed sizing output"
+		tail -n+$SIZE $1 || die "failed extracting output"
+	}
+
+Running this shell function in the current shell looks like this:
+
+	$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.log 
+
+	jumps (1)
+
 
 # MODULES
 
