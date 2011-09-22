@@ -9,15 +9,16 @@ standard operating procedure.
 
 # DESCRIPTION
 
-Rerun is a lightweight tool building framework useful for those that 
-implement management procedure with shell scripts. Rerun will help you
+Rerun is a lightweight tool building framework useful for those  
+implementing management procedure with shell scripts. Rerun will help you
 organize your implementation into well defined modular interfaces.
 Collections of management modules can be archived and delivered as
 a single executable to facilitate team hand offs.
+Using the "stubbs" module, rerun will even facilitate unit tests.
 
 Rerun provides two interfaces:
 
-1. Listing: `rerun` lists modules and commands. Listing
+1. Listing: Rerun lists modules and commands. Listing
 information includes name, description and command line usage syntax.
 2. Execution: Rerun provides option processing (possibly defaulting
 unspecified arguments) and executes the specified module command.
@@ -26,16 +27,17 @@ For the module developer, rerun is a trivial framework following
 simple conventions that easily fit in a shell context.
 Rerun includes a module development tool called "stubbs" that
 helps create and evolve rerun modules. Stubbs contains
-commands to automate option processing code and metadata definition.
+commands to automate option processing code, metadata definition
+and unit testing.
 
-Internally, rerun implements a simple dispatching mechanism to look up named
+Internally, `rerun` implements a simple dispatching mechanism to look up named
 commands and execute them. *Commands* are logically named and
 have a corresponding script.
 
 Commands reside in a module and can have named command line 
 parameters called *options*. Each option is named and 
-described and also be defined to have a default value 
-or whether it is required input.
+described and can also be defined to use a default value 
+or whether it is required or not.
 
 Rerun modules can optionally declare metadata describing name, description
 and other aspects of each command. Rerun makes use of this metadata
@@ -47,7 +49,7 @@ for additional documentation including:
 
 * [Getting started](https://github.com/dtolabs/rerun/wiki)
 * [Installation](https://github.com/dtolabs/rerun/wiki/Installation)
-* [stubbs module tool](https://github.com/dtolabs/rerun/tree/master/modules/stubbs)
+* [Stubbs module tool](https://github.com/dtolabs/rerun/tree/master/modules/stubbs)
 * [Why rerun?](https://github.com/dtolabs/rerun/wiki/Why-rerun%3F)
 
 # OPTIONS
@@ -72,6 +74,28 @@ for additional documentation including:
 
 
 # USING
+
+## Help
+
+For syntax and example usage execute `rerun` using the `-help` flag:
+
+	$ ./rerun -help
+	 _ __ ___ _ __ _   _ _ __
+	| '__/ _ \ '__| | | | '_ \ 
+	| | |  __/ |  | |_| | | | |
+	|_|  \___|_|   \__,_|_| |_|
+	Version: v0.1. License: Apache 2.0.
+
+	Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--checklog <file>] [module:[command [command_args]]]
+
+	Examples:
+	| $ rerun 
+	| => List all modules.
+	| $ rerun freddy
+	| => List all freddy commands.
+	| $ rerun freddy:dance -jumps 3
+	| => Execute the freddy dance command.
+
 
 ## Listing
 
