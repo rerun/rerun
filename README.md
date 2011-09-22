@@ -198,6 +198,12 @@ Each command execution is logged in a file named using the following pattern:
 
     $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.log
 
+To list all logs for the freddy `dance` command run:
+
+	$ ls -l $RERUN_LOGS/freddy-dance*.log
+	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-0921-195402.log
+	
+
 *Log file format*
 
 Command logs use the following format.
