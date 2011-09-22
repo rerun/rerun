@@ -1,0 +1,6 @@
+NAME=logs
+DESCRIPTION="logs directory"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=
+
