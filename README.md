@@ -9,7 +9,7 @@ standard operating procedure.
 
 # DESCRIPTION
 
-Rerun is a lightweight tool building framework useful to those  
+Rerun is a lightweight tool building framework useful to those
 implementing management procedure with shell scripts. Rerun will help you
 organize your implementation into well defined modular interfaces.
 Collections of management modules can be archived and delivered as
@@ -20,9 +20,9 @@ execution data into log files that can later be replayed.
 
 Rerun provides two interfaces:
 
-1. Listing: Rerun lists modules and commands. Listing
+1. *Listing*: Rerun lists modules and commands. Listing
 information includes name, description and command line usage syntax.
-2. Execution: Rerun provides option processing (possibly defaulting
+2. *Execution*: Rerun provides option processing (possibly defaulting
 unspecified arguments) and executes the specified module command.
 
 For the module developer, rerun is a trivial framework following
@@ -172,9 +172,10 @@ To run freddy module's "study" command, type:
     studying (math)
 
 The string "studying (math)" is the printed result. 
-And, "math" is the subject option's default value.
+And, "math" is the subject option's default value
+as defined in the module metadata.
     
-Arguments passed after the "module:command" specification. 
+Arguments are passed after the "module:command" string. 
 Tell freddy to study the subject, "biology":
 
     $ rerun freddy:study -subject biology
@@ -188,22 +189,40 @@ should be:
 
 ### Archives
 
-A set of modules and `rerun` itself can be archived into a self extracting
-script called a rerun *archive*. 
-If the execute bit is set, just invoke the archive directly:
+An *archive* contains all the rerun modules you need
+(you might have a library of them) and gives you
+the same exact interface as rerun,... all in one file!
 
-    $ ./rerun.bin
-    [modules]
-    .
-    .
-    . listing output ommitted
+Specifically, an archive is a set of modules 
+and `rerun` itself packaged into a self extracting
+script (by default "rerun.bin"). 
+Archives can be useful if you want
+to share a single self contained executable that contains any needed modules.
 
-If the execute bit is not set, run it via `bash`:
+Run an archive script like you would run `rerun`.
+
+You can execute an archive via `bash` like so:
 
     $ bash rerun.bin <module>:<command> -your options
 
+If the execute bit is set, invoke the archive directly.
+
+Here the archive is executed without arguments which causes the archive
+to list the modules contained within it.
+
+    $ ./rerun.bin
+    [modules]
+      freddy: "A dancer in a red beret and matching suspenders"
+      .
+      . listing output ommitted
+
 Note, ".bin" is just a suffix naming convention for a bash self-extracting script.
 The file can be named anything you wish.
+
+Run the `freddy:dance` command in the archive:
+
+	$ bash ./rerun.bin freddy:dance -jumps 3
+	jumps (3)
 
 See `stubbs:archive` for further information about creating and 
 understanding rerun archives.
@@ -212,17 +231,17 @@ understanding rerun archives.
 
 Rerun supports basic command replay logging (See "Logs" section below).
 When rerun logs a command it does so in a form that can be re-executed 
-(aka "replayed"). It's possible to have rerun compare the results of a 
+(i.e., "replayed"). It's possible to have rerun compare the results of a 
 given replay log against a new command execution.
 
 Use the `--replay <log>` option to compare replay output from a command log.
 Replay logs are normally found in the directory specified by the `RERUN_LOGS`
 environment variable (or the `-L <dir>` option).
 
-Below you can see the results of `freddy:dance -jumps 2` compared
-against an earlier command execution. After the command completes,
-rerun uses the `diff` command to compare the results to those found
-in the specified replay log.
+Below you can see the results of a comparison between this run of
+`freddy:dance -jumps 2`  against an earlier command execution. 
+After the command completes, rerun uses the `diff` command 
+to compare the log output.
 
 	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-0921-140744.replay freddy:dance -jumps 2
 	jumps (2)
@@ -239,17 +258,18 @@ below the `[diff]` label and exit with a non-zero exit status.
 
 # LOGS
 
-Rerun logs all command execution if the `-L <dir>` 
+Rerun logs all command execution, if the `-L <dir>` 
 argument is set or the `RERUN_LOGS` environment variable is set.
 Be sure to set `RERUN_LOGS` to a writable directory. 
 
 Each command execution is stored in the form of a "replay" log
-file. This log file contains information about the command
+file (ending with `.replay`).
+This log file contains information about the command
 execution, as well as, the output from the execution.
 
-These log files can be edited executed as scripts.
+These .replay files can be edited or executed as scripts.
 
-*Log file names*
+*File naming*
 
 Each replay log is named using the following pattern:
 
@@ -261,9 +281,9 @@ To list the replay logs for the `freddy:dance` command use `ls`:
 	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-0921-195402.replay
 	
 
-*Log file format*
+*File format*
 
-Replay logs use a simple format that combines 
+Replay logs follow a simple format that combines 
 command execution metadata and log output.
 
 metadata:
@@ -275,7 +295,7 @@ metadata:
 * USER: The user executing the command
 * DATE: The timestamp for the execution
 
-Here's the metadata part of the replay template:
+Here's the metadata as specified in the file template:
 
 	#
 	# Rerun replay log
@@ -290,7 +310,7 @@ Here's the metadata part of the replay template:
 	
 Any command output is stored below the line delimiter, `__LOG_BELOW__`.
 
-Here's an example log for the `freddy:dance` command:
+Here's an example replay file for the `freddy:dance` command:
 
 	#
 	# Rerun replay log
@@ -305,7 +325,7 @@ Here's an example log for the `freddy:dance` command:
 
 	jumps (1)
 
-Here's a simple shell function that will parse the content for a given 
+This simple shell function will parse the content for a given 
 replay log:
 
 	rerun_extractLog() {
@@ -314,9 +334,9 @@ replay log:
 		tail -n+$SIZE $1 || die "failed extracting output"
 	}
 
-Running this shell function in the current shell looks similar to this:
+Running this shell function for a given replay log looks similar to this:
 
-	$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.log 
+	$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.replay
 
 	jumps (1)
 
@@ -345,7 +365,7 @@ A rerun module assumes the following structure:
 
 ## Scripts
 
-Rerun's internal dispatch logic follows the layout convention 
+Rerun's internal dispatch logic uses the layout convention 
 described above to find and execute scripts for each command.
 
 Rerun expects a default implementation script for each command
@@ -377,8 +397,8 @@ Here's one for the "study" command:
     NAME="study"
     DESCRIPTION="tell freddy to study"
 
-Options can be
-described in a file called `MODULE_DIR/commands/<command>/<option>.option`.
+Options can be described in a file called 
+`MODULE_DIR/commands/<command>/<option>.option`.
 Beyond just NAME and DESCRIPTION, options can declare:
 
 * ARGUMENTS: Does the option take an argument.
@@ -395,7 +415,7 @@ Here's `subject.option` describing an option named "subject":
 
 Combining the examples above into the layout described earlier
 the "freddy" module along with its commands "dance" and "study"
-is illustrated here:
+are illustrated here:
 
     freddy
     ├── commands
@@ -415,10 +435,10 @@ is illustrated here:
 # ENVIRONMENT
 
 `RERUN_MODULES`
-: Path to directory containing rerun modules
+: Path to directory containing rerun modules.
 
 `RERUN_LOGS`
-: Path to directory where rerun will write log files
+: Path to directory where rerun will write log files.
 
 `RERUN_COLOR`
 : Set 'true' if you want ANSI text effects. Makes

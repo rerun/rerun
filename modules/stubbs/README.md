@@ -524,7 +524,7 @@ It's also possible to execute this test script directly.
 	jumps (1)
 
 Does this test script remind you of a command replay log? 
-It should, it is a replay log!
+It should, it works like a replay log!
 		
 #### Example log output
 
