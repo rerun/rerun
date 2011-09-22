@@ -444,12 +444,11 @@ Use the `test` command to execute all the tests in the suite:
 ### Test logs
 
 The output from the test script execution is stored in
-the directory specified by `-logs <>` to `test` or will
-default to `$(pwd)/tests-reports`.
+the directory specified by `-logs <>` option or it will
+defaulted to `$(pwd)/tests-reports`.
 
 Here's a sample report listing of a test suite execution.
 
-	$ tree test-reports
 	test-reports
 	├── TEST-freddy.txt
 	├── TEST-freddy:dance.default.sh.txt
@@ -458,7 +457,7 @@ Here's a sample report listing of a test suite execution.
 	├── freddy-dance-2011-0921-194512.log
 	└── tests-dance-2011-0921-194511.log
 
-Cat the top level report for a summary:
+Cat the file named TEST-$MODULE.txt to see a summary:
 
 	$ cat test-reports/TEST-freddy.txt 
 	Testsuite: freddy
