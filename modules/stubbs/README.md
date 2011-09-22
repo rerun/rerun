@@ -395,7 +395,19 @@ Here's a snippet of freddy's "dance" command with verbose output:
 
 Stubbs provides very basic support for unit testing modules.
 Each module can contain a test suite of scripts.
+Stubbs will run a module's tests via the `test` command.
 
+Here the unit tests for the "freddy" module are executed via `test`:
+
+	rerun stubbs:test -name freddy
+	[tests]  
+	  dance: "test freddy dance": default.sh: OK
+
+A successful unit test will print `OK` while a failed one 
+will print `FAIL` and cause rerun to exit non zero.
+
+Stubbs creates a unit test for every command that is created
+through `add-command`.
 When `add-command` is run, a boiler plate unit test script
 is generated and added to the module's test suite.
 
@@ -435,12 +447,6 @@ specify the freddy module directory as the modules directory:
 This example shows there is one unit test in the 
 freddy test suite.
 
-Use the `test` command to execute all the tests in the suite:
-
-	rerun stubbs:test -name freddy
-	[tests]  
-	  dance: "test freddy dance": default.sh: OK
-	
 ### Test logs
 
 The output from the test script execution is stored in
