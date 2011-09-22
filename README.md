@@ -198,7 +198,7 @@ Each command execution is logged in a file named using the following pattern:
 
     $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.log
 
-To list all logs for the freddy `dance` command run:
+To list all logs for the `freddy:dance` command run:
 
 	$ ls -l $RERUN_LOGS/freddy-dance*.log
 	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-0921-195402.log
@@ -218,9 +218,23 @@ Command logs use the following format.
 	USER="$USER"
 	DATE="$(date '+%Y-%m%d-%H%M%S')"
 	__LOG_BELOW__
-
 	
 Any command output is stored below the line delimiter, `__LOG_BELOW__`.
+
+Here's an example log for the `freddy:dance` command:
+
+	#
+	# Rerun command execution log
+	#
+	RERUN="/Users/alexh/rerun-workspace/rerun/rerun"
+	MODULE="freddy"
+	COMMAND="dance"
+	OPTIONS=""
+	USER="alexh"
+	DATE="2011-0921-195402"
+	__LOG_BELOW__
+
+	jumps (1)
 
 # MODULES
 

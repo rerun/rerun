@@ -43,7 +43,7 @@ Add a command named "dance" to the freddy module:
 
     rerun stubbs:add-command -name dance -description "tell freddy to dance" -module freddy
 
-The `add-command `module will generate a boilerplate script you can edit.
+The `add-command` module will generate a boilerplate script file you can edit.
 
 	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/commands/dance/default.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
@@ -66,7 +66,7 @@ Define a command option for the specified module and generate options parser scr
 
 *Example*
 
-Define an option named "jumps":
+Define an option named "-jumps":
 
     rerun stubbs:add-option -name jumps -description "jump #num times" -module freddy -command dance
 
@@ -80,7 +80,7 @@ option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 The `default.sh` script sources the `options.sh` script to take care of
 command line option parsing.
 
-Users will now be able to specify a "-jumps" argument to freddy's "dance" command:
+Users will now be able to specify a "-jumps" argument to the `freddy:dance` command:
 
     $ rerun freddy
     freddy:
@@ -93,7 +93,7 @@ Users will now be able to specify a "-jumps" argument to freddy's "dance" comman
 
 Create a bash self extracting archive script (aka. a .bin file)
 useful for launching a self contained rerun environment.
-Use `archive` to save a set of specified modules and
+Use `stubbs:archive` to save a set of specified modules and
 the `rerun` executable into a single file that can easily
 be copied across the network.
 
@@ -124,7 +124,7 @@ will see freddy's command listed:
       [options]
         -jumps <>: "jump #num times"
 
-Now run freddy's "dance" command.
+Now run the `freddy:dance` command.
 
     $ bash rerun.bin freddy:dance -jumps 10
     jumps (10)
@@ -175,7 +175,7 @@ the test framework.
 
 ## Command implementation
 
-Running `add-command` as shown above will generate a stub default implementation
+Running `stubbs:add-command` as shown above will generate a stub default implementation
 for the new command: `$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh`:
 
 The dance command's `default.sh` stub is shown below.
@@ -232,14 +232,14 @@ implementation:
 
 Always faithfully check and return useful exit codes!
 
-Try running the command:
+Try running the `freddy:dance` command:
 
     $ rerun freddy:dance -jumps 3
     jumps (3)
 
 The "jumps (3)" is written to the console stdout.
 
-Run "dance" again but this time without options.
+Run `freddy:dance` again but this time without options.
 
     $ rerun freddy:dance
     jumps ()
@@ -251,7 +251,7 @@ so an empty string is printed instead.
 ### Option defaults
 
 If a command option is not supplied by the user, the
-`option.sh` script (created by `add-option`) 
+`options.sh` script (created by `add-option`) 
 can set a default value.
 
 Call the `add-option` command again but this
@@ -266,7 +266,7 @@ Here the "jumps" option is set to a default value, "1":
 The `add-option` will update the `jumps.option` metadata file with the
 new default value and extend the `options.sh` script.
 
-Run the "dance" command again but this time without the "-jumps" option:
+Run the `freddy:dance` command again but this time without the "-jumps" option:
 
     $ rerun freddy:dance
     jumps (1)
@@ -321,8 +321,8 @@ A statement like this is added for options that declare
 `DEFAULT` metadata.
 
 Separating options processing into the `options.sh` script,
-away from the command implementation logic in `default.sh`, facilates
-additonal options being created. It also helps "stubbs"
+away from the command implementation logic in `default.sh`, facilitates
+additional options being created. It also helps "stubbs"
 preserve changes you make to `default.sh` or other scripts
 that source `options.sh`.
 
@@ -343,7 +343,7 @@ operating system. It returns "Linux".
     $ uname -s
     Linux
 
-So, to create a Linux OS specific implmentation,
+So, to create a Linux OS specific implementation,
 create a script called `Linux.sh`. Copy default.sh
 as a starting point:
 
@@ -361,7 +361,7 @@ Inside the Linux.sh script, replace the implementation with:
 
      echo "I'm a locker"
      
-Run freddy's "dance" command:
+Run the `freddy:dance` command:
 
     $ rerun freddy:dance
     I'm a locker
@@ -377,7 +377,7 @@ Shed more light by enabling verbose output using rerun's `-v` flag.
 Adding '-v' effectively has `rerun` call the command
 implementation script with bash's "-vx" flags. 
 
-Here's a snippet of freddy's "dance" command with verbose output:
+Here's a snippet of the `freddy:dance` command with verbose output:
 
     rerun -v freddy:dance
     .
@@ -397,7 +397,7 @@ Stubbs provides very basic support for unit testing modules.
 Each module can contain a test suite of scripts.
 Stubbs will run a module's tests via the `test` command.
 
-Here the unit tests for the "freddy" module are executed via `test`:
+Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 
 	rerun stubbs:test -name freddy
 	[tests]  
@@ -407,7 +407,7 @@ A successful unit test will print `OK` while a failed one
 will print `FAIL` and cause rerun to exit non zero.
 
 Stubbs creates a unit test for every command that is created
-through `add-command`.
+through `stubbs:add-command`.
 When `add-command` is run, a boiler plate unit test script
 is generated and added to the module's test suite.
 
