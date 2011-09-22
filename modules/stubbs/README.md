@@ -45,7 +45,7 @@ Add a command named "dance" to the freddy module:
 
 The `add-command `module will generate a boilerplate script you can edit.
 
-	Wrote command test: /Users/alexh/.rerun/modules/freddy/commands/dance/test.sh
+	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/commands/dance/default.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
 Of course, stubbs doesn't write the implementation for you, merely a stub.
