@@ -94,7 +94,9 @@ For syntax and example usage execute `rerun` using the `-help` flag:
 	| $ rerun freddy
 	| => List all freddy commands.
 	| $ rerun freddy:dance -jumps 3
-	| => Execute the freddy dance command.
+	| => Execute the freddy:dance command.
+	| $ rerun -M /var/rerun freddy:dance
+	| => Execute the freddy:dance command found in /var/rerun
 
 
 ## Listing
@@ -105,7 +107,7 @@ Without arguments, `rerun` will list existing modules:
     [modules]
       freddy: "A dancer in a red beret and matching suspenders"
 
-To list the commands available from the 'freddy' module add `-m module`:
+To list the commands available from the 'freddy' module run:
 
     $ rerun freddy
     freddy:
@@ -124,7 +126,7 @@ Options that declare a default value are shown
 with a string between the "<>" characters.
 
 For example, notice how "-jumps" option shows `<1>`.
-The "1" is the default value assigned to the "jumps" option.
+The "1" is the default value assigned to the "-jumps" option.
 
 ### Bash completion
 
@@ -132,7 +134,7 @@ If you are a bash shell user, be sure to source the `bash_completion.sh` file.
 It provides listing via the tab key.
 
 Type `rerun` and then the tab key. The shell will generate
-the `-m` option and then a list of existing modules.
+a list of existing modules.
 
     $ rerun[TAB][TAB]
 
@@ -151,7 +153,7 @@ After accepting a command, typing the tab key will show arguments.
     $ rerun freddy:study [TAB]
     subject
 
-The "study" command accepts one option (subject).
+The `freddy:study` command accepts one option (subject).
     
 ## Executing
 
