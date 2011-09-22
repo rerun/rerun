@@ -104,7 +104,7 @@ mkdir -p $RERUN_MODULES/$MODULE/tests/$NAME/commands || die "failed creating tes
     sed -e "s/@NAME@/default/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$NAME/g" \
-	-e "s/@RERUN_MODULES@/$RERUN_MODULES/g" \
+	-e "s,@RERUN_MODULES@,${RERUN_MODULES},g" \
 	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh || die
     echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh"
 }
