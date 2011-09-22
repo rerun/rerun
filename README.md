@@ -176,13 +176,45 @@ The file can be named anything you wish.
 
 Use the `--checklog <log>` option to compare execution output from a command log.
 	
-	$ ./rerun --checklog $RERUN_LOGS_/freddy-dance-2011-0921-140744.log freddy:dance -jumps 2
+	$ ./rerun --checklog $RERUN_LOGS/freddy-dance-2011-0921-140744.log freddy:dance -jumps 2
 	jumps (2)
 	[diff]
 	2c2
 	< jumps ()
 	---
 	> jumps (2)
+
+If a difference is detected, `rerun` will exit with a non-zero exit status.
+
+# LOGS
+
+Rerun logs all command execution if the `-L <dir>` 
+argument is set or the `RERUN_LOGS` environment variable is set.
+Be sure to set `RERUN_LOGS` to a writable directory. 
+
+*Log file names*
+
+Each command execution is logged in a file named using the following pattern:
+
+    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.log
+
+*Log file format*
+
+Command logs use the following format.
+
+	#
+	# Rerun command execution log
+	#
+	RERUN="$RERUN"
+	MODULE="$MODULE"
+	COMMAND="$COMMAND"
+	OPTIONS="$*"
+	USER="$USER"
+	DATE="$(date '+%Y-%m%d-%H%M%S')"
+	__LOG_BELOW__
+
+	
+Any command output is stored below the line delimiter, `__LOG_BELOW__`.
 
 # MODULES
 
@@ -288,35 +320,6 @@ is illustrated here:
 labels in text to print bold in the console.
 Syntax errors will also print bold.
 
-# LOGS
-
-Rerun logs all command execution if the `-L <dir>` 
-argument is set or the `RERUN_LOGS` environment variable is set.
-Be sure to set `RERUN_LOGS` to a writable directory. 
-
-*Log file names*
-
-Each command execution is logged in a file named using the following pattern:
-
-    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.log
-
-*Log file format*
-
-Command logs use the following format.
-
-	#
-	# Rerun command execution log
-	#
-	RERUN="$RERUN"
-	MODULE="$MODULE"
-	COMMAND="$COMMAND"
-	OPTIONS="$*"
-	USER="$USER"
-	DATE="$(date '+%Y-%m%d-%H%M%S')"
-	__LOG_BELOW__
-
-	
-Any command output is stored below the line delimiter, `__LOG_BELOW__`.
 
 # SEE ALSO
 
