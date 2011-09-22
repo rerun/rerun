@@ -99,12 +99,14 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || die
 }
 
 # Generate a unit test script
-[ ! -f $RERUN_MODULES/$MODULE/commands/$NAME/test.sh -o -n "$OVEWRITE" ] && {
-    sed -e "s/@NAME@/$NAME/g" \
+mkdir -p $RERUN_MODULES/$MODULE/tests/$NAME/commands || die "failed creating tests directory"
+[ ! -f $RERUN_MODULES/$MODULE/tests/$NAME/commands.sh -o -n "$OVEWRITE" ] && {
+    sed -e "s/@NAME@/default/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$NAME/g" \
-	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/commands/$NAME/test.sh || die
-    echo "Wrote test script: $RERUN_MODULES/$MODULE/commands/$NAME/test.sh"
+	-e "s/@RERUN_MODULES@/$RERUN_MODULES/g" \
+	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh || die
+    echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh"
 }
 
 # Generate command metadata

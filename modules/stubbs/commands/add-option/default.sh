@@ -13,7 +13,7 @@
 . $RERUN_MODULES/stubbs/lib/functions.sh
 
 # print an error and exit
-die() { echo "ERROR: \$* " ; exit 1 ; }
+die() { echo "ERROR: $* " ; exit 1 ; }
 
 # Upper case the string
 caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }

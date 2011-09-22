@@ -45,12 +45,16 @@ Add a command named "dance" to the freddy module:
 
 The `add-command `module will generate a boilerplate script you can edit.
 
-    Wrote command handler: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
+	Wrote command test: /Users/alexh/.rerun/modules/freddy/commands/dance/test.sh
+	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
-Of course, stubb doesn't write the implementation for you, merely a stub.
+Of course, stubbs doesn't write the implementation for you, merely a stub.
 
 See the "Command implementation" section below to learn about 
 the `default.sh` script.
+
+See the "Testing" section below to learn about
+the `test.sh` script.
 
 ### add-option
 
@@ -338,7 +342,7 @@ Run freddy's "dance" command:
     $ rerun freddy:dance
     I'm a locker
 
-The result comes from rerun's execution of the new Linux.sh script.
+The result comes from rerun's execution of the new `Linux.sh` script.
 
 ### Verbosity?
 
@@ -363,4 +367,12 @@ Here's a snippet of freddy's "dance" command with verbose output:
     exit $?
     + exit 0
 
+## Testing 
 
+Tests scripts
+
+	freddy
+	└── commands
+	    └── dance
+	        ├── defaut.sh (generic command script)
+	        └── test.sh (test script)

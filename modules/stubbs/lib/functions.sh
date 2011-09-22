@@ -57,3 +57,21 @@ rerun_options() {
 rerun_optionDefault() {
     awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$4.option
 }
+
+rerun_tests() {
+	modules=$1
+	module=$2
+    tests=
+    for t in $modules/$module/tests/commands/*/*.sh
+	do
+	[ -f $t ] && {
+	    test_name=$(basename $t)
+	    tests="$tests $test_name"
+	}
+    done
+    echo $tests
+}
+
+rerun_testDescription() {
+	awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
+}

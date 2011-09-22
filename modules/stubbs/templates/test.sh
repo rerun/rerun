@@ -1,6 +1,7 @@
 # This is a rerun command unit test script
 # 
 # metadata
+RERUN_MODULES="@RERUN_MODULES@"
 MODULE="@MODULE@"
 COMMAND="@COMMAND@"
 OPTIONS="$*"

@@ -87,8 +87,8 @@ rerun_lookupHandler() {
 rerun_existsHandler() {
     mod=$1
     cmd=$2
-    handler=`rerun_lookupHandler $mod $cmd`
-    if [ -f "$handler" ]
+    script=`rerun_lookupHandler $mod $cmd`
+    if [ -f "$script" ]
     then return 0
     else return 1
     fi
@@ -252,10 +252,10 @@ then
     export RERUN_MODULES
     MODULE_DIR=`rerun_lookupModule $MODULE`
     export MODULE_DIR 
-    CMD_HANDLER=`rerun_lookupHandler $MODULE $COMMAND`
+    CMD_SCRIPT=`rerun_lookupHandler $MODULE $COMMAND`
     . $MODULE_DIR/metadata
-    [ -r $MODULE_DIR/commands/${cmd_name}/metadata ] && {
-	  . $MODULE_DIR/commands/${cmd_name}/metadata
+    [ -r $MODULE_DIR/commands/${COMMAND}/metadata ] && {
+	  . $MODULE_DIR/commands/${COMMAND}/metadata
     }
     #
     # execute the command implementation
@@ -280,7 +280,7 @@ then
 
 		EOF
 		) > $LOG
-	    $SH $VERBOSE $CMD_HANDLER "$@" | tee -a $LOG
+	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
 		if [ -n "$CHECKLOG" ]
 		then
 			# extract the log content from checklog
@@ -295,7 +295,7 @@ then
 			rm $RERUN_LOGS/rerun-$$.{log,checklog}
 		fi
 	else
-    	$SH $VERBOSE $CMD_HANDLER "$@"	
+    	$SH $VERBOSE $CMD_SCRIPT "$@"	
 	    RETVAL=$?
 	fi
 else 

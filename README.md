@@ -284,7 +284,9 @@ is illustrated here:
 : Path to directory where rerun will write log files
 
 `RERUN_COLOR`
-: Set 'true' if you want ANSI text effects
+: Set 'true' if you want ANSI text effects. Makes
+labels in text to print bold in the console.
+Syntax errors will also print bold.
 
 # LOGS
 
