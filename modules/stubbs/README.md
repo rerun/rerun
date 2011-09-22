@@ -481,7 +481,7 @@ this script contains several rough sections:
 
 1.  Command metadata is stored at the top
 2.  Extract execution log content
-3.  Diff
+3.  Diff results to required example output
 4.  Required example command output found below the `__LOG_BELOW__` string.
 
 File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
@@ -509,7 +509,11 @@ File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
 	exit $? ; # exit before reading the log content
 	__LOG_BELOW__
 	jumps (1)
-	
+
+The text below the `__LOG_BELOW__`	 delimiter should be
+the example content the test results should match.
+In this case, the expected text is "jumps (1)".
+
 It's also possible to execute this test script directly.
 
 	$ bash $RERUN_MODULES/freddy/tests/commands/dance/default.sh 
