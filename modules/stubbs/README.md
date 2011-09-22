@@ -516,11 +516,22 @@ File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
 	__LOG_BELOW__
 	jumps (1)
 
-The text below the `__LOG_BELOW__`	 delimiter should be
-the example content the test results should match.
-In this case, the expected text is "jumps (1)".
-
 It's also possible to execute this test script directly.
 
 	$ bash $RERUN_MODULES/freddy/tests/commands/dance/default.sh 
-	jumps (1)	
+	jumps (1)
+		
+#### Example log output
+
+The text below the `__LOG_BELOW__`	 delimiter should be
+the example content the test results should match.
+This is content you must supply.
+
+In this case, the expected text is "jumps (1)".
+
+	__LOG_BELOW__
+	jumps (1)
+
+When your command executes, it's output should exactly match what is
+below the `__LOG_BELOW__` delimiter.
+
