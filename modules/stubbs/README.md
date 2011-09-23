@@ -393,7 +393,10 @@ Here's a snippet of the `freddy:dance` command with verbose output:
     exit $?
     + exit 0
 
-### Example: freddy:study
+### Example: freddy
+
+This section describes how to define the "freddy" module used
+through the documentation.
 
 Create the `freddy:study` command:
 
@@ -407,12 +410,31 @@ Define an option called "-subject":
 	   -default math
 
 Edit the default implementation (`RERUN_MODULES_/freddy/commands/study/default.sh`).
-The implementation should echo out what freddy is studying:
+The implementation should echo what freddy is studying:
 
 	# ------------------------------
 	echo "studying ($SUBJECT)"
 	# ------------------------------
 
+Similarly, define the `freddy:dance` command:
+
+	rerun stubbs:add-command -name study \
+		   -description "tell freddy to study" -module freddy
+
+Define an option called "-jumps":
+
+	rerun stubbs:add-option  -name jumps \
+		   -description "jump #num times" -module freddy -command dance \
+		   -default 1
+
+Edit the default implementation (`RERUN_MODULES_/freddy/commands/dance/default.sh`).
+The implementation should echo how many jumps:
+
+	# ------------------------------
+	echo "studying ($SUBJECT)"
+	# ------------------------------
+
+The commands, their options and default implementations are completed.
 Check the usage for the new command:
 
 	$ ./rerun freddy: 
