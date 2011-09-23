@@ -295,7 +295,7 @@ then
 				bold "[diff]"
 				cat $RERUN_LOGS/rerun-$$.diff
 			}
-			rm $RERUN_LOGS/rerun-$$.{log,checklog}
+			rm -f $RERUN_LOGS/rerun-$$.{log,checklog,diff}
 		fi
 	else
     	$SH $VERBOSE $CMD_SCRIPT "$@"	
