@@ -398,6 +398,10 @@ Here's a snippet of the `freddy:dance` command with verbose output:
 This section describes how to define the "freddy" module used
 through the documentation.
 
+Create the "freddy" module:
+
+	rerun stubbs:add-module -name freddy -description "A dancer in a red beret and matching suspenders"
+
 Create the `freddy:study` command:
 
 	rerun stubbs:add-command -name study \
@@ -448,7 +452,8 @@ Use rerun listing to show the command usage:
 
 The "dance" and "study" commands are listed. 
 Try `freddy:study` with and without options.
-Since "-default math" was specified to `stubbs:add-option` 
+Since a default value was assigned to "-subject"
+(remember "-default math" was specified to `stubbs:add-option`),
 the subject "math" will be printed.
 
 Without option:
