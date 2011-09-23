@@ -418,8 +418,8 @@ The implementation should echo what freddy is studying:
 
 Similarly, define the `freddy:dance` command:
 
-	rerun stubbs:add-command -name study \
-		   -description "tell freddy to study" -module freddy
+	rerun stubbs:add-command -name dance \
+		   -description "tell freddy to dance" -module freddy
 
 Define an option called "-jumps":
 
@@ -431,11 +431,11 @@ Edit the default implementation (`RERUN_MODULES_/freddy/commands/dance/default.s
 The implementation should echo how many jumps:
 
 	# ------------------------------
-	echo "studying ($SUBJECT)"
+	echo "jumps ($JUMPS)"
 	# ------------------------------
 
-The commands, their options and default implementations are completed.
-Check the usage for the new command:
+The freddy commands, their options and default implementations are completed.
+Use rerun listing to show the command usage:
 
 	$ ./rerun freddy: 
 	[commands]
@@ -446,7 +446,8 @@ Check the usage for the new command:
 	  [options]
 	    -subject <math>: "subject to study"
 
-The "study" command is listed. Finally, try it with and without options.
+The "dance" and "study" commands are listed. 
+Try `freddy:study` with and without options.
 Since "-default math" was specified to `stubbs:add-option` 
 the subject "math" will be printed.
 
