@@ -41,7 +41,7 @@ cp $RERUN $PAYLOAD/rerun || rerun_die
 for template in $RERUN_MODULES/stubbs/templates/{extract,launcher}
 do
     # replace the template substitution tokens ...
-    sed -e "s/@GENERATOR@/stubbs#archive/" \
+    sed -e "s/@GENERATOR@/stubbs:archive/" \
 	-e "s/@DATE@/$(date)/" \
 	-e "s/@USER@/$USER/" \
 	$template > $PAYLOAD/$(basename $template) || rerun_die
