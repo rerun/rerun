@@ -9,8 +9,8 @@
 #   Build a self extracting archive
 #
 
-# Function to print error message and exit
-die() { echo "ERROR: $* " ; exit 1 ; }
+# Source common function library
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 
 # Parse the command options
 [ -r $RERUN_MODULES/stubbs/commands/archive/options.sh ] && {
@@ -18,24 +18,24 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 }
 
 CWD=$(pwd); #remember current working directory
-[ -n "${LIST}"  ] && VERB=v 
+[ -n "${LIST}"  ] && VERBOSE=v 
 [ -z "${FILE}"  ] && FILE=$CWD/rerun.bin
 
 # create a work directory the archive content
-export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die
+export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || rerun_die
 
 #
 # Start adding payload content
 
 # Copy in the specified modules
-mkdir -p $PAYLOAD/rerun/modules || die
+mkdir -p $PAYLOAD/rerun/modules || rerun_die
 for module in $MODULES
 do
-    cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || die
+    cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
 done
 
 # Copy rerun itself
-cp $RERUN $PAYLOAD/rerun || die
+cp $RERUN $PAYLOAD/rerun || rerun_die
 
 # Copy in the extract and launcher scripts used during execution
 for template in $RERUN_MODULES/stubbs/templates/{extract,launcher}
@@ -44,7 +44,7 @@ do
     sed -e "s/@GENERATOR@/stubbs#archive/" \
 	-e "s/@DATE@/$(date)/" \
 	-e "s/@USER@/$USER/" \
-	$template > $PAYLOAD/$(basename $template) || die
+	$template > $PAYLOAD/$(basename $template) || rerun_die
     # ... and save it to the payload --^
 done
 
@@ -54,23 +54,23 @@ done
 
 # make the payload.tar file
 cd $PAYLOAD
-tar c${VERB}f payload.tar launcher extract rerun || die
+tar c${VERBOSE}f payload.tar launcher extract rerun || rerun_die
 
 # compress the tar
 if [ -e "payload.tar" ]; then
-    gzip payload.tar || die
+    gzip payload.tar || rerun_die
 
     if [ -e "payload.tar.gz" ]; then
 	#
 	# Prepend the extract script to the payload.
 	#    and thus turn the thing into a shell script!
 	#
-        cat extract payload.tar.gz > ${FILE} || die
+        cat extract payload.tar.gz > ${FILE} || rerun_die
     else
-        die "payload.tar.gz does not exist"
+        rerun_die "payload.tar.gz does not exist"
     fi
 else
-    die "payload.tar does not exist"
+    rerun_die "payload.tar does not exist"
 fi
 
 echo "Wrote self extracting archive script: ${FILE}"

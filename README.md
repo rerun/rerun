@@ -243,7 +243,7 @@ Below you can see the results of a comparison between this run of
 After the command completes, rerun uses the `diff` command 
 to compare the log output.
 
-	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-0921-140744.replay freddy:dance -jumps 2
+	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance -jumps 2
 	jumps (2)
 	[diff]
 	2c2
@@ -273,12 +273,12 @@ These .replay files can be edited or executed as scripts.
 
 Each replay log is named using the following pattern:
 
-    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MMDD-HHMMSS.replay
+    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MM-DD-THHMMSS.replay
 
 To list the replay logs for the `freddy:dance` command use `ls`:
 
 	$ ls -l $RERUN_LOGS/freddy-dance*.replay
-	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-0921-195402.replay
+	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-09-21T195402.replay
 	
 
 *File format*

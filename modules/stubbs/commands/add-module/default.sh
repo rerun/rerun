@@ -10,10 +10,7 @@
 #
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/functions.sh
-
-# print an error and exit
-die() { echo "ERROR: $* " ; exit 1; }
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 
 rerun_init
 
@@ -56,11 +53,11 @@ done
 }
 
 # Create module structure
-mkdir -p $RERUN_MODULES/$NAME || die
+mkdir -p $RERUN_MODULES/$NAME || rerun_die
 # Create etc/ subdirectory
-mkdir -p $RERUN_MODULES/$NAME/etc || die
+mkdir -p $RERUN_MODULES/$NAME/etc || rerun_die
 # Create commands/ subdirectory
-mkdir -p $RERUN_MODULES/$NAME/commands || die
+mkdir -p $RERUN_MODULES/$NAME/commands || rerun_die
 
 # Generate a profile for metadata
 (
@@ -71,8 +68,12 @@ NAME=$NAME
 DESCRIPTION="$DESC"
 
 EOF
-) > $RERUN_MODULES/$NAME/metadata || die
+) > $RERUN_MODULES/$NAME/metadata || rerun_die
 
+# Copy a basic function library
+mkdir -p $RERUN_MODULES/$NAME/lib || rerun_die
+sed 's/@MODULE@/$NAME/g' $RERUN_MODULES/stubbs/templates/functions.sh \
+   > $RERUN_MODULES/$NAME/lib/functions.sh || rerun_die
 
 # Done
 echo "Created module structure: $RERUN_MODULES/$NAME"

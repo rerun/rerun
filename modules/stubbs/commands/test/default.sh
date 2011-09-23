@@ -10,10 +10,8 @@
 #
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/functions.sh
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 PAD="  "
-# print an error and exit
-die() { echo "ERROR: $* " ; exit 1; }
 
 rerun_init
 
@@ -49,12 +47,12 @@ done
     echo "Module name: "
     read NAME
 }
-[ -d $RERUN_MODULES/$NAME ] || die "Module directory not found: $RERUN_MODULES/$NAME"
+[ -d $RERUN_MODULES/$NAME ] || rerun_die "Module directory not found: $RERUN_MODULES/$NAME"
 #
 # set some defaults
 [ -z "$LOGS" ] && LOGS="./test-reports"
 
-mkdir -p $LOGS || die "Failed making logs directory: $LOGS"
+mkdir -p $LOGS || rerun_die "Failed making logs directory: $LOGS"
 
 
 FAILURES=0 ;# test failure counter

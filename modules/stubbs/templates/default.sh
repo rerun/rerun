@@ -10,11 +10,15 @@
 #
 
 # Function to print error message and exit
-die() { echo "ERROR: $* " ; exit 1 ; }
+rerun_die() { echo "ERROR: $* " ; exit 1 ; }
 
+# Read module function library
+[ -r $RERUN_MODULES/@MODULE@/lib/functions.sh ] && {
+  source $RERUN_MODULES/@MODULE@/lib/functions.sh
+}
 # Parse the command options
 [ -r $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh ] && {
-  . $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh
+  source $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh
 }
 
 # ------------------------------
@@ -23,3 +27,4 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 
 exit $?
 
+# Done

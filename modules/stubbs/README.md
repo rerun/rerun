@@ -195,7 +195,7 @@ File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
     #   tell freddy to dance
      
     # Function to print error message and exit
-    die() {
+    rerun_die() {
         echo "ERROR: $* " ; exit 1;
     }
      
@@ -213,7 +213,7 @@ File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
 The name and description supplied via `add-command` options
 are inserted as comments at the top.
 
-A `die` function is provided for convenience in case things go awry.
+A `rerun_die` function is provided for convenience in case things go awry.
 
 Rather than implement a specialized option parser logic inside
 each command implementation, `add-option` generates a reusable
@@ -392,6 +392,51 @@ Here's a snippet of the `freddy:dance` command with verbose output:
     # ------------------------------
     exit $?
     + exit 0
+
+### Example: freddy:study
+
+Create the `freddy:study` command:
+
+	rerun stubbs:add-command -name study \
+	   -description "tell freddy to study" -module freddy
+
+Define an option called "-subject":
+
+	rerun stubbs:add-option  -name subject \
+	   -description "subject to study" -module freddy -command study \
+	   -default math
+
+Edit the default implementation (`RERUN_MODULES_/freddy/commands/study/default.sh`).
+The implementation should echo out what freddy is studying:
+
+	# ------------------------------
+	echo "studying ($SUBJECT)"
+	# ------------------------------
+
+Check the usage for the new command:
+
+	$ ./rerun freddy: 
+	[commands]
+	 dance: "tell freddy to dance"
+	  [options]
+	    -jumps <1>: "jump #num times"
+	 study: "tell freddy to study"
+	  [options]
+	    -subject <math>: "subject to study"
+
+The "study" command is listed. Finally, try it with and without options.
+Since "-default math" was specified to `stubbs:add-option` 
+the subject "math" will be printed.
+
+Without option:
+
+	$ ./rerun freddy: study
+	studying (math)
+
+With option:
+
+	$ ./rerun freddy: study -subject locking
+	studying (locking)
 
 ## Testing 
 

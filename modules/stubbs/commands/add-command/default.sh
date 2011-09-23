@@ -10,10 +10,8 @@
 #
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/functions.sh
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 
-# print an error and exit
-die() { echo "ERROR: \$* " ; exit 1 ; }
 
 # Init the handler
 rerun_init 
@@ -83,29 +81,29 @@ done
 }
 
 [ ! -r "$TEMPLATE" ] && {
-    die "TEMPLATE does not exist: $TEMPLATE"
+    rerun_die "TEMPLATE does not exist: $TEMPLATE"
 }
 
 # Create command structure
-mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || die
+mkdir -p $RERUN_MODULES/$MODULE/commands/$NAME || rerun_die
 
 # Generate a boiler plate implementation
 [ ! -f $RERUN_MODULES/$MODULE/commands/$NAME/default.sh -o -n "$OVEWRITE" ] && {
     sed -e "s/@NAME@/$NAME/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
-	$TEMPLATE > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || die
+	$TEMPLATE > $RERUN_MODULES/$MODULE/commands/$NAME/default.sh || rerun_die
     echo "Wrote command script: $RERUN_MODULES/$MODULE/commands/$NAME/default.sh"
 }
 
 # Generate a unit test script
-mkdir -p $RERUN_MODULES/$MODULE/tests/$NAME/commands || die "failed creating tests directory"
+mkdir -p $RERUN_MODULES/$MODULE/tests/$NAME/commands || rerun_die "failed creating tests directory"
 [ ! -f $RERUN_MODULES/$MODULE/tests/$NAME/commands.sh -o -n "$OVEWRITE" ] && {
     sed -e "s/@NAME@/default/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$NAME/g" \
 	-e "s,@RERUN_MODULES@,${RERUN_MODULES},g" \
-	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh || die
+	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh || rerun_die
     echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$NAME/commands/default.sh"
 }
 
@@ -118,6 +116,6 @@ NAME=$NAME
 DESCRIPTION="$DESC"
 
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || die
+) > $RERUN_MODULES/$MODULE/commands/$NAME/metadata || rerun_die
 
 # Done
