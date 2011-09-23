@@ -13,13 +13,15 @@ DIFF=diff
 export RERUN=$0
 
 examples() {
-echo "Examples:
+echo "$(tput sgr 0 1)Examples:$(tput sgr0)
 | \$ $PROG 
 | => List all modules.
 | \$ $PROG freddy
 | => List all freddy commands.
 | \$ $PROG freddy:dance -jumps 3
 | => Execute the freddy dance command."
+
+
 }
 
 #
@@ -31,11 +33,12 @@ bold() { echo -e "\033[1m$*\033[0m" ; reset ; }
 reset () { tput sgr0 ; }
 # print a ascii art banner with version info
 banner() {
-echo " _ __ ___ _ __ _   _ _ __
-| '__/ _ \ '__| | | | '_ \ 
-| | |  __/ |  | |_| | | | |
-|_|  \___|_|   \__,_|_| |_|
-Version: v0.1. License: Apache 2.0."
+echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
+echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
+echo $(tput setaf 3) "| | |  __/ |  | |_| | | | |"
+echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
+echo $(tput setaf 5) "Version: v0.1. License: Apache 2.0."
+reset
 }
 
 # 
@@ -262,9 +265,9 @@ then
     #
 	if [ -n "$RERUN_LOGS" -a -d "$RERUN_LOGS" ]
 	then
-	    # set up a log file
-		TSTAMP=$(date '+%Y-%m%d-%H%M%S')
-		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.log
+	    # set up a replay log file
+		TSTAMP=$(date '+%Y-%m-%dT%H%M%S')
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
 		(
 		cat <<-EOF
 		#
