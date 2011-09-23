@@ -9,14 +9,14 @@
     export RERUN_MODULES=$(pwd)
 }
 
-# list all the child directory names in specified parent 
+# list all executable child directory names in specified parent 
 _listdirnames()
 {
     local dirs dir
-    [ -d "$1" ] && dir=$1 || { return 1 ; }
+    [ -d "$1" -a -x "$1" ] && dir=$1 || { return 1 ; }
     for d in $(echo ${dir}/*) 
     do 
-	[ -d "$d" ] && dirs="$dirs $(basename $d)"
+	[ -d "$d" -a -x "$d" ] && dirs="$dirs $(basename $d)"
     done
     echo $dirs
 }
