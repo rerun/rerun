@@ -6,14 +6,14 @@
 SH=/bin/bash
 PROG=`basename $0`
 USAGE="
-Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--checklog <file>] [module:[command [command_args]]]
+Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [command_args]]]
 "
 PAD="  "
 DIFF=diff
 export RERUN=$0
 
 examples() {
-echo "$(tput sgr 0 1)Examples:$(tput sgr0)
+echo $(tput sgr 0 1)"Examples:$(tput sgr0)
 | \$ $PROG 
 | => List all modules.
 | \$ $PROG freddy
@@ -150,9 +150,9 @@ while [ "$#" -gt 0 ]; do
 	    RERUN_LOGS="$2"
 	    shift
 	    ;;	
-	--checklog)
+	--replay)
 	    rerun_syntax_check "$#"
-	    CHECKLOG="$2"
+	    REPLAY="$2"
 	    shift
 	    ;;	
 	  # unknown option
@@ -284,10 +284,10 @@ then
 		EOF
 		) > $LOG
 	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
-		if [ -n "$CHECKLOG" ]
+		if [ -n "$REPLAY" ]
 		then
 			# extract the log content from checklog
-			rerun_extractLog $CHECKLOG > $RERUN_LOGS/rerun-$$.checklog
+			rerun_extractLog $REPLAY > $RERUN_LOGS/rerun-$$.checklog
 			rerun_extractLog $LOG > $RERUN_LOGS/rerun-$$.log
 			$DIFF $RERUN_LOGS/rerun-$$.checklog $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
 			RETVAL=$?
