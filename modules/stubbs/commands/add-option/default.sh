@@ -105,6 +105,9 @@ done
     done
 }
 
+# Verify this command exists
+#
+[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || rerun_die "command does not exist: \""$MODULE:$COMMAND\"""
 
 # Generate metadata for new option
 
