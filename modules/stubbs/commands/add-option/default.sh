@@ -17,8 +17,16 @@ caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
 
 # Used to generate an entry inside options.sh
 add_optionparser() {
-    oU=$(echo $1 | tr "[:lower:]" "[:upper:]")
-    printf " -%s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" "$1" "$oU"
+	local optName=$1
+    local optNameCap=$(echo $optName | tr "[:lower:]" "[:upper:]")
+	ARGUMENTS=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $optName)
+	if [ "$ARGUMENTS" == "false" ]
+	then
+		printf " -%s) %s=true ;;\n" "$optName" "$optNameCap"
+	else
+    	printf " -%s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" \
+			"$optName" "$optNameCap"
+	fi
 }
 
 # Init the handler
@@ -50,12 +58,12 @@ while [ "$#" -gt 0 ]; do
 	    MODULE="$2"
 	    shift
 	    ;;
-	-req)
+	-req*)
 	    rerun_option_check "$#"
 	    REQ="$2"
 	    shift
 	    ;;
-	-args)
+	-arg*)
 	    rerun_option_check "$#"
 	    ARGS="$2"
 	    shift
@@ -123,6 +131,7 @@ DEFAULT=$DEFAULT
 
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option || rerun_die
+echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option"
 
 
 # list the options that set a default
@@ -173,9 +182,8 @@ printf "[ -z \"$%s\" ] && %s=%s\n" $(caps $opt) $(caps $opt) $(rerun_optionDefau
 done)
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
+echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 
 # Done
-echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
-echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option"
 
 
