@@ -267,11 +267,11 @@ then
 	then
 	    # set up a replay log file
 		TSTAMP=$(date '+%Y-%m-%dT%H%M%S')
-		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.running
 		(
 		cat <<-EOF
 		#
-		# Rerun replay log
+		# Command replay log
 		#
 		RERUN="$0"
 		MODULE="$MODULE"
@@ -284,6 +284,8 @@ then
 		EOF
 		) > $LOG
 	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
+		mv $LOG $RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay || die
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
 		if [ -n "$REPLAY" ]
 		then
 			# extract the log content from checklog
