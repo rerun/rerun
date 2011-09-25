@@ -2,24 +2,24 @@
 # Fri Sep 16 08:04:55 PDT 2011
 
 # print error message and exit non-zero
-rerun_syntax_error() {
+rerun_option_error() {
     echo "SYNTAX ERROR" >&2 ; exit 2;
 }
 # check option has its argument
-rerun_syntax_check() {
-    [ "$1" -lt 2 ] && rerun_syntax_error
+rerun_option_check() {
+    [ "$1" -lt 2 ] && rerun_option_error
 }
 
 # options: [file list modules]
 while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
-        -file) rerun_syntax_check $# ; FILE=$2 ; shift ;;
- -list) rerun_syntax_check $# ; LIST=$2 ; shift ;;
- -modules) rerun_syntax_check $# ; MODULES=$2 ; shift ;;
+        -file) rerun_option_check $# ; FILE=$2 ; shift ;;
+ -list) rerun_option_check $# ; LIST=$2 ; shift ;;
+ -modules) rerun_option_check $# ; MODULES=$2 ; shift ;;
         # unknown option
         -?)
-            rerun_syntax_error
+            rerun_option_error
             ;;
         # end of options, just arguments left
         *)

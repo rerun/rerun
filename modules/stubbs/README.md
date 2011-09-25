@@ -290,11 +290,11 @@ to the value of the "-jumps" argument.
     # Tue Sep 13 20:11:52 PDT 2011
      
     # print error message and exit non-zero
-    rerun_syntax_error() {
+    rerun_option_error() {
         echo "SYNTAX ERROR" >&2 ; exit 2;
     }
     # check option has its argument
-    rerun_syntax_check() {
+    rerun_option_check() {
         [ "$1" -lt 2 ] && syntax_error
     }
      
@@ -302,10 +302,10 @@ to the value of the "-jumps" argument.
     while [ "$#" -gt 0 ]; do
         OPT="$1"
         case "$OPT" in
-            -jumps) rerun_syntax_check $# ; JUMPS=$2 ; shift ;;
+            -jumps) rerun_option_check $# ; JUMPS=$2 ; shift ;;
             # unknown option
             -?)
-                rerun_syntax_error
+                rerun_option_error
                 ;;
             # end of options, just arguments left
             *)

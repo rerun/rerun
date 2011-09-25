@@ -22,14 +22,14 @@ rerun_die() {
 }
 
 # print USAGE and exit
-rerun_syntax_error() {
+rerun_option_error() {
     [ -z "$USAGE"  ] && echo "$USAGE" >&2
     [ -z "$SYNTAX" ] && echo "$SYNTAX $*" >&2
     exit 2
 }
 
 # check option has its argument
-rerun_syntax_check() {
-    [ "$1" -lt 2 ] && rerun_syntax_error
+rerun_option_check() {
+    [ "$1" -lt 2 ] && rerun_option_error
 }
 
