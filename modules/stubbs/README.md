@@ -151,6 +151,29 @@ executable in the user's current working directory.
 
 Refer to the source code implementation for further details.
 
+### docs
+
+Generate the docs.
+
+*Usage*
+
+    rerun stubbs:docs -name <>
+    
+*Example*
+
+Generate the manual page for "freddy":
+
+    rerun stubbs:docs -name freddy
+
+The `docs` command will print:
+
+    Generated unix manual: /Users/alexh/rerun-workspace/rerun/modules/freddy/freddy.1
+
+
+Run `rerun --manual <module>` to display it:
+	
+	rerun --manual freddy
+	
 ### test
 
 Run module test suite
