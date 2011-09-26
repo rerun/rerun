@@ -2,25 +2,25 @@
 # Fri Sep 16 13:42:34 PDT 2011
 
 # print error message and exit non-zero
-rerun_syntax_error() {
+rerun_option_error() {
     echo "SYNTAX ERROR" >&2 ; exit 2;
 }
 # check option has its argument
-rerun_syntax_check() {
-    [ "$1" -lt 2 ] && rerun_syntax_error
+rerun_option_check() {
+    [ "$1" -lt 2 ] && rerun_option_error
 }
 
 # options: [module name ovewrite template]
 while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
-        -module) rerun_syntax_check $# ; MODULE=$2 ; shift ;;
- -name) rerun_syntax_check $# ; NAME=$2 ; shift ;;
- -ovewrite) rerun_syntax_check $# ; OVEWRITE=$2 ; shift ;;
- -template) rerun_syntax_check $# ; TEMPLATE=$2 ; shift ;;
+        -module) rerun_option_check $# ; MODULE=$2 ; shift ;;
+ -name) rerun_option_check $# ; NAME=$2 ; shift ;;
+ -ovewrite) rerun_option_check $# ; OVEWRITE=$2 ; shift ;;
+ -template) rerun_option_check $# ; TEMPLATE=$2 ; shift ;;
         # unknown option
         -?)
-            rerun_syntax_error
+            rerun_option_error
             ;;
         # end of options, just arguments left
         *)

@@ -17,15 +17,15 @@ rerun_die() {
 }
 
 # print USAGE and exit
-rerun_syntax_error() {
+rerun_option_error() {
     [ -z "$USAGE"  ] && echo "$USAGE" >&2
     [ -z "$SYNTAX" ] && echo "$SYNTAX $*" >&2
     exit 2
 }
 
 # check option has its argument
-rerun_syntax_check() {
-    [ "$1" -lt 2 ] && rerun_syntax_error
+rerun_option_check() {
+    [ "$1" -lt 2 ] && rerun_option_error
 }
 
 # Bootstrap a command handler
@@ -39,8 +39,10 @@ rerun_init() {
 rerun_modules() {
     names=
     for f in `echo $1/*/metadata`; do
-	mod_name=$(basename $(dirname $f))
-	names="$names $mod_name"
+	[ -f $f ] && {
+		mod_name=$(basename $(dirname $f))
+		names="$names $mod_name"
+	}
     done
     echo $names
 }
@@ -68,8 +70,16 @@ rerun_options() {
     echo $options
 }
 
+rerun_optionArguments() {
+	[ -f $1/$2/commands/$3/$4.option ] && {
+		awk -F= '/ARGUMENTS/ {print $2}' $1/$2/commands/$3/$4.option
+	}
+}
+
 rerun_optionDefault() {
-    awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$4.option
+	[ -f $1/$2/commands/$3/$4.option ] && {
+    	awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$4.option
+	}
 }
 
 rerun_tests() {
@@ -87,5 +97,7 @@ rerun_tests() {
 }
 
 rerun_testDescription() {
-	awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
+	[ -f $1/$2/tests/commands/$3/metadata ] && {
+		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
+	}
 }

@@ -151,6 +151,29 @@ executable in the user's current working directory.
 
 Refer to the source code implementation for further details.
 
+### docs
+
+Generate the docs.
+
+*Usage*
+
+    rerun stubbs:docs -name <>
+    
+*Example*
+
+Generate the manual page for "freddy":
+
+    rerun stubbs:docs -name freddy
+
+The `docs` command will print:
+
+    Generated unix manual: /Users/alexh/rerun-workspace/rerun/modules/freddy/freddy.1
+
+
+Run `rerun --manual <module>` to display it:
+	
+	rerun --manual freddy
+	
 ### test
 
 Run module test suite
@@ -290,11 +313,11 @@ to the value of the "-jumps" argument.
     # Tue Sep 13 20:11:52 PDT 2011
      
     # print error message and exit non-zero
-    rerun_syntax_error() {
+    rerun_option_error() {
         echo "SYNTAX ERROR" >&2 ; exit 2;
     }
     # check option has its argument
-    rerun_syntax_check() {
+    rerun_option_check() {
         [ "$1" -lt 2 ] && syntax_error
     }
      
@@ -302,10 +325,10 @@ to the value of the "-jumps" argument.
     while [ "$#" -gt 0 ]; do
         OPT="$1"
         case "$OPT" in
-            -jumps) rerun_syntax_check $# ; JUMPS=$2 ; shift ;;
+            -jumps) rerun_option_check $# ; JUMPS=$2 ; shift ;;
             # unknown option
             -?)
-                rerun_syntax_error
+                rerun_option_error
                 ;;
             # end of options, just arguments left
             *)
@@ -613,3 +636,21 @@ In this case, the expected text is "jumps (1)".
 When your command executes, it's output should exactly match what is
 below the `__LOG_BELOW__` delimiter.
 
+# LICENSE
+
+Copyright 2011 DTO Solutions
+
+Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, 
+software distributed under the License is distributed on an 
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+either express or implied. See the License for the specific 
+language governing permissions and limitations under the License.
+
+The rerun source code and all documentation may be downloaded from
+<https://github.com/dtolabs/rerun/>.

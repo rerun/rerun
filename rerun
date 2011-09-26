@@ -40,7 +40,22 @@ echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
 echo $(tput setaf 5) "Version: v0.1. License: Apache 2.0."
 reset
 }
-
+# print help. A banner or the unix manual if it exists
+man() {
+	local module=$1
+	# Try autogenerating the doc if stubbs:docs is around
+	if [ ! -f $RERUN_MODULES/$module/$module.1 \
+		-a -f $RERUN_MODULES/stubbs/commands/docs/default.sh ]
+	then
+		$RERUN stubbs:docs -name $module 
+	fi
+	if [ -f $RERUN_MODULES/$module/$module.1 ]
+	then
+		nroff -man $RERUN_MODULES/$module/$module.1 | ${PAGER:more}
+	else
+		echo "Manual not found."
+	fi
+}
 # 
 # utility functions -
 #
@@ -128,8 +143,8 @@ while [ "$#" -gt 0 ]; do
 	  # options without arguments
 	-h*)
 		banner
-	    bold "$USAGE"
-	    examples
+		bold "$USAGE"
+		examples		
 	    exit 0
 	    ;;
   	-v)
@@ -140,6 +155,11 @@ while [ "$#" -gt 0 ]; do
 	    set -vx
 	    ;;
 	# options with arguments
+	--man*)
+	    rerun_syntax_check "$#"
+	    man $2
+	    exit 0
+	    ;;	
 	-M)
 	    rerun_syntax_check "$#"
 	    RERUN_MODULES="$2"
@@ -265,13 +285,20 @@ then
     #
 	if [ -n "$RERUN_LOGS" -a -d "$RERUN_LOGS" ]
 	then
-	    # set up a replay log file
-		TSTAMP=$(date '+%Y-%m-%dT%H%M%S')
-		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
+	    # set up the log file
+		TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.running
+		#
+		# Execute the command script
+		#
+	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
+	    EXIT_STATUS=$?
+		
+		# Generate replay metadata
 		(
 		cat <<-EOF
 		#
-		# Rerun replay log
+		# Command replay log
 		#
 		RERUN="$0"
 		MODULE="$MODULE"
@@ -279,11 +306,23 @@ then
 		OPTIONS="$*"
 		USER="$USER"
 		DATE="$TSTAMP"
+		EXIT_STATUS="$EXIT_STATUS"
 		__LOG_BELOW__
 
 		EOF
-		) > $LOG
-	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
+		) > ${LOG%*.running}.metadata || die
+		
+		#
+		# Generate .replay
+		cat ${LOG%*.running}.metadata $LOG > $RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay || die		
+		rm -f $LOG ${LOG%*.running}.metadata; # cleanup working files
+		# New log
+		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
+		
+		# Reset the "latest" symlink
+		rm -f $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; #remove old symlink
+		ln -s $LOG $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; # recreate it
+		
 		if [ -n "$REPLAY" ]
 		then
 			# extract the log content from checklog

@@ -21,18 +21,18 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-name)
-	    rerun_syntax_check "$#"
+	    rerun_option_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
 	-description)
-	    rerun_syntax_check "$#"
+	    rerun_option_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    rerun_syntax_error
+	    rerun_option_error
 	    ;;
 	  # end of options, just arguments left
 	*)
