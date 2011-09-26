@@ -2,11 +2,11 @@
 #
 # NAME
 #
-#   archive
+#   add-command
 #
 # DESCRIPTION
 #
-#   build a self extracting rerun
+#   add command to module
 #
 
 # Source common function library
