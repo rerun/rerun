@@ -40,7 +40,22 @@ echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
 echo $(tput setaf 5) "Version: v0.1. License: Apache 2.0."
 reset
 }
-
+# print help. A banner or the unix manual if it exists
+man() {
+	local module=$1
+	# Try autogenerating the doc if stubbs:docs is around
+	if [ ! -f $RERUN_MODULES/$module/$module.1 \
+		-a -f $RERUN_MODULES/stubbs/commands/docs/default.sh ]
+	then
+		$RERUN stubbs:docs -name $module 
+	fi
+	if [ -f $RERUN_MODULES/$module/$module.1 ]
+	then
+		nroff -man $RERUN_MODULES/$module/$module.1 | ${PAGER:more}
+	else
+		echo "Manual not found."
+	fi
+}
 # 
 # utility functions -
 #
@@ -128,8 +143,8 @@ while [ "$#" -gt 0 ]; do
 	  # options without arguments
 	-h*)
 		banner
-	    bold "$USAGE"
-	    examples
+		bold "$USAGE"
+		examples		
 	    exit 0
 	    ;;
   	-v)
@@ -140,6 +155,11 @@ while [ "$#" -gt 0 ]; do
 	    set -vx
 	    ;;
 	# options with arguments
+	--man*)
+	    rerun_syntax_check "$#"
+	    man $2
+	    exit 0
+	    ;;	
 	-M)
 	    rerun_syntax_check "$#"
 	    RERUN_MODULES="$2"
