@@ -22,6 +22,7 @@
 rerun_module_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")
 	local metadata=$RERUN_MODULES/$2/metadata
+	[ -f $metadata ] || return ; # skip weird file expansion
 	awk -F= "/^$FIELD/ {print \$2}" $metadata
 }
 
@@ -35,17 +36,20 @@ rerun_module_synopsys() {
 rerun_command_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")
 	local metadata=$RERUN_MODULES/$2/commands/${3}/metadata
+	[ -f $metadata ] || return ; # skip weird file expansion
 	awk -F= "/^$FIELD/ {print \$2}" $metadata
 }
 
 rerun_option_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")
 	local metadata=$RERUN_MODULES/$2/commands/${3}/$4.option
+	[ -f $metadata ] || return ; # skip weird file expansion	
 	awk -F= "/^$FIELD/ {print \$2}" $metadata
 }
 
 rerun_command_usage() {
 	for opt_metadata in $RERUN_MODULES/$1/commands/${2}/*.option; do
+		[ -f $opt_metadata ] || continue ; # skip weird file expansion
 		option=$(basename $opt_metadata)
 		printf "%s %s\n" "$PAD" "$(rerun_option_summary $1 $2 ${option%*.option} )"
 	done
@@ -53,6 +57,7 @@ rerun_command_usage() {
 rerun_command_summary() {
 	declare -a summary=()
 	for opt_metadata in $RERUN_MODULES/$1/commands/${2}/*.option; do
+		[ -f $opt_metadata ] || continue ; # skip weird file expansion
 		option=$(basename $opt_metadata)
 		typeset -a arr=( "$(rerun_option_summary $1 $2 ${option%*.option} )" )
 		param="${arr[@]:0:1}"
@@ -82,16 +87,14 @@ rerun_option_summary() {
 (
 cat <<EOF
 .TH $NAME 1 "$(date)" "Version 1" "Rerun User Manual" 
-.SH $NAME
+.SH NAME
+$NAME \- $(rerun_module_metadata "description" $NAME)
 .PP
 .SH SYNOPSIS
 .PP
 \f[CR] 
- ${RERUN} $(rerun_module_synopsys $NAME)
+$(basename ${RERUN}) [ARGS] $(rerun_module_synopsys $NAME) [OPTIONS]
 \f[]
-.SH DESCRIPTION
-.PP
-$(rerun_module_metadata "description" $NAME)
 EOF
 ) > $DOC || rerun_die
 #
@@ -105,7 +108,7 @@ cat <<EOF
 .SH $NAME:$command \f[]$(rerun_command_summary $NAME $command)
 $(rerun_command_metadata description $NAME $command)
 .PP
-\f[I]Command Options\f[]
+\f[I]OPTIONS\f[]
 $(for option in $(rerun_options $RERUN_MODULES $NAME $command)
 do
 description=$(rerun_option_metadata "description" $NAME $command $option)
@@ -127,6 +130,9 @@ done || rerun_die
 # AUTHORS section
 (
 cat <<EOF
+.SH RETURN VALUES
+.PP
+Successful completion: 0
 .SH AUTHORS
 $USER
 EOF
