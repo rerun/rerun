@@ -73,8 +73,10 @@ _rerunListOpts()
     modulesdir=$1 module=$2 command=$3 options="" founddir=""
 
     for opt_md in $modulesdir/$module/commands/$command/*.option; do
-	opt=$(basename $(echo ${opt_md%%.option}))
-	options="$options $opt"
+	[ -f $opt_md ] && {
+		opt=$(basename $(echo ${opt_md%%.option}))
+		options="$options $opt"
+	}
     done
     echo $options
 }
@@ -84,14 +86,16 @@ _rerunGetOptsDefault()
     local opt module command modulesdir opt_def
     modulesdir=$1 module=$2 command=$3 opt=$4
     opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option
-    awk -F= '/^DEFAULT/ {print $2}' $opt_md
+	[ -f $opt_md ] && {
+    	awk -F= '/^DEFAULT/ {print $2}' $opt_md
+	}
 }
 # check if option takes an argument
 _rerunHasOptsArgument()
 {
     local opt module command modulesdir founddir
     modulesdir=$1 module=$2 command=$3 opt=$4
-    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option
+    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option	
     opt_def=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_md`
     [ "$opt_def" = "true" ] && return 0
     return 1
