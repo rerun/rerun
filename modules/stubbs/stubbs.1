@@ -1,0 +1,146 @@
+.TH stubbs 1 "Mon Sep 26 08:37:07 PDT 2011" "Version 1" "Rerun User Manual" 
+.SH NAME
+stubbs \- "Simple rerun module builder"
+.PP
+.SH SYNOPSIS
+.PP
+\f[CR] 
+rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | test ] [OPTIONS]
+\f[]
+.SH COMMANDS
+.SH stubbs:add-command \f[]-module <> -name <> -ovewrite <false> -template <$RERUN_MODULES/stubbs/templates/default.sh>
+"add command to module"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-module \f[]"the module name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-name \f[]"the command name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-ovewrite \f[]"ovewrite the command default.sh?"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+default: \f[I]false\f[]
+.RS
+.RE
+.TP
+.B \-template \f[]"default script template"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+default: \f[I]$RERUN_MODULES/stubbs/templates/default.sh\f[]
+.RS
+.RE
+.SH stubbs:add-module \f[]-description <> -name <>
+"add a new module"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-description \f[]"the module description"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-name \f[]"the module name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:add-option \f[][-arg <false>] -command <> -desc <> -module <> -name <> [-required <false>]
+"add a command option"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-arg \f[]"option argument?"\f[]
+required: \f[I]false\f[]
+arguments: \f[I]true\f[]
+default: \f[I]false\f[]
+.RS
+.RE
+.TP
+.B \-command \f[]"the command name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-desc \f[]"the option description"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-module \f[]"the module name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-name \f[]"the option name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-required \f[]"the option required?"\f[]
+required: \f[I]false\f[]
+arguments: \f[I]true\f[]
+default: \f[I]false\f[]
+.RS
+.RE
+.SH stubbs:archive \f[]-file <> -modules <"*">
+"build a self extracting rerun" 
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-file \f[]"self extracting archive file"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-modules \f[]"module glob list"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+default: \f[I]"*"\f[]
+.RS
+.RE
+.SH stubbs:docs \f[]-name <>
+"generate the docs"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-name \f[]"module name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:test \f[][-logs <>] -name <>
+"run module test scripts"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \-logs \f[]"logs directory"\f[]
+required: \f[I]false\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \-name \f[]"the module name"\f[]
+required: \f[I]true\f[]
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH RETURN VALUES
+.PP
+Successful completion: 0
+.SH AUTHORS
+alexh
