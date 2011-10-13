@@ -79,9 +79,9 @@ for additional documentation including:
 
 ## Help
 
-For syntax and example usage execute `rerun` using the `-help` flag:
+For syntax and example usage execute `rerun` using the `--help` flag:
 
-	$ ./rerun -help
+	$ ./rerun --help
 	 _ __ ___ _ __ _   _ _ __
 	| '__/ _ \ '__| | | | '_ \ 
 	| | |  __/ |  | |_| | | | |

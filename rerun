@@ -141,7 +141,7 @@ while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
 	  # options without arguments
-	-h*)
+	-h*|--h*)
 		banner
 		bold "$USAGE"
 		examples		
