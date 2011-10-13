@@ -20,12 +20,12 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-name)
+	-m|--name)
 	    rerun_option_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
-	-description)
+	--description)
 	    rerun_option_check "$#"
 	    DESC="$2"
 	    shift

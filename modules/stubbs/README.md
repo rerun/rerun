@@ -17,13 +17,13 @@ Create a new rerun module.
 
 *Usage*
 
-    rerun stubbs:add-module [-name <>] [-description <>]
+    rerun stubbs:add-module [--name <>] [--description <>]
     
 *Example*
 
 Make a new module named "freddy":
 
-    rerun stubbs:add-module -name freddy -description "A dancer in a red beret and matching suspenders"
+    rerun stubbs:add-module --name freddy --description "A dancer in a red beret and matching suspenders"
 
 The `add-module` command will print:
 
@@ -35,13 +35,13 @@ Create a command in the specified module and generate a default implementation.
 
 *Usage*
 
-    rerun stubbs:add-command -name <> -description <> -module <> [-ovewrite <false>]
+    rerun stubbs:add-command --name <> --description <> --module <> [--ovewrite <false>]
 
 *Example*
 
 Add a command named "dance" to the freddy module:
 
-    rerun stubbs:add-command -name dance -description "tell freddy to dance" -module freddy
+    rerun stubbs:add-command --name dance --description "tell freddy to dance" --module freddy
 
 The `add-command` module will generate a boilerplate script file you can edit.
 
@@ -62,13 +62,13 @@ Define a command option for the specified module and generate options parser scr
 
 *Usage*
 
-    rerun stubbs:add-option [-arg <true>] -name <> -description <> -module <> -command <> [-required <false>]
+    rerun stubbs:add-option [--arg <true>] --name <> --description <> --module <> --command <> [--required <false>]
 
 *Example*
 
-Define an option named "-jumps":
+Define an option named "--jumps":
 
-    rerun stubbs:add-option -name jumps -description "jump #num times" -module freddy -command dance
+    rerun stubbs:add-option --name jumps --description "jump #num times" --module freddy --command dance
 
 You will see output similar to:
 
@@ -80,14 +80,14 @@ option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 The `default.sh` script sources the `options.sh` script to take care of
 command line option parsing.
 
-Users will now be able to specify a "-jumps" argument to the `freddy:dance` command:
+Users will now be able to specify a "--jumps" argument to the `freddy:dance` command:
 
     $ rerun freddy
     freddy:
     [commands]
      dance: tell freddy to dance
       [options]
-        -jumps <>: "jump #num times"
+        --jumps <>: "jump #num times"
 
 ### archive
 
@@ -105,13 +105,13 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun stubbs:archive [-file <>] [-modules <"*">]
+    rerun stubbs:archive [--file <>] [--modules <"*">]
 
 *Example*
 
 Create an archive containing the "freddy" module:
 
-    rerun stubbs:archive -modules "freddy"
+    rerun stubbs:archive --modules "freddy"
 
 The `archive` command generates a "rerun.bin" file 
 in the current directory.
@@ -124,11 +124,11 @@ will see freddy's commands listed:
     [commands]
      dance: tell freddy to dance
       [options]
-        -jumps <>: "jump #num times"
+        --jumps <>: "jump #num times"
 
 Now run the `freddy:dance` command.
 
-    $ bash rerun.bin freddy:dance -jumps 10
+    $ bash rerun.bin freddy:dance --jumps 10
     jumps (10)
 
 It works like a normal `rerun` command. Amazing !
@@ -157,13 +157,13 @@ Generate the docs.
 
 *Usage*
 
-    rerun stubbs:docs -name <>
+    rerun stubbs:docs --name <>
     
 *Example*
 
 Generate the manual page for "freddy":
 
-    rerun stubbs:docs -name freddy
+    rerun stubbs:docs --name freddy
 
 The `docs` command will print:
 
@@ -180,13 +180,13 @@ Run module test suite
 
 *Usage*
 
-    rerun stubbs:test [-name <>]
+    rerun stubbs:test [--name <>]
     
 *Example*
 
 Run the test suite for the module named "freddy":
 
-    rerun stubbs:test -name freddy
+    rerun stubbs:test --name freddy
 
 The `test` command will print output similar to the following:
 
@@ -259,10 +259,10 @@ Always faithfully check and return useful exit codes!
 
 Try running the `freddy:dance` command:
 
-    $ rerun freddy:dance -jumps 3
+    $ rerun freddy:dance --jumps 3
     jumps (3)
 
-The "jumps (3)" is written to the console stdout.
+The "jumps (3)" is written to the console standard output.
 
 Run `freddy:dance` again but this time without options.
 
@@ -280,18 +280,18 @@ If a command option is not supplied by the user, the
 can set a default value.
 
 Call the `add-option` command again but this
-time use its `-default <>` parameter to set the default value. 
+time use its `--default <>` parameter to set the default value. 
 
-Here the "-jumps" option is set to a default value, "1":
+Here the "--jumps" option is set to a default value, "1":
 
     rerun stubbs:add-option \
-      -name jumps -description "jump #num times" -module freddy -command dance \
-      -default 1
+      --name jumps -description "jump #num times" --module freddy --command dance \
+      --default 1
 
 The `add-option` will update the `jumps.option` metadata file with the
 new default value and extend the `options.sh` script.
 
-Run the `freddy:dance` command again but this time without the "-jumps" option:
+Run the `freddy:dance` command again but this time without the "--jumps" option:
 
     $ rerun freddy:dance
     jumps (1)
@@ -306,8 +306,8 @@ and supporting shell functions to process command line input.
 
 The meat of the script is the while loop and case statement.
 In the body of the case statement, you can see a case for
-the "-jumps" option and the `JUMPS` variable that will be set
-to the value of the "-jumps" argument.
+the "--jumps" option and the `JUMPS` variable that will be set
+to the value of the "--jumps" argument.
 
     # generated by add-option
     # Tue Sep 13 20:11:52 PDT 2011
@@ -325,7 +325,7 @@ to the value of the "-jumps" argument.
     while [ "$#" -gt 0 ]; do
         OPT="$1"
         case "$OPT" in
-            -jumps) rerun_option_check $# ; JUMPS=$2 ; shift ;;
+            --jumps) rerun_option_check $# ; JUMPS=$2 ; shift ;;
             # unknown option
             -?)
                 rerun_option_error
@@ -423,20 +423,20 @@ through the documentation.
 
 Create the "freddy" module:
 
-	rerun stubbs:add-module -name freddy -description "A dancer in a red beret and matching suspenders"
+	rerun stubbs:add-module --name freddy --description "A dancer in a red beret and matching suspenders"
 
 Create the `freddy:study` command:
 
-	rerun stubbs:add-command -name study \
-	   -description "tell freddy to study" -module freddy
+	rerun stubbs:add-command --name study \
+	   --description "tell freddy to study" --module freddy
 
 Define an option called "-subject":
 
-	rerun stubbs:add-option  -name subject \
-	   -description "subject to study" -module freddy -command study \
-	   -default math
+	rerun stubbs:add-option --name subject \
+	   --description "subject to study" --module freddy --command study \
+	   --default math
 
-Edit the default implementation (`RERUN_MODULES_/freddy/commands/study/default.sh`).
+Edit the default implementation (`RERUN_MODULES/freddy/commands/study/default.sh`).
 The implementation should echo what freddy is studying:
 
 	# ------------------------------
@@ -445,16 +445,16 @@ The implementation should echo what freddy is studying:
 
 Similarly, define the `freddy:dance` command:
 
-	rerun stubbs:add-command -name dance \
-		   -description "tell freddy to dance" -module freddy
+	rerun stubbs:add-command --name dance \
+		   --description "tell freddy to dance" --module freddy
 
-Define an option called "-jumps":
+Define an option called "--jumps":
 
-	rerun stubbs:add-option  -name jumps \
-		   -description "jump #num times" -module freddy -command dance \
-		   -default 1
+	rerun stubbs:add-option --name jumps \
+		   --description "jump #num times" --module freddy --command dance \
+		   --default 1
 
-Edit the default implementation (`RERUN_MODULES_/freddy/commands/dance/default.sh`).
+Edit the default implementation (`RERUN_MODULES/freddy/commands/dance/default.sh`).
 The implementation should echo how many jumps:
 
 	# ------------------------------
@@ -468,15 +468,15 @@ Use rerun listing to show the command usage:
 	[commands]
 	 dance: "tell freddy to dance"
 	  [options]
-	    -jumps <1>: "jump #num times"
+	    --jumps <1>: "jump #num times"
 	 study: "tell freddy to study"
 	  [options]
-	    -subject <math>: "subject to study"
+	    --subject <math>: "subject to study"
 
 The "dance" and "study" commands are listed. 
 Try `freddy:study` with and without options.
-Since a default value was assigned to "-subject"
-(remember "-default math" was specified to `stubbs:add-option`),
+Since a default value was assigned to "--subject"
+(remember "--default math" was specified to `stubbs:add-option`),
 the subject "math" will be printed.
 
 Without option:
@@ -486,7 +486,7 @@ Without option:
 
 With option:
 
-	$ ./rerun freddy: study -subject locking
+	$ ./rerun freddy: study --subject locking
 	studying (locking)
 
 ## Testing 
@@ -497,7 +497,7 @@ Stubbs will run a module's tests via the `test` command.
 
 Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 
-	rerun stubbs:test -name freddy
+	rerun stubbs:test --name freddy
 	[tests]  
 	  dance: "test freddy dance": default.sh: OK
 
@@ -548,7 +548,7 @@ freddy test suite.
 ### Test logs
 
 The output from the test script execution is stored in
-the directory specified by `-logs <>` option or it will
+the directory specified by `--logs <>` option or it will
 defaulted to `$(pwd)/tests-reports`.
 
 Here's a sample test report listing for the 'freddy' test suite.

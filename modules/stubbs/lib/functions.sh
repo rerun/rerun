@@ -82,6 +82,12 @@ rerun_optionDefault() {
 	}
 }
 
+rerun_optionShort() {
+	[ -f $1/$2/commands/$3/$4.option ] && {
+    	awk -F= '/SHORT/ {print $2}' $1/$2/commands/$3/$4.option
+	}
+}
+
 rerun_tests() {
 	modules=$1
 	module=$2

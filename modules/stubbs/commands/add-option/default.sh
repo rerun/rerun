@@ -19,13 +19,20 @@ caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
 add_optionparser() {
 	local optName=$1
     local optNameCap=$(echo $optName | tr "[:lower:]" "[:upper:]")
-	ARGUMENTS=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $optName)
+	local ARGUMENTS=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $optName)
+	local SHORT=$(rerun_optionShort $RERUN_MODULES $MODULE $COMMAND $optName)
+	if [ -n "${SHORT}" ] 
+	then
+		argstring=$(printf ' -%s|--%s' "${SHORT}" "${optName}")
+	else
+		argstring=$(printf " --%s" "${optName}" )
+    fi
 	if [ "$ARGUMENTS" == "false" ]
 	then
-		printf " -%s) %s=true ;;\n" "$optName" "$optNameCap"
+		printf " %s) %s=true ;;\n" "${argstring}" "$optName" "$optNameCap"
 	else
-    	printf " -%s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" \
-			"$optName" "$optNameCap"
+    	printf " %s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" \
+			"$argstring" "$optNameCap"
 	fi
 }
 
@@ -38,37 +45,55 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-name)
+	-n|--name)
 	    rerun_option_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
-	-description)
+	--desc*)
 	    rerun_option_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
-	-command)
+	-c|--command)
 	    rerun_option_check "$#"
-	    COMMAND="$2"
+		# Parse if command is named "module:command"
+	 	regex='([^:]+)(:)([^:]+)'
+		if [[ $2 =~ $regex ]]
+		then
+			MODULE=${BASH_REMATCH[1]}
+			COMMAND=${BASH_REMATCH[3]}
+		else
+	    	COMMAND="$2"		
+	    fi
 	    shift
 	    ;;
-	-module)
+	-m|--module)
 	    rerun_option_check "$#"
 	    MODULE="$2"
 	    shift
 	    ;;
-	-req*)
+	--req*)
 	    rerun_option_check "$#"
 	    REQ="$2"
 	    shift
 	    ;;
-	-arg*)
+	--arg*)
 	    rerun_option_check "$#"
 	    ARGS="$2"
 	    shift
 	    ;;
-	-default)
+	--long)
+	    rerun_option_check "$#"
+	    LONG="$2"
+	    shift
+	    ;;
+	-range)
+	    rerun_option_check "$#"
+	    RANGE="$2"
+	    shift
+	    ;;			
+	--default)
 	    rerun_option_check "$#"
 	    DEFAULT="$2"
 	    shift
@@ -127,7 +152,10 @@ NAME=$NAME
 DESCRIPTION="$DESC"
 ARGUMENTS=${ARGS:-true}
 REQUIRED=${REQ:-true}
+SHORT=${NAME:0:1}
+LONG=${LONG:-$NAME}
 DEFAULT=$DEFAULT
+RANGE=$RANGE
 
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$NAME.option || rerun_die

@@ -115,10 +115,10 @@ To list the commands available from the 'freddy' module run:
     [commands]
      study: "tell freddy to study"
       [options]
-       -subject <math>: "the summer school subject"
+       --subject <math>: "the summer school subject"
      dance: "tell freddy to dance"
       [options]
-       -jumps <1>: "jump #num times"
+       --jumps <1>: "jump #num times"
 
 The listing consists of info about command options 
 including default values if they were described with option metadata.
@@ -126,8 +126,8 @@ including default values if they were described with option metadata.
 Options that declare a default value are shown
 with a string between the "<>" characters.
 
-For example, notice how "-jumps" option shows `<1>`.
-The "1" is the default value assigned to the "-jumps" option.
+For example, notice how "--jumps" option shows `<1>`.
+The "1" is the default value assigned to the "--jumps" option.
 
 See the "Environment" section below to learn about the
 `RERUN_MODULES` environment variable. This variable
@@ -156,9 +156,9 @@ and choose a command.
 After accepting a command, typing the tab key will show arguments.
 
     $ rerun freddy:study -[TAB]
-    -subject
+    --subject
 
-The `freddy:study` command accepts one option (-subject <>).
+The `freddy:study` command accepts one option (--subject <>).
     
 ## Executing
 
@@ -178,7 +178,7 @@ as defined in the module metadata.
 Arguments are passed after the "module:command" string. 
 Tell freddy to study the subject, "biology":
 
-    $ rerun freddy:study -subject biology
+    $ rerun freddy:study --subject biology
     studying (biology)
 
 If the 'freddy' module is stored in `/var/rerun`, then the command usage
@@ -203,7 +203,7 @@ Run an archive script like you would run `rerun`.
 
 You can execute an archive via `bash` like so:
 
-    $ bash rerun.bin <module>:<command> -your options
+    $ bash rerun.bin <module>:<command> --your options
 
 If the execute bit is set, invoke the archive directly.
 
@@ -221,7 +221,7 @@ The file can be named anything you wish.
 
 Run the `freddy:dance` command in the archive:
 
-	$ bash ./rerun.bin freddy:dance -jumps 3
+	$ bash ./rerun.bin freddy:dance --jumps 3
 	jumps (3)
 
 See `stubbs:archive` for further information about creating and 
@@ -243,7 +243,7 @@ Below you can see the results of a comparison between this run of
 After the command completes, rerun uses the `diff` command 
 to compare the log output.
 
-	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance -jumps 2
+	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance --jumps 2
 	jumps (2)
 	[diff]
 	2c2

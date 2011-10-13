@@ -5,4 +5,6 @@ DESCRIPTION="module name"
 ARGUMENTS=true
 REQUIRED=true
 DEFAULT=
-
+SHORT=m
+LONG=name
+RANGE=

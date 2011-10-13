@@ -1,0 +1,7 @@
+NAME=range
+DESCRIPTION="argument value range"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT="*"
+SHORT=
+RANGE=

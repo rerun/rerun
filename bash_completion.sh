@@ -159,7 +159,7 @@ _rerun() {
     [ -n "$opts_command" -a -n "$opts_module" ] && {
         [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
 			local options=$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})
-            COMPREPLY=( $(compgen -W "$options" -P "-" -- ${cur}) )
+            COMPREPLY=( $(compgen -W "$options" -P "--" -- ${cur}) )
             return 0
     	}
     }
@@ -176,7 +176,7 @@ _rerun() {
                     return 0
                 }  
                 [ -z "$default" ] && {
-                    echo $prev | egrep -q '^\-file.*|^\-out.*|^\-.*?file$|^\-xml.*' && {
+                    echo $prev | egrep -q '^\--file.*|^\--out.*|^\--.*?file$|^\--xml.*' && {
                         # use filename completion in these cases
                 	COMPREPLY=( $(compgen -o filenames -A file -- ${cur}) )
                     }

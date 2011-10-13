@@ -5,4 +5,5 @@ DESCRIPTION="default script template"
 ARGUMENTS=true
 REQUIRED=true
 DEFAULT=$RERUN_MODULES/stubbs/templates/default.sh
-
+SHORT=
+RANGE=

@@ -249,11 +249,19 @@ shift; # Shift over to the command options
 		    	opt_arg=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata`
 		    	opt_req=`awk -F= '/^REQUIRED/ {print $2}' $opt_metadata`
 		    	opt_def=`awk -F= '/^DEFAULT/ {print $2}' $opt_metadata`
+		    	opt_short=`awk -F= '/^SHORT/ {print $2}' $opt_metadata`
 				# option usage summary
-		    	opt_usage=$(printf " -%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
+				argstring=
+				if [ -n "${opt_short}" ] 
+				then
+					argstring=$(printf ' -%s|--%s' "${opt_short}" "${opt_name}")
+				else
+					argstring=$(printf " --%s" "${opt_name}" )
+			    fi		    	
 		    	[ "true" != "${opt_req}" ] && {
-					opt_usage=$(printf "[-%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
+					opt_usage=$(printf "[%s <%s>]" "${argstring}" "${opt_def}") 
 		    	}
+				opt_usage=$(printf "%s: %s" "${argstring}" "${opt_desc}")
 		    	printf "%s %s\n" "$PAD" "$opt_usage"
 			done
 	    fi

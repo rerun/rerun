@@ -24,27 +24,27 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-name)
+	-c|--name)
 	    rerun_option_check "$#"
 	    NAME="$2"
 	    shift
 	    ;;
-	-description)
+	--description)
 	    rerun_option_check "$#"
 	    DESC="$2"
 	    shift
 	    ;;
-	-module)
+	-m|--module)
 	    rerun_option_check "$#"
 	    MODULE="$2"
 	    shift
 	    ;;
-	-overwrite)
+	--overwrite)
 	    rerun_option_check "$#"
 	    OVERWRITE="$2"
 	    shift
 	    ;;
-	-template)
+	-t|--template)
 	    rerun_option_check "$#"
 	    TEMPLATE="$2"
 	    shift

@@ -1,8 +1,7 @@
-NAME=logs
-DESCRIPTION="logs directory"
+NAME=long
+DESCRIPTION="long option name"
 ARGUMENTS=true
 REQUIRED=false
 DEFAULT=
 SHORT=
-LONG=logs
 RANGE=
