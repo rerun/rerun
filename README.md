@@ -95,7 +95,7 @@ For syntax and example usage execute `rerun` using the `--help` flag:
 	| => List all modules.
 	| $ rerun freddy
 	| => List all freddy commands.
-	| $ rerun freddy:dance -jumps 3
+	| $ rerun freddy:dance --jumps 3
 	| => Execute the freddy:dance command.
 	| $ rerun -M /var/rerun freddy:dance
 	| => Execute the freddy:dance command found in /var/rerun
@@ -239,7 +239,7 @@ Replay logs are normally found in the directory specified by the `RERUN_LOGS`
 environment variable (or the `-L <dir>` option).
 
 Below you can see the results of a comparison between this run of
-`freddy:dance -jumps 2`  against an earlier command execution. 
+`freddy:dance --jumps 2`  against an earlier command execution. 
 After the command completes, rerun uses the `diff` command 
 to compare the log output.
 
