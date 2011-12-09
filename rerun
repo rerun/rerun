@@ -18,7 +18,7 @@ echo $(tput sgr 0 1)"Examples:$(tput sgr0)
 | => List all modules.
 | \$ $PROG freddy
 | => List all freddy commands.
-| \$ $PROG freddy:dance -jumps 3
+| \$ $PROG freddy:dance --jumps 3
 | => Execute the freddy dance command."
 
 
