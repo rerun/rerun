@@ -88,6 +88,12 @@ rerun_optionShort() {
 	}
 }
 
+rerun_optionRequired() {
+	[ -f $1/$2/commands/$3/$4.option ] && {
+    	awk -F= '/REQUIRED/ {print $2}' $1/$2/commands/$3/$4.option
+	}
+}
+
 rerun_tests() {
 	modules=$1
 	module=$2

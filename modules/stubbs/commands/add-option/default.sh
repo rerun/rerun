@@ -45,7 +45,7 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-n|--name)
+	-o|--name)
 	    rerun_option_check "$#"
 	    NAME="$2"
 	    shift
@@ -169,6 +169,13 @@ for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
     [ -n "$default" ] && optionsWithDefaults="$optionsWithDefaults $opt"
 done
 
+# list the options that are required
+optionsRequired=
+for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
+    required=$(rerun_optionRequired $RERUN_MODULES $MODULE $COMMAND $opt)
+    [ "$required" == "true"  ] && optionsRequired="$optionsRequired $opt"
+done
+
 # Generate option parser script.
 
 (
@@ -207,6 +214,10 @@ done
 # If defaultable options variables are unset, set them to their DEFAULT
 $(for opt in $(echo $optionsWithDefaults|sort); do
 printf "[ -z \"$%s\" ] && %s=%s\n" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
+done)
+# Check required options are set
+$(for opt in $(echo $optionsRequired|sort); do
+printf "[ -z \"$%s\" ] && echo missing required option: --%s; exit 1;" $(caps $opt) $opt
 done)
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
