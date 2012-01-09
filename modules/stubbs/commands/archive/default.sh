@@ -29,10 +29,16 @@ export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || rerun_die
 
 # Copy in the specified modules
 mkdir -p $PAYLOAD/rerun/modules || rerun_die
+pushd $RERUN_MODULES || rerun_die
 for module in $MODULES
 do
-    cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
+    # Check for a commands subdir to be sure it looks like a module
+    if [ -d $RERUN_MODULES/$module/commands ]
+    then
+	cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
+    fi
 done
+popd 
 
 # Copy rerun itself
 cp $RERUN $PAYLOAD/rerun || rerun_die
