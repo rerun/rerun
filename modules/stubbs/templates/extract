@@ -9,6 +9,8 @@
 # Function to print error message and exit
 die() { echo "ERROR: $* " ; exit 1 ; }
 
+umask 0002
+
 # extracted payload goes in here
 export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die "failed making payload extraction directory"
 
@@ -16,7 +18,7 @@ SIZE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0` || die "error sizi
 
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
-tail -n+$SIZE $0 | tar xz -C $PAYLOAD || die "unarchiving failed. (tar=$(which tar). size=$SIZE)"
+tail -n+$SIZE $0 | (cd $PAYLOAD && tar xzf -) || die "unarchiving failed. (tar=$(which tar). size=$SIZE)"
 
 # CWD and TMDIR are passed to launcher as env variables
 export CWD=`pwd`
