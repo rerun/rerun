@@ -21,6 +21,7 @@ SIZE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0` || die "error sizi
 tail -n+$SIZE $0 | (cd $PAYLOAD && tar xzf -) || die "unarchiving failed. (tar=$(which tar). size=$SIZE)"
 
 # CWD and TMDIR are passed to launcher as env variables
+export oldCWD=$(pwd)
 export CWD=/tmp
 export PAYLOAD
 
