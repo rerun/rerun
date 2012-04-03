@@ -217,7 +217,7 @@ printf "[ -z \"$%s\" ] && %s=%s\n" $(caps $opt) $(caps $opt) $(rerun_optionDefau
 done)
 # Check required options are set
 $(for opt in $(echo $optionsRequired|sort); do
-printf "[ -z \"$%s\" ] && echo missing required option: --%s; exit 1;" $(caps $opt) $opt
+printf "[ -z \"$%s\" ] && { echo missing required option: --%s; exit 1; }" $(caps $opt) $opt
 done)
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
