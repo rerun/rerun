@@ -17,7 +17,7 @@ rerun_option_check() {
 while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
-         -name) rerun_option_check $# ; NAME=$2 ; shift ;;
+         -m|--module) rerun_option_check $# ; MODULE=$2 ; shift ;;
         # unknown option
         -?)
             rerun_option_error

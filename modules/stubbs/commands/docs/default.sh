@@ -81,19 +81,19 @@ rerun_option_summary() {
 }
 
 
-[ -z "$DOC" ] && DOC=$RERUN_MODULES/$NAME/${NAME}.1
+[ -z "$DOC" ] && DOC=$RERUN_MODULES/$MODULE/${MODULE}.1
 #
 # Document head
 (
 cat <<EOF
-.TH $NAME 1 "$(date)" "Version 1" "Rerun User Manual" 
+.TH $MODULE 1 "$(date)" "Version 1" "Rerun User Manual" 
 .SH NAME
-$NAME \- $(rerun_module_metadata "description" $NAME)
+$MODULE \- $(rerun_module_metadata "description" $MODULE)
 .PP
 .SH SYNOPSIS
 .PP
 \f[CR] 
-$(basename ${RERUN}) [ARGS] $(rerun_module_synopsys $NAME) [OPTIONS]
+$(basename ${RERUN}) [ARGS] $(rerun_module_synopsys $MODULE) [OPTIONS]
 \f[]
 EOF
 ) > $DOC || rerun_die
@@ -101,20 +101,20 @@ EOF
 # COMMANDS section
 #
 echo ".SH COMMANDS" >> $DOC
-for command in $(rerun_commands $RERUN_MODULES $NAME)
+for command in $(rerun_commands $RERUN_MODULES $MODULE)
 do
 (
 cat <<EOF
-.SH $NAME:$command \f[]$(rerun_command_summary $NAME $command)
-$(rerun_command_metadata description $NAME $command)
+.SH $MODULE:$command \f[]$(rerun_command_summary $MODULE $command)
+$(rerun_command_metadata description $MODULE $command)
 .PP
 \f[I]OPTIONS\f[]
-$(for option in $(rerun_options $RERUN_MODULES $NAME $command)
+$(for option in $(rerun_options $RERUN_MODULES $MODULE $command)
 do
-description=$(rerun_option_metadata "description" $NAME $command $option)
-arguments=$(rerun_option_metadata "arguments" $NAME $command $option)
-default=$(rerun_option_metadata "default" $NAME $command $option)
-required=$(rerun_option_metadata "required" $NAME $command $option)
+description=$(rerun_option_metadata "description" $MODULE $command $option)
+arguments=$(rerun_option_metadata "arguments" $MODULE $command $option)
+default=$(rerun_option_metadata "default" $MODULE $command $option)
+required=$(rerun_option_metadata "required" $MODULE $command $option)
 echo .TP
 echo .B \\-$option \\f[]$description\\f[]
 echo "required: \\f[I]${required}\\f[]"
