@@ -124,6 +124,21 @@ rerun_extractLog() {
 	tail -n+$SIZE $file || die "failed extracting log"
 }
 
+rerun_metadataLookup() {
+    field=$1
+    file=$2
+
+    [ ! -r $file ] && { echo "file not found: $file" ; return 1 ; }
+    while read line
+    do
+	key=${line%%=*}
+	value=${line##*=}
+	[ "$key" == "$field" ] && {
+	    echo $value ; break ;
+	}
+    done < $file
+}
+
 #
 # Main body of the script. 
 #
@@ -219,7 +234,7 @@ shift; # Shift over to the command options
 	do
        	$(rerun_existsModule $(basename $mod)) && {
 	   		mod_name=$(basename $mod)
-	   		mod_desc=$(awk -F= '/^DESCRIPTION/ {print $2}' $mod/metadata)
+	   		mod_desc=$(rerun_metadataLookup DESCRIPTION $mod/metadata)
 	   		echo "${PAD}${mod_name}: ${mod_desc}" 
         }
     done
@@ -235,7 +250,7 @@ shift; # Shift over to the command options
 	do
 		cmd_name=$(basename $(dirname $cmd))
 		cmd_metadata=$RERUN_MODULES/$MODULE/commands/${cmd_name}/metadata
-		[ -f $cmd_metadata ] && cmd_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $cmd_metadata`
+		[ -f $cmd_metadata ] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
   	    echo " ${cmd_name}: ${cmd_desc}" 
 		# List the options
 		if [ -d $RERUN_MODULES/$MODULE/commands/${cmd_name} ]
@@ -244,12 +259,12 @@ shift; # Shift over to the command options
 			shopt -s nullglob # enable
 			for opt_metadata in $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option; do
 		    	cmd_param=$(basename $(echo ${opt_metadata%%.option}))
-		    	opt_name=`awk -F= '/^NAME/ {print $2}' $opt_metadata`
-		    	opt_desc=`awk -F= '/^DESCRIPTION/ {print $2}' $opt_metadata`
-		    	opt_arg=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata`
-		    	opt_req=`awk -F= '/^REQUIRED/ {print $2}' $opt_metadata`
-		    	opt_def=`awk -F= '/^DEFAULT/ {print $2}' $opt_metadata`
-		    	opt_short=`awk -F= '/^SHORT/ {print $2}' $opt_metadata`
+		    	opt_name=$(rerun_metadataLookup NAME $opt_metadata)
+		    	opt_desc=$(rerun_metadataLookup DESCRIPTION $opt_metadata)
+		    	opt_arg=$(rerun_metadataLookup ARGUMENTS $opt_metadata)
+		    	opt_req=$(rerun_metadataLookup REQUIRED $opt_metadata)
+		    	opt_def=$(rerun_metadataLookup DEFAULT $opt_metadata)
+		    	opt_short=$(rerun_metadataLookup SHORT $opt_metadata)
 				# option usage summary
 				argstring=
 				if [ -n "${opt_short}" ] 
