@@ -93,7 +93,7 @@ while [ "$#" -gt 0 ]; do
 	    RANGE="$2"
 	    shift
 	    ;;			
-	--default)
+	-d|--default)
 	    rerun_option_check "$#"
 	    DEFAULT="$2"
 	    shift

@@ -1,0 +1,7 @@
+NAME=default
+DESCRIPTION="default value"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=
+SHORT=d
+RANGE=
