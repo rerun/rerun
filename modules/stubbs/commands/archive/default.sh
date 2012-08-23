@@ -62,18 +62,25 @@ done
 cd $PAYLOAD
 tar c${VERBOSE}f payload.tar launcher extract rerun || rerun_die
 
+if [ $(uname -s) = "Darwin" ]
+then
+  BASE64="base64 -b 76"
+else
+  BASE64="base64"
+fi
+
 # compress the tar
 if [ -e "payload.tar" ]; then
-    gzip payload.tar || rerun_die
+    gzip -c payload.tar | $BASE64 > payload.tgz.base64   || rerun_die
 
-    if [ -e "payload.tar.gz" ]; then
+    if [ -e "payload.tgz.base64" ]; then
 	#
 	# Prepend the extract script to the payload.
 	#    and thus turn the thing into a shell script!
 	#
-        cat extract payload.tar.gz > ${FILE} || rerun_die
+        cat extract payload.tgz.base64 > ${FILE} || rerun_die
     else
-        rerun_die "payload.tar.gz does not exist"
+        rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
     fi
 else
     rerun_die "payload.tar does not exist"

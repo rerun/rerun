@@ -14,11 +14,17 @@ umask 0002
 # extracted payload goes in here
 export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die "failed making payload extraction directory"
 
-SIZE=`awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' $0` || die "error sizing payload content"
-
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
-tail -n+$SIZE $0 | (cd $PAYLOAD && tar xzf -) || die "unarchiving failed. (tar=$(which tar). size=$SIZE)"
+
+if [ $(uname -s) = "Darwin" ]
+then
+  BASE64="base64 -D"
+else
+  BASE64="base64 -d"
+fi
+
+cat $0 | sed -e '1,/^__ARCHIVE_BELOW__/ d'| $BASE64 | (cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
 
 # CWD and TMDIR are passed to launcher as env variables
 export oldCWD=$(pwd)
