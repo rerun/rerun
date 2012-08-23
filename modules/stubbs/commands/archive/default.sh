@@ -62,16 +62,9 @@ done
 cd $PAYLOAD
 tar c${VERBOSE}f payload.tar launcher extract rerun || rerun_die
 
-if [ $(uname -s) = "Darwin" ]
-then
-  BASE64="base64 -b 76"
-else
-  BASE64="base64"
-fi
-
 # compress the tar
 if [ -e "payload.tar" ]; then
-    gzip -c payload.tar | $BASE64 > payload.tgz.base64   || rerun_die
+    gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
 
     if [ -e "payload.tgz.base64" ]; then
 	#

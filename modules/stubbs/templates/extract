@@ -17,14 +17,7 @@ export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die "failed making payload e
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
 
-if [ $(uname -s) = "Darwin" ]
-then
-  BASE64="base64 -D"
-else
-  BASE64="base64 -d"
-fi
-
-cat $0 | sed -e '1,/^__ARCHIVE_BELOW__/ d'| $BASE64 | (cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
+cat $0 | sed -e '1,/^__ARCHIVE_BELOW__/ d'| openssl enc -base64 -d  | (cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
 
 # CWD and TMDIR are passed to launcher as env variables
 export oldCWD=$(pwd)
