@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # RUN ME after pulling the code from git!
 if [ "clean" == "$1" ]; then

@@ -3,7 +3,7 @@
 # rerun - a simple command runner because it's easy to forget 
 #         standard operating procedure.
 #
-SH=/bin/bash
+SH="/usr/bin/env bash"
 PROG=`basename $0`
 USAGE="
 Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [command_args]]]

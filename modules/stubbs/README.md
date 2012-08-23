@@ -207,7 +207,7 @@ The dance command's `default.sh` stub is shown below.
 
 File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
 
-    #!/bin/bash
+    #!/usr/bin/env bash
     #
     # NAME
     #
