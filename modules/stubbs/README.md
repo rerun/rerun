@@ -434,7 +434,7 @@ Define an option called "-subject":
 
 	rerun stubbs:add-option --option subject \
 	   --description "subject to study" --module freddy --command study \
-	   --default math
+	   --default math --required false
 
 Edit the default implementation (`RERUN_MODULES/freddy/commands/study/default.sh`).
 The implementation should echo what freddy is studying:
@@ -452,7 +452,7 @@ Define an option called "--jumps":
 
 	rerun stubbs:add-option --option jumps \
 		   --description "jump #num times" --module freddy --command dance \
-		   --default 1
+		   --default 1 --required false
 
 Edit the default implementation (`RERUN_MODULES/freddy/commands/dance/default.sh`).
 The implementation should echo how many jumps:
@@ -464,14 +464,14 @@ The implementation should echo how many jumps:
 The freddy commands, their options and default implementations are completed.
 Use rerun listing to show the command usage:
 
-	$ ./rerun freddy: 
+	$ ./rerun freddy
 	[commands]
 	 dance: "tell freddy to dance"
 	  [options]
-	    --jumps <1>: "jump #num times"
+	    [-j|--jumps <1>: "jump #num times"]
 	 study: "tell freddy to study"
 	  [options]
-	    --subject <math>: "subject to study"
+	    [-s|--subject <math>: "subject to study"]
 
 The "dance" and "study" commands are listed. 
 Try `freddy:study` with and without options.
@@ -500,6 +500,7 @@ Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 	rerun stubbs:test --module freddy
 	[tests]  
 	  freddy:dance: OK
+	  freddy:study: OK
 
 A successful unit test will print `OK` while a failed one 
 will print `FAIL` and cause rerun to exit non zero.
