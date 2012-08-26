@@ -1,4 +1,4 @@
-NAME=name
+NAME=module
 DESCRIPTION="the module name"
 ARGUMENTS=true
 REQUIRED=true
