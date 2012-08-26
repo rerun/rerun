@@ -5,6 +5,7 @@
 # generator: @GENERATOR@
 # date: @DATE@
 # user: @USER@
+# version: @VERSION@
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " ; exit 1 ; }

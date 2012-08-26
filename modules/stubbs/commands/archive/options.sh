@@ -10,12 +10,13 @@ rerun_option_check() {
     [ "$1" -lt 2 ] && rerun_option_error
 }
 
-# options: [file list modules]
+# options: [file modules version]
 while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
-        --file) rerun_option_check $# ; FILE=$2 ; shift ;;
-        --modules) rerun_option_check $# ; MODULES=$2 ; shift ;;
+        -f|--file) rerun_option_check $# ; FILE=$2 ; shift ;;
+        -m|--modules) rerun_option_check $# ; MODULES=$2 ; shift ;;
+        -v|--version) rerun_option_check $# ; VERSION=$2 ; shift ;;
         # unknown option
         -?)
             rerun_option_error

@@ -17,19 +17,29 @@ source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function
   . $RERUN_MODULES/stubbs/commands/archive/options.sh
 }
 
-CWD=$(pwd); #remember current working directory
-[ -n "${LIST}"  ] && VERBOSE=v 
-[ -z "${FILE}"  ] && FILE=$CWD/rerun.bin
+CWD=$(pwd); #remember current working directory.
+
+# Check if file option was specified and if not set it to rerun.bin.
+[ -z "${FILE}"  ] && FILE=rerun.bin 
+
+# Prepend curren working directory if relative file path.
+[[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
+
+[ ! -d $(dirname ${FILE}) ] && rerun_die "directory not found: $(dirname ${FILE})"
+
+# Default version to blank if unspecified.
+[ -z "${VERSION}" ] && VERSION=
 
 # create a work directory the archive content
 export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || rerun_die
 
 #
-# Start adding payload content
+# Start preparing the payload content.
+#
 
-# Copy in the specified modules
+# Iterate through the the specified modules and add them to payload
 mkdir -p $PAYLOAD/rerun/modules || rerun_die
-pushd $RERUN_MODULES || rerun_die
+pushd $RERUN_MODULES >/dev/null || rerun_die
 for module in $MODULES
 do
     # Check for a commands subdir to be sure it looks like a module
@@ -38,9 +48,9 @@ do
 	cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
     fi
 done
-popd 
+popd >/dev/null
 
-# Copy rerun itself
+# Copy rerun itself to the payload
 cp $RERUN $PAYLOAD/rerun || rerun_die
 
 # Copy in the extract and launcher scripts used during execution
@@ -50,6 +60,7 @@ do
     sed -e "s/@GENERATOR@/stubbs:archive/" \
 	-e "s/@DATE@/$(date)/" \
 	-e "s/@USER@/$USER/" \
+	-e "s/@VERSION@/$VERSION/" \
 	$template > $PAYLOAD/$(basename $template) || rerun_die
     # ... and save it to the payload --^
 done
@@ -58,11 +69,12 @@ done
 # Archive the content
 #
 
-# make the payload.tar file
 cd $PAYLOAD
-tar c${VERBOSE}f payload.tar launcher extract rerun || rerun_die
 
-# compress the tar
+# make the payload.tar file
+tar cf payload.tar launcher extract rerun || rerun_die
+
+# compress and base64 encode the tar file
 if [ -e "payload.tar" ]; then
     gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
 

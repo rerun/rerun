@@ -5,6 +5,9 @@
 # generator: @GENERATOR@
 # date: @DATE@
 # user: @USER@
+# version: @VERSION@
+
+[ "$1" == '-version' ] && { grep "^# version:" $0|cut -f3 -d" " ; exit 0 ; }
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " ; exit 1 ; }

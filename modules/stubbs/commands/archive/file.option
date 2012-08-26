@@ -3,7 +3,7 @@
 NAME=file
 DESCRIPTION="self extracting archive file"
 ARGUMENTS=true
-REQUIRED=true
+REQUIRED=false
 DEFAULT=
 SHORT=f
 RANGE=
