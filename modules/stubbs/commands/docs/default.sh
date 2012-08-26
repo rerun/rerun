@@ -73,9 +73,9 @@ rerun_option_summary() {
 	opt_req=$(rerun_option_metadata "required" $1 $2 $opt_name)
 	opt_def=$(rerun_option_metadata "default" $1 $2 $opt_name)
 	# option usage summary
-	opt_usage=$(printf " -%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
+	opt_usage=$(printf " --%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
 	[ "true" != "${opt_req}" ] && {
-		opt_usage=$(printf "[-%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
+		opt_usage=$(printf "[--%s <%s>]: %s" "${opt_name}" "${opt_def}" "${opt_desc}") 
 	}
 	printf "%s %s\n" "$PAD" "$opt_usage"
 }
@@ -116,10 +116,10 @@ arguments=$(rerun_option_metadata "arguments" $MODULE $command $option)
 default=$(rerun_option_metadata "default" $MODULE $command $option)
 required=$(rerun_option_metadata "required" $MODULE $command $option)
 echo .TP
-echo .B \\-$option \\f[]$description\\f[]
-echo "required: \\f[I]${required}\\f[]"
+echo .B \\--$option \\f[]$description\\f[]
+echo "required: \\f[I]${required}\\f[] ,"
 echo "arguments: \\f[I]${arguments}\\f[]"
-[ -n "$default" ] && echo "default: \\f[I]$default\\f[]"
+[ -n "$default" ] && echo ", default: \\f[I]$default\\f[]"
 echo .RS
 echo .RE
 done)
