@@ -303,7 +303,7 @@ then
     MODULE_DIR=`rerun_lookupModule $MODULE`
     export MODULE_DIR 
     CMD_SCRIPT=`rerun_lookupHandler $MODULE $COMMAND`
-    . $MODULE_DIR/metadata
+    [ -r $MODULE_DIR/metadata ] && . $MODULE_DIR/metadata
     [ -r $MODULE_DIR/commands/${COMMAND}/metadata ] && {
 	  . $MODULE_DIR/commands/${COMMAND}/metadata
     }
@@ -318,8 +318,8 @@ then
 		#
 		# Execute the command script
 		#
-	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee -a $LOG
-	    EXIT_STATUS=$?
+	    $SH $VERBOSE $CMD_SCRIPT "$@" >> $LOG
+	    RETVAL=$?
 		
 		# Generate replay metadata
 		(
@@ -333,7 +333,7 @@ then
 		OPTIONS="$*"
 		USER="$USER"
 		DATE="$TSTAMP"
-		EXIT_STATUS="$EXIT_STATUS"
+		EXIT_STATUS="$RETVAL"
 		__LOG_BELOW__
 
 		EOF
@@ -371,4 +371,4 @@ else
     die command not found: \"$COMMAND\"
 fi
 
-exit ${RETVAL:-0}
+exit ${RETVAL}

@@ -4,4 +4,5 @@ ARGUMENTS=true
 REQUIRED=true
 DEFAULT=
 SHORT=m
+LONG=module
 RANGE=

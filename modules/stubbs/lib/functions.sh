@@ -12,14 +12,13 @@ reset () { tput sgr0 ; }
 
 # print error message and exit
 rerun_die() {
-	[[ "$RERUN_COLOR" == "true" ]] && bold "ERROR: $*" >&2 || echo "ERROR: $*" >&2
-	exit 1
+    [[ "$RERUN_COLOR" == "true" ]] && bold "$*" >&2 || echo "$*" >&2
+    exit 1
 }
 
 # print USAGE and exit
 rerun_option_error() {
-    [ -z "$USAGE"  ] && echo "$USAGE" >&2
-    [ -z "$SYNTAX" ] && echo "$SYNTAX $*" >&2
+    echo "$*" >&2
     exit 2
 }
 

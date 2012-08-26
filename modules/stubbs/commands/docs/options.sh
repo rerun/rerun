@@ -31,3 +31,9 @@ done
 
 # If defaultable options variables are unset, set them to their DEFAULT
 
+
+# Post processes the options
+[ -z "$MODULE" ] && {
+    echo "Module name: "
+    read MODULE
+}
