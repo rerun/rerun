@@ -6,7 +6,6 @@
 #
 #
 
-
 # die - print an error and exit
 die() { echo "ERROR: $* " ; exit 1 ; }
 
@@ -24,14 +23,12 @@ MODULE="@MODULE@"
 COMMAND="@COMMAND@"
 OPTIONS=""
 
-
 #
 # Extract benchamrk text
 #
 BENCHMARK=$TMPDIR/$MODULE:$COMMAND-$(basename $0).benchmark
 SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $0) || die "failed sizing test log"
 tail -n+$SIZE $0 > $BENCHMARK || die "failed extracting benchmark text"
-
 
 #
 # Run the command and compare the benchmark text to the command output
