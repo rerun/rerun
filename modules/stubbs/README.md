@@ -642,7 +642,7 @@ File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
 It's also possible to execute this test script directly.
 
 	$ bash $RERUN_MODULES/freddy/tests/commands/dance/default.sh 
-	jumps (1)
+	jumps (3)
 
 Does this test script remind you of a command replay log? 
 It should, it works like a replay log!
@@ -653,10 +653,10 @@ The text below the `__BENCHMARK_TEXT__`	 delimiter should be
 the example content the test results should match.
 This is content you must supply.
 
-In this case, the expected text is "jumps (1)".
+In this case, the expected text is "jumps (3)".
 
 	__BENCHMARK_TEXT__
-	jumps (1)
+	jumps (3)
 
 When your command executes, it's output should exactly match what is
 below the `__BENCHMARK_TEXT__` delimiter.
