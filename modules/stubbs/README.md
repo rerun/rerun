@@ -587,7 +587,7 @@ this script contains several rough sections:
 1.  Command metadata is stored at the top
 2.  Extract execution log content
 3.  Diff results to required example output
-4.  Required example command output found below the `__LOG_BELOW__` string.
+4.  Required example command output found below the `__BENCHMARK_TEXT__` string.
 
 File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
 
