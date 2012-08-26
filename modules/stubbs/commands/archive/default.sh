@@ -31,7 +31,7 @@ CWD=$(pwd); #remember current working directory.
 [ -z "${VERSION}" ] && VERSION=
 
 # create a work directory the archive content
-export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || rerun_die
+export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die
 
 #
 # Start preparing the payload content.
@@ -90,6 +90,11 @@ if [ -e "payload.tar" ]; then
 else
     rerun_die "payload.tar does not exist"
 fi
+#
+# Clean up the temp directory
+#
+rm -r $PAYLOAD
+
 
 echo "Wrote self extracting archive script: ${FILE}"
 exit 0
