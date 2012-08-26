@@ -21,9 +21,14 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-n|--name)
+	-m|--module)
 	    rerun_option_check "$#"
-	    NAME="$2"
+	    MODULE="$2"
+	    shift
+	    ;;
+	-c|--command)
+	    rerun_option_check "$#"
+	    COMMAND="$2"
 	    shift
 	    ;;
 	-l|--logs)
@@ -43,70 +48,99 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Post processes the options
-[ -z "$NAME" ] && {
+[ -z "$MODULE" ] && {
     echo "Module name: "
-    read NAME
+    read MODULE
 }
-[ -d $RERUN_MODULES/$NAME ] || rerun_die "Module directory not found: $RERUN_MODULES/$NAME"
-#
-# set some defaults
+[ -d $RERUN_MODULES/$MODULE ] || rerun_die "Module directory not found: $RERUN_MODULES/$MODULE"
 [ -z "$LOGS" ] && LOGS="./test-reports"
 
+#
+# Make the log directories
+#
 mkdir -p $LOGS || rerun_die "Failed making logs directory: $LOGS"
+mkdir -p $LOGS/replay || rerun_die "Failed making replay directory: $LOGS/replay"
 
+epoch() { date "+%s" ; };# epoch - return number seconds since unix epoch
 
+#
+# Initialize the counters
+#
 FAILURES=0 ;# test failure counter
 ELAPSED=   ;# total elapsed time
+START=$(epoch)
+
+echo "------------- ---------------- ---------------" > /tmp/hr.txt
+
+
+echo "[tests]"
+
 shopt -s nullglob
 
-# epoch - return number seconds since unix epoch
-epoch() { date "+%s" ; }
+COMMANDS=
+if [ -n "$COMMAND" ]
+then
+    COMMANDS=( $COMMAND )
+else
+    COMMANDS=$(rerun_commands $RERUN_MODULES $MODULE)
+fi
 
-START=$(epoch)
-echo "[tests]"
-for command in $(rerun_commands $RERUN_MODULES $NAME)
+for command in $COMMANDS
 do	
-	TESTS=( $(rerun_tests $RERUN_MODULES $NAME $command) )
-	for test in $TESTS
-	do
-		LOG=$LOGS/TEST-${NAME}:${command}.$test.txt
-		test_descr=$(rerun_testDescription $RERUN_MODULES $NAME $command)
-		printf "${PAD}$command: $test_descr: $test: "
-		(
-		unset RERUN_COLORS
-		$RERUN -M $RERUN_MODULES/${NAME} \
-			   -L $LOGS \
-			tests:$command > $LOG 2> $LOG.stderr
-		)
-		if [ "$?" != 0 ]
-		then
-			FAILURES=$(( $FAILURES + 1 ))
-			printf "FAIL\n"
-		else
-			printf "OK\n"
-		fi
-	done
-	END=$(epoch)
-	ELAPSED=$(( $END - $START ))
-	# Report header
+    # Logs to store the stout/stderr for the command testsuite
+    OUT=$LOGS/TEST-${MODULE}:${command}.stdout
+    ERR=$LOGS/TEST-${MODULE}:${command}.stderr
+    echo "------------- Standard Output ---------------" > $OUT
+    echo "------------- Standard Error ----------------" > $ERR
+    
+    TESTS=( $(rerun_tests $RERUN_MODULES $MODULE $command) )
+    for test in $TESTS
+    do
+	echo "--Output from ${test}--" >> $OUT
+	echo "--Output from ${test}--" >> $ERR
+
+	test_descr=$(rerun_testDescription $RERUN_MODULES $MODULE $command)
+	printf "${PAD}$MODULE:$command: "
 	(
+	    unset RERUN_COLORS
+	    $RERUN -M $RERUN_MODULES/${MODULE} \
+		tests:$command >> $OUT 2>> $ERR
+	)
+	if [ "$?" -eq 0 ]
+	then
+	    printf "OK\n"
+	else
+	    FAILURES=$(( $FAILURES + 1 ))
+	    printf "FAIL\n"
+	fi
+
+    done
+    END=$(epoch)
+    ELAPSED=$(( $END - $START ))
+	# Report header
+    (
 	cat <<-EOF
-	Testsuite: ${NAME}:${command}
-	Tests run: ${#TESTS[*]}, Failures: ${FAILURES}, Time elapsed: $ELAPSED s
+	Testsuite: ${MODULE}:${command}
+	Tests run: ${#TESTS[*]}, Failures: ${FAILURES}, Time elapsed: ${ELAPSED}s
 
 	EOF
-	) > $LOGS/TEST-${NAME}:${command}.txt	
+    ) > $LOGS/TEST-${MODULE}:${command}.summary
+    cat $LOGS/TEST-${MODULE}:${command}.summary \
+	$OUT /tmp/hr.txt $ERR /tmp/hr.txt > $LOGS/TEST-${MODULE}:${command}.txt
 done
+
+#
 # Generate report
+#
 END=$(epoch)
 ELAPSED=$(( $END - $START ))
 (
-cat <<-EOF
-Testsuite: ${NAME}
-Tests run: ${#TESTS[*]}, Failures: ${FAILURES}, Time elapsed: $ELAPSED s
+    cat <<-EOF
+Testsuite: ${MODULE}
+Tests run: ${#TESTS[*]}, Failures: ${FAILURES}, Time elapsed: ${ELAPSED}s
 
 EOF
-) > $LOGS/TEST-${NAME}.txt
+) > $LOGS/TEST-${MODULE}.txt
 
 (( $FAILURES > 0 )) && exit 1
 
