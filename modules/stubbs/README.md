@@ -62,13 +62,13 @@ Define a command option for the specified module and generate options parser scr
 
 *Usage*
 
-    rerun stubbs:add-option [--arg <true>] --name <> --description <> --module <> --command <> [--required <false>]
+    rerun stubbs:add-option [--arg <true>] --option <> --description <> --module <> --command <> [--required <false>]
 
 *Example*
 
 Define an option named "--jumps":
 
-    rerun stubbs:add-option --name jumps --description "jump #num times" --module freddy --command dance
+    rerun stubbs:add-option --option jumps --description "jump #num times" --module freddy --command dance
 
 You will see output similar to:
 
@@ -105,7 +105,7 @@ like a `rerun` launcher.
 
 *Usage*
 
-    rerun stubbs:archive [--file <>] [--modules <"*">]
+    rerun stubbs:archive [--file <>] [--modules <"*">] [--version <>]
 
 *Example*
 
@@ -157,13 +157,13 @@ Generate the docs.
 
 *Usage*
 
-    rerun stubbs:docs --name <>
+    rerun stubbs:docs --module <>
     
 *Example*
 
-Generate the manual page for "freddy":
+Generate the manual page for "freddy" module:
 
-    rerun stubbs:docs --name freddy
+    rerun stubbs:docs --module freddy
 
 The `docs` command will print:
 
@@ -180,7 +180,7 @@ Run module test suite
 
 *Usage*
 
-    rerun stubbs:test [--name <>]
+    rerun stubbs:test [--module <>] [--command <>] [--logs <>]
     
 *Example*
 
@@ -191,7 +191,7 @@ Run the test suite for the module named "freddy":
 The `test` command will print output similar to the following:
 
 	[tests]  
-	  dance: "test freddy dance": default.sh: OK
+	  freddy:dance: OK
 
 Each command that has any unit test scripts will be tested.
 
@@ -423,16 +423,16 @@ through the documentation.
 
 Create the "freddy" module:
 
-	rerun stubbs:add-module --name freddy --description "A dancer in a red beret and matching suspenders"
+	rerun stubbs:add-module --module freddy --description "A dancer in a red beret and matching suspenders"
 
 Create the `freddy:study` command:
 
-	rerun stubbs:add-command --name study \
+	rerun stubbs:add-command --command study \
 	   --description "tell freddy to study" --module freddy
 
 Define an option called "-subject":
 
-	rerun stubbs:add-option --name subject \
+	rerun stubbs:add-option --option subject \
 	   --description "subject to study" --module freddy --command study \
 	   --default math
 
@@ -445,12 +445,12 @@ The implementation should echo what freddy is studying:
 
 Similarly, define the `freddy:dance` command:
 
-	rerun stubbs:add-command --name dance \
+	rerun stubbs:add-command --command dance \
 		   --description "tell freddy to dance" --module freddy
 
 Define an option called "--jumps":
 
-	rerun stubbs:add-option --name jumps \
+	rerun stubbs:add-option --option jumps \
 		   --description "jump #num times" --module freddy --command dance \
 		   --default 1
 
@@ -497,9 +497,9 @@ Stubbs will run a module's tests via the `test` command.
 
 Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 
-	rerun stubbs:test --name freddy
+	rerun stubbs:test --module freddy
 	[tests]  
-	  dance: "test freddy dance": default.sh: OK
+	  freddy:dance: OK
 
 A successful unit test will print `OK` while a failed one 
 will print `FAIL` and cause rerun to exit non zero.
@@ -590,29 +590,53 @@ this script contains several rough sections:
 
 File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
 
-	# This is a rerun command unit test script
-	# 
-	# metadata
-	MODULE="freddy"
-	COMMAND="dance"
-	OPTIONS="$*"
-	RERUN_MODULES=$HOME/rerun-workspace/rerun/modules
-	# die - print an error and exit
-	die() { echo "ERROR: $* " ; exit 1 ; }
+    # Commands covered: dance
+    #
+    # This file contains test scripts to run for the dance command.
+    # Execute it by invoking: 
+    #                         rerun stubbs:test -m freddy -c dance
+    #
+    #     
+     
+    # die - print an error and exit
+    die() { echo "ERROR: $* " ; exit 1 ; }
+     
+    # Temporary directory
+    TMPDIR=$(mktemp -d /tmp/rerun.tests.XXXXXX) || die "failed creating temp dir" 
+     
+    # Output log
+    OUT=$TMPDIR/$$.log
+     
+    # 
+    # Command invocation parameters
+    #
+    RERUN_MODULES="/Users/alexh/rerun-workspace/rerun/modules"
+    MODULE="freddy"
+    COMMAND="dance"
+    OPTIONS=""     
+     
+    #
+    # Extract benchamrk text
+    #
+    BENCHMARK=$TMPDIR/$MODULE:$COMMAND-test1.benchmark
+    SIZE=$(awk '/^__BENCHMARK_TEXT__/ {print NR + 1; exit 0; }' $0) || die "failed sizing test log"
+    tail -n+$SIZE $0 > $BENCHMARK || die "failed extracting benchmark content"
+          
+    #
+    # Run the command and compare the benchmark text to the command output
+    #
+    ${RERUN:=rerun} ${MODULE}:${COMMAND} $OPTIONS > $OUT
+    EXIT_STATUS=$?
+    if [ $EXIT_STATUS -eq 0 ]
+    then
+        diff $BENCHMARK $OUT >/dev/null
+        EXIT_STATUS=$?
+    fi
+     
+    exit $EXIT_STATUS ; # exit before reading the benchmark text
+    __BENCHMARK_TEXT__
+    jumps (3)
 
-	# Extract execution log content
-	TMPDIR=$(mktemp -d /tmp/rerun.tests.XXXXXX) || die; # save it here
-	SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $0) || die "failed sizing test log"
-	tail -n+$SIZE $0 > $TMPDIR/$(basename $0) || die "failed extracting test log"
-
-	# Execute the command
-	${RERUN:=rerun} -M $RERUN_MODULES ${MODULE}:${COMMAND} $OPTIONS 2>&1 | tee $TMPDIR/$$.log || die
-	# Compare the results
-	diff $TMPDIR/$(basename $0) $TMPDIR/$$.log
-
-	exit $? ; # exit before reading the log content
-	__LOG_BELOW__
-	jumps (1)
 
 It's also possible to execute this test script directly.
 
@@ -624,21 +648,19 @@ It should, it works like a replay log!
 		
 #### Example log output
 
-The text below the `__LOG_BELOW__`	 delimiter should be
+The text below the `__BENCHMARK_TEXT__`	 delimiter should be
 the example content the test results should match.
 This is content you must supply.
 
 In this case, the expected text is "jumps (1)".
 
-	__LOG_BELOW__
+	__BENCHMARK_TEXT__
 	jumps (1)
 
 When your command executes, it's output should exactly match what is
-below the `__LOG_BELOW__` delimiter.
+below the `__BENCHMARK_TEXT__` delimiter.
 
 # LICENSE
-
-Copyright 2011 DTO Solutions
 
 Licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this file except in compliance with the License. 
