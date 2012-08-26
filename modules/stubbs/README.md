@@ -17,13 +17,13 @@ Create a new rerun module.
 
 *Usage*
 
-    rerun stubbs:add-module [--name <>] [--description <>]
+    rerun stubbs:add-module [--module <>] [--description <>]
     
 *Example*
 
 Make a new module named "freddy":
 
-    rerun stubbs:add-module --name freddy --description "A dancer in a red beret and matching suspenders"
+    rerun stubbs:add-module --module freddy --description "A dancer in a red beret and matching suspenders"
 
 The `add-module` command will print:
 
@@ -35,13 +35,13 @@ Create a command in the specified module and generate a default implementation.
 
 *Usage*
 
-    rerun stubbs:add-command --name <> --description <> --module <> [--ovewrite <false>]
+    rerun stubbs:add-command --command <> --description <> --module <> [--ovewrite <false>]
 
 *Example*
 
 Add a command named "dance" to the freddy module:
 
-    rerun stubbs:add-command --name dance --description "tell freddy to dance" --module freddy
+    rerun stubbs:add-command --command dance --description "tell freddy to dance" --module freddy
 
 The `add-command` module will generate a boilerplate script file you can edit.
 
