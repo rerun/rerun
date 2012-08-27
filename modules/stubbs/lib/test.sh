@@ -2,7 +2,46 @@
 # Test function library
 # 
 # This file contains a collection of shell functions useful 
-# for testing rerun modules via stubbs.
+# for testing rerun modules via stubbs. 
+#
+# Example: Test the freddy:dance command 
+#
+#      
+#      # 
+#      # The rerun command environment
+#      #
+#      RERUN=rerun
+#      RERUN_MODULES="/Users/alexh/rerun-workspace/rerun/modules"
+#      # 
+#      # Load the test function library
+#      #
+#      source $RERUN_MODULES/stubbs/lib/test.sh || exit 1
+#       
+#      #
+#      # Create a test execution session for the command
+#      #
+#      typeset -a test
+#      test=( $(test:session $RERUN $RERUN_MODULES freddy dance "") ) || {
+#          test:exit 1 "error creating session" 
+#      }
+#       
+#      test:pass $test || test:fail $test "execution failure"
+#       
+#      test:equals $test "" "jumps (1)" || test:fail $test "no options default value"
+#       
+#      test:equals $test "--jumps 3"  "jumps (3)" || test:fail $test "jumps specified 3" 
+#       
+#      test:equals $test "--jumps up" "jumps (up)" || test:fail $test "jumps specified up"
+
+
+
+# ----------------------------------------------------------- 
+#
+# test:log --
+#
+#      Prints your message to stdout.
+#
+# ----------------------------------------------------------- 
 
 function test:log {
     echo $*
