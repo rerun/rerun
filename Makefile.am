@@ -25,21 +25,21 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/add-command/default.sh \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/module.option \
-	modules/stubbs/commands/add-command/name.option \
+	modules/stubbs/commands/add-command/command.option \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/ovewrite.option \
 	modules/stubbs/commands/add-command/template.option \
 	modules/stubbs/commands/add-module/default.sh \
 	modules/stubbs/commands/add-module/description.option \
 	modules/stubbs/commands/add-module/metadata \
-	modules/stubbs/commands/add-module/name.option \
+	modules/stubbs/commands/add-module/module.option \
 	modules/stubbs/commands/add-option/arg.option \
 	modules/stubbs/commands/add-option/command.option \
 	modules/stubbs/commands/add-option/default.sh \
 	modules/stubbs/commands/add-option/desc.option \
 	modules/stubbs/commands/add-option/metadata \
 	modules/stubbs/commands/add-option/module.option \
-	modules/stubbs/commands/add-option/name.option \
+	modules/stubbs/commands/add-option/option.option \
 	modules/stubbs/commands/add-option/required.option \
 	modules/stubbs/commands/archive/default.sh \
 	modules/stubbs/commands/archive/file.option \
@@ -48,12 +48,12 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/docs/default.sh \
 	modules/stubbs/commands/docs/metadata \
-	modules/stubbs/commands/docs/name.option \
+	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
 	modules/stubbs/commands/test/default.sh \
 	modules/stubbs/commands/test/logs.option \
 	modules/stubbs/commands/test/metadata \
-	modules/stubbs/commands/test/name.option \
+	modules/stubbs/commands/test/module.option \
 	modules/stubbs/lib/functions.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/README.md \
