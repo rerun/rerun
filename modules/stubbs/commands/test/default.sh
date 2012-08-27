@@ -96,9 +96,6 @@ do
     TESTS=( $(rerun_tests $RERUN_MODULES $MODULE $command) )
     for test in $TESTS
     do
-	echo "--Output from ${test}--" >> $OUT
-	echo "--Output from ${test}--" >> $ERR
-
 	test_descr=$(rerun_testDescription $RERUN_MODULES $MODULE $command)
 	printf "${PAD}$MODULE:$command: "
 	(

@@ -2,44 +2,34 @@
 #
 # This file contains test scripts to run for the @COMMAND@ command.
 # Execute it by invoking: 
-#                         rerun stubbs:test -m @MODULE@ -c @COMMAND@
+#    
+#                rerun stubbs:test -m @MODULE@ -c @COMMAND@
 #
+# The test report can be found in:
 #
-
-# die - print an error and exit
-die() { echo "ERROR: $* " ; exit 1 ; }
-
-# Temporary directory
-TMPDIR=$(mktemp -d /tmp/rerun.tests.XXXXXX) || die "failed creating temp dir" 
-
-# Output log
-OUT=$TMPDIR/$$.log
+#                test-reports/TEST-@MODULE@:@COMMAND@.txt
+#
 
 # 
-# Command invocation parameters
+# The rerun command environment
 #
+RERUN="@RERUN@"
 RERUN_MODULES="@RERUN_MODULES@"
-MODULE="@MODULE@"
-COMMAND="@COMMAND@"
-OPTIONS=""
+# 
+# Load the test function library
+#
+source $RERUN_MODULES/stubbs/lib/test.sh || exit 1
 
 #
-# Extract benchamrk text
+# Create a test execution session for the command
 #
-BENCHMARK=$TMPDIR/$MODULE:$COMMAND-$(basename $0).benchmark
-SIZE=$(awk '/^__BENCHMARK_TEXT__/ {print NR + 1; exit 0; }' $0) || die "failed sizing test log"
-tail -n+$SIZE $0 > $BENCHMARK || die "failed extracting benchmark text"
+typeset -a test
+test=( $(test:session $RERUN $RERUN_MODULES @MODULE@ @COMMAND@ "") ) || {
+    test:exit 1 "error creating session" 
+}
 
 #
-# Run the command and compare the benchmark text to the command output
+# test 1
 #
-${RERUN:=rerun} ${MODULE}:${COMMAND} $OPTIONS > $OUT
-EXIT_STATUS=$?
-if [ $EXIT_STATUS -eq 0 ]
-then
-    diff $BENCHMARK $OUT >/dev/null
-    EXIT_STATUS=$?
-fi
+test:pass $test || test:fail $test "test1: execution failure"
 
-exit $EXIT_STATUS ; # exit before reading the benchmark text
-__BENCHMARK_TEXT__

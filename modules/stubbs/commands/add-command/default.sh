@@ -102,7 +102,8 @@ mkdir -p $RERUN_MODULES/$MODULE/tests/commands/$COMMAND || rerun_die "failed cre
     sed -e "s/@NAME@/default/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
-	-e "s,@RERUN_MODULES@,${RERUN_MODULES},g" \
+	-e "s;@RERUN@;${RERUN};g" \
+	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
 	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/commands/$COMMAND/default.sh || rerun_die
     echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/commands/$COMMAND/default.sh"
 }
