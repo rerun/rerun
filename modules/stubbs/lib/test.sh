@@ -64,7 +64,7 @@ function test:log {
 
 function test:exit {
     [ ! $# -eq 3 ] && { 
-	test:die 'wrong # args: should be: test:exit directory code msg'
+	    test:die 'wrong # args: should be: test:exit directory code msg'
     }
 
     DIRECTORY=$1
@@ -73,9 +73,9 @@ function test:exit {
 
     if [ "$EXIT_CODE" == 0 ]
     then 
-	test:log $MESSAGE
+	    test:log $MESSAGE
     else
-	test:log $MESSAGE >&2
+	    test:log $MESSAGE >&2
     fi
 
     rm -r $DIRECTORY || echo "failed removing session directory"
@@ -140,7 +140,7 @@ function test:mktempdir {
 # ----------------------------------------------------------- 
 
 function test:session {
- 
+    
     tempdir=$(test:mktempdir) || test:die "failed creating session directory"
     [ -d ${tempdir} ] || test:die "test directory not found: ${tempdir}"
 
@@ -188,46 +188,41 @@ function test:context {
     session=( $data )
     [ ${#session[@]} -lt 4 ] && test:die "error reading session command context"
 
-    if [ $# -eq 1 ] 
-    then
+            if [ $# -eq 1 ] 
+            then
 
-	echo ${session[@]}
+	            echo ${session[@]}
 
-    elif [ $# -eq 2 ]
-    then
-	key=$2
-	case "$key" in 
-	    rerun)
-		echo ${session[1]} ;;
-	    modules)
-		echo ${session[2]} ;;
-	    module)
-		echo ${session[3]} ;;
-	    command)
-		echo ${session[4]} ;;
-	    option)
-		echo ${session[5]} ;;
-	esac
+            elif [ $# -eq 2 ]
+            then
+	            key=$2
+	            case "$key" in 
+	                rerun)   echo ${session[1]} ;;
+	                modules) echo ${session[2]} ;;
+	                module)  echo ${session[3]} ;;
+	                command) echo ${session[4]} ;;
+	                option)  echo ${session[5]} ;;
+	            esac
 	
-    elif [ $# -eq 3 ]
-    then
-	key=$2
-	value=$3
-	case "$key" in 
-	    rerun)
-		session[1]=$value ;;
-	    modules)
-		session[2]=$value ;;
-	    module)
-		session[3]=$value ;;
-	    command)
-		session[4]=$value ;;
-	    option)
-		session[5]=$value ;;
-	esac
-	echo ${session[@]} > ${session[0]}/session	
-    fi
-}
+            elif [ $# -eq 3 ]
+            then
+	            key=$2
+	            value=$3
+	            case "$key" in 
+	                rerun)
+	                    session[1]=$value ;;
+	                modules)
+	                    session[2]=$value ;;
+	                module)
+	                    session[3]=$value ;;
+	                command)
+	                    session[4]=$value ;;
+	                option)
+	                    session[5]=$value ;;
+	            esac
+	            echo ${session[@]} > ${session[0]}/session	
+            fi
+    }
 
 #
 # ----------------------------------------------------------- 
@@ -244,7 +239,7 @@ function test:context {
 
 function test:fail {
     [ ! $# -eq 2 ] && { 
-	test:die 'wrong # args: should be: test:fail directory msg'
+	    test:die 'wrong # args: should be: test:fail directory msg'
     }
 
     DIRECTORY=$1
@@ -267,6 +262,7 @@ function test:fail {
 # Results:
 #
 # -----------------------------------------------------------
+
 function test:setup {
     :
 }
@@ -280,10 +276,10 @@ function test:setup {
 # Results:
 #
 # -----------------------------------------------------------
+
 function test:teardown {
     :
 }
-
 
 # ----------------------------------------------------------- 
 #
@@ -303,9 +299,9 @@ function test:teardown {
 
 function test:extract {
     [ ! $# -eq 2 ] && { 
-	test:die 'wrong # args: should be: test:extract storedir infile'
+	    test:die 'wrong # args: should be: test:extract storedir infile'
     }
-
+        
     STORE_DIR=$1
     INFILE=$2
 
@@ -315,13 +311,13 @@ function test:extract {
     # Count number of lines from file delimiter
     #
     SIZE=$(awk '/^__BENCHMARK_TEXT__/ {print NR + 1; exit 0; }' $INFILE) || {
-	test:die "failed sizing benchmark text"
+	    test:die "failed sizing benchmark text"
     }
     #
     # Read text from delimiter onward and write the text to outfile
     #
     tail -n+$SIZE $INFILE > $STORE_DIR/BENCHMARK_TEXT || {
-	test:die "failed extracting benchmark text"
+	    test:die "failed extracting benchmark text"
     }
     #
     # Print the path to the extracted output file
@@ -350,30 +346,29 @@ function test:extract {
 
 function test:exec {
     [ ! $# -eq 2 ] && { 
-	test:die 'wrong # args: should be: test:exec directory options'
+	    test:die 'wrong # args: should be: test:exec directory options'
     }
 
     DIRECTORY=$1
 
     declare -a session=()
 
-    # Read the session data
-    read data < $DIRECTORY/session
+    read data < $DIRECTORY/session;  # Read the session data
     session=( $data )
     [ ${#session[*]} -lt 4 ] && test:die "error reading session command context"
 
     if [ -n "$2" ]
     then
-	OPTIONS=$2
-	test:context $DIRECTORY option "$2"
+	    OPTIONS=$2
+	    test:context $DIRECTORY option "$2"
     else
-	OPTIONS=${session[5]}
+	    OPTIONS=${session[5]}
     fi
     RERUN=${session[1]} MODULES_DIR=${session[2]} MODULE=${session[3]} COMMAND=${session[4]}
 
     $RERUN -M $MODULES_DIR $MODULE:$COMMAND $OPTIONS 
     RETVAL=$?
-
+    
     return $RETVAL
 }
 
@@ -401,7 +396,7 @@ function test:exec {
 
 function test:pass {
     [ "$#" -lt 1 ] && { 
-	test:die 'wrong # args: should be: test:pass directory command'
+	    test:die 'wrong # args: should be: test:pass directory command'
     }
 
     DIRECTORY=$1
@@ -415,10 +410,10 @@ function test:pass {
 
     if [ "$RETVAL" -eq 0 ]
     then
-	return 0
+	    return 0
     else
-	test:log $DIRECTORY $MESSAGE
-	return 1
+	    test:log $DIRECTORY $MESSAGE
+	    return 1
     fi
 }
 
@@ -432,22 +427,30 @@ function test:pass {
 #    0 - command output matches benchmark
 #    1 - command output did not match benchmark
 # -----------------------------------------------------------
+
 function test:equals {
     [ ! $# -eq 3 ] && { 
-	test:die 'wrong # args: should be: test:equals directory command benchmark'
+	    test:die 'wrong # args: should be: test:equals directory command benchmark'
     }
     DIRECTORY=$1
     COMMAND=$2
 
+    #
+    # Call the test setup
+    #
     test:setup $DIRECTORY
+
+    #
+    # Execute the command
+    #
     test:exec $DIRECTORY "$COMMAND" | tee $DIRECTORY/out || test:die "command execution failure"
 
     if [ -f "$3" ] 
     then
-	BENCHMARK=$3
+	    BENCHMARK=$3
     else
-	echo "$3" > $DIRECTORY/benchmark
-	BENCHMARK=$DIRECTORY/benchmark
+	    echo "$3" > $DIRECTORY/benchmark
+	    BENCHMARK=$DIRECTORY/benchmark
     fi
 
     #
@@ -456,7 +459,13 @@ function test:equals {
     diff $BENCHMARK  $DIRECTORY/out >&2
     RETVAL=$?
 
+    #
+    # Tear down the test setup
+    #
     test:teardown $DIRECTORY
 
+    #
+    # Return the comparison status
+    #
     return $RETVAL
 }
