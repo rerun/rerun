@@ -6,7 +6,7 @@
 SH="/usr/bin/env bash"
 PROG=`basename $0`
 USAGE="
-Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [command_args]]]
+Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [options]]]
 "
 PAD="  "
 DIFF=diff
@@ -299,7 +299,7 @@ shift; # Shift over to the command options
 #
 if ( rerun_existsHandler $MODULE $COMMAND )
 then
-    export RERUN_MODULES
+    export RERUN RERUN_MODULES MODULE COMMAND
     MODULE_DIR=`rerun_lookupModule $MODULE`
     export MODULE_DIR 
     CMD_SCRIPT=`rerun_lookupHandler $MODULE $COMMAND`
