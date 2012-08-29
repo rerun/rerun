@@ -649,4 +649,4 @@ either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
 The rerun source code and all documentation may be downloaded from
-<https://github.com/dtolabs/rerun/>.
+<https://github.com/rerun/rerun/>.

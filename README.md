@@ -46,13 +46,13 @@ and other aspects of each command. Rerun makes use of this metadata
 to support a listing mode, a feature where modules and command usage
 are summarized for end users.
 
-See the [project wiki](https://github.com/dtolabs/rerun/wiki)
+See the [project wiki](https://github.com/rerun/rerun/wiki)
 for additional documentation including:
 
-* [Getting started](https://github.com/dtolabs/rerun/wiki)
-* [Installation](https://github.com/dtolabs/rerun/wiki/Installation)
-* [Stubbs module tool](https://github.com/dtolabs/rerun/tree/master/modules/stubbs)
-* [Why rerun?](https://github.com/dtolabs/rerun/wiki/Why-rerun%3F)
+* [Getting started](https://github.com/rerun/rerun/wiki)
+* [Installation](https://github.com/rerun/rerun/wiki/Installation)
+* [Stubbs module tool](https://github.com/rerun/rerun/tree/master/modules/stubbs)
+* [Why rerun?](https://github.com/rerun/rerun/wiki/Why-rerun%3F)
 
 # OPTIONS
 
@@ -449,7 +449,7 @@ Syntax errors will also print bold.
 # SEE ALSO
 
 To create modules, see
-[stubbs](https://github.com/dtolabs/rerun/tree/master/modules/stubbs).
+[stubbs](https://github.com/rerun/rerun/tree/master/modules/stubbs).
 
 # ERROR CODE
 
@@ -464,8 +464,6 @@ To create modules, see
 
 # LICENSE
 
-Copyright 2011 DTO Solutions
-
 Licensed under the Apache License, Version 2.0 (the "License"); 
 you may not use this file except in compliance with the License. 
 You may obtain a copy of the License at
@@ -479,4 +477,4 @@ either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
 The rerun source code and all documentation may be downloaded from
-<https://github.com/dtolabs/rerun/>.
+<https://github.com/rerun/rerun/>.
