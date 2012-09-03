@@ -17,6 +17,8 @@ source $RERUN_MODULES/@MODULE@/lib/functions.sh || exit 1 ;
   source $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh || exit 2 ;
 }
 
+# Exit immediately upon non-zero exit. See [set](http://ss64.com/bash/set.html)
+set -e
 
 # ------------------------------
 # Your implementation goes here.
