@@ -1,3 +1,4 @@
+
 #
 # BASH shell tab completion for RERUN
 #
@@ -6,212 +7,202 @@
 # @author: <a href="mailto:alex@dtosolutions.com">alex@dtosolutions.com</a>
 
 [ -n "${RERUN_MODULES}" -a -d "${RERUN_MODULES}" ] || {
-    export RERUN_MODULES=$(pwd)
-}
-
-# list all executable child directory names in specified parent 
-_listdirnames()
-{
-    local dirs dir
-    [ -d "$1" -a -x "$1" ] && dir=$1 || { return 1 ; }
-    for d in $(echo ${dir}/*) 
-    do 
-	[ -d "$d" -a -x "$d" ] && dirs="$dirs $(basename $d)"
-    done
-    echo $dirs
+    export RERUN_MODULES=$(pwd)/modules
 }
 
 # check if item is in the list
-_lexists()
+list:exists()
 {
     local  item="$1" list="$2"
     for e in $(eval echo $list)
     do
-	[ "${item}" = "${e}" ] && return 0
+	    [ "${item}" = "${e}" ] && return 0
     done
     return 1	
 }
-# remove the item from the list
-_lremove() 
-{
-    local list item retlist
-    list=$2 item=$1 retlist=""
-    for e in $(eval echo $list)
-    do
-	[ "$e" = "$item" ] || retlist="$retlist $e"
-    done
-    echo $retlist
-}
+
 # subtract the items in list2 from list1
-_lsubtract() 
+list:subtract() 
 {
     local list1="$1" list2="$2" retlist=""
     for item in $(eval echo $list1)
     do
-	_lexists $item "$list2" || retlist="$retlist $item"
+	    list:exists $item "$list2" || retlist="$retlist $item"
     done
     echo $retlist    
 }
-# list all the commands for the module
-_rerunListCommands()
+
+
+# list all rerun modules
+rerun:modules()
 {
-    local  modulesdir module found
-    modulesdir=$1 module=$2 found="" 
-    for hdlr in $modulesdir/$module/commands/*/default.sh; do
+    local  modules=""
+    for mod in $RERUN_MODULES/*
+    do 
+	    [ -d "$mod" -a -x "$mod" ] && modules="$modules $(basename $mod)"
+    done
+    echo $modules
+}
+
+
+# list all the commands for the module
+rerun:module:commands()
+{
+    local  module=$1 commands=""
+    for hdlr in $RERUN_MODULES/$module/commands/*/default.sh; do
 	[ -f $hdlr ] && {
 	    cmd_name=$(basename $(dirname $hdlr))
-	    found="$found $cmd_name"	
+	    commands="$commands $cmd_name"	
 	}
     done    
-    echo $found
+    echo $commands
 }
 
 # List all the registered options for the command
-_rerunListOpts() 
+rerun:command:options() 
 {
-    local modulesdir module command options founddir
-    modulesdir=$1 module=$2 command=$3 options="" founddir=""
+    local module=$1 command=$2 prefix=$3 options=""
 
-    for opt_md in $modulesdir/$module/commands/$command/*.option; do
-	[ -f $opt_md ] && {
-		opt=$(basename $(echo ${opt_md%%.option}))
-		options="$options $opt"
+    for opt in $RERUN_MODULES/$module/commands/$command/*.option; do
+	[ -f $opt ] && {
+		name=$(basename ${opt})
+		options="$options ${prefix}${name%%.option}"
 	}
     done
     echo $options
 }
-# get the default for the specified option
-_rerunGetOptsDefault()
+# Check if command has option
+rerun:command:has-option() 
 {
-    local opt module command modulesdir opt_def
-    modulesdir=$1 module=$2 command=$3 opt=$4
-    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option
-	[ -f $opt_md ] && {
-    	awk -F= '/^DEFAULT/ {print $2}' $opt_md
+    local module=$1 command=$2 option=$3
+    [ -f "$RERUN_MODULES/$module/commands/$command/${option##*-}.option" ] && return 0
+    return 1
+}
+# get the default for the specified option
+rerun:option:default()
+{
+    local module=$1 command=$2 opt=$3 
+	[ -f $RERUN_MODULES/$module/commands/$command/${opt##*-}.option ] && {
+    	awk -F= '/^DEFAULT/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option
 	}
 }
 # check if option takes an argument
-_rerunHasOptsArgument()
+rerun:option:has-argument()
 {
-    local opt module command modulesdir founddir
-    modulesdir=$1 module=$2 command=$3 opt=$4
-    opt_md=$modulesdir/$module/commands/$command/${opt##*-}.option	
-    opt_def=`awk -F= '/^ARGUMENTS/ {print $2}' $opt_md`
-    [ "$opt_def" = "true" ] && return 0
-    return 1
+    local module=$1 command=$2 opt=$3
+    args=$(awk -F= '/^ARGUMENTS/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option)
+    [ "$args" = "true" ] && return 0 || return 1
 }
 
-
+# list remaining options
+rerun:options:remaining() 
+{
+    local argline=$1 options=$2 used="" 
+    for arg in $argline; do
+        [[ "$arg" == -* ]] && used="$used ${arg}"
+    done
+    list:subtract "$options" "$used"
+}
 
 # program completion for the 'rerun' command.
 _rerun() {
     [ -z "${RERUN_MODULES}" -o ! \( -d "${RERUN_MODULES}" \) ] && { 
 		return 0 ; 
     }
-    local cur prev context comp_line opts_module opts_command opts_module opts_args OPT 
+    local cur prev cntx_module cntx_command cntx_options options
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    context=()
+ 
     eval set $COMP_LINE
-    shift; # shift once to drop the "rerun" from the argline
-
-    #
-    # Set up the context array...
+    shift; # shift once to drop the "rerun" from the argument string
 
 	# Define regex pattern to parse command line input
+    #   module:command --optionA arg --optionB arg ...
+    #
 	regex='([^:]+)([:]?[ ]?)([A-Za-z0-9_-]*)([ ]*)(.*)'
 	if [[ "$@" =~ $regex ]]
 	then
-		context[0]=${BASH_REMATCH[1]};    # module
+        [ -d "$RERUN_MODULES/${BASH_REMATCH[1]}" ] && cntx_module=${BASH_REMATCH[1]};
 		[ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
-		context[1]=${BASH_REMATCH[3]/ /}; # command
+	    [ -d "$RERUN_MODULES/$cntx_module/commands/${BASH_REMATCH[3]/ /}" ] && {
+	    	cntx_command=${BASH_REMATCH[3]/ /}
+		}
 		# BASH_REMATCH[4] contains the whitespace between command and options
-		context[2]=${BASH_REMATCH[5]};    # options
-	else
-	    context[0]=${1/:/}                # module (minus colon)
+
+        # BASH_REMATCH[5] contains options
+        cntx_options=${BASH_REMATCH[5]};  
 	fi
 
     # Shift over to the command options
     shift;
-  
-    # 1. see if an existing module was specified. Set it, if so
-    [ ${#context[@]} -gt 0 -a -n "${context[0]}" ] && {
-		[ -n "${context[0]}" -a -d $RERUN_MODULES/${context[0]} ] && {	
-	    	opts_module=${context[0]}	    
-		}
-    }
-    # 2. see if an existing command was specified for a module. Set it, if so
-    [ ${#context[@]} -gt 1 -a -n "$opts_module" ] && {
-		_lexists ${context[1]} "$(_rerunListCommands ${RERUN_MODULES} ${opts_module})"  && {
-	    	opts_command=${context[1]}
-		}
-    }
-    # 3. see if command options are specified
-    [ ${#context[@]} -eq 2 -a -n "$opts_command" ] && {
-		opts_args=${context[2]}
+
+    echo "\$@=$@" > /tmp/completion.out
+    echo "prev=${prev}" >>/tmp/completion.out
+    echo "cur=${cur}" >>/tmp/completion.out
+    echo "COMP_LINE=$COMP_LINE" >> /tmp/completion.out
+    echo "\${BASH_REMATCH[5]}=${BASH_REMATCH[5]}" >> /tmp/completion.out
+
+    # Empty context: list modules
+    [ -z "$cntx_module" ]  && {
+		local modules=$(rerun:modules $RERUN_MODULES)
+        COMPREPLY=( $(compgen -W "$modules" -S ':' -o nospace -- ${cur}) )
+        return 0
     }    
-
-    # List information pertaining to current context level. 
-    # Context-level ordering goes from most qualified to least (command,module,empty)
-
-    # Command context: List command-specific args 
-    [ -n "$opts_command" -a -n "$opts_module" ] && {
-        [ -f $RERUN_MODULES/$opts_module/commands/${opts_command}/default.sh ] && {
-			local options=$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})
-            COMPREPLY=( $(compgen -W "$options" -P "--" -- ${cur}) )
-            return 0
-    	}
-    }
-
-    # Arg context: Process the command-specific arg(s)
-    [ -n "$opts_args" ] && {
-        [ -n "$opts_module" ] && {
-            # check if current option takes an argument, and that prev matches -.*
-            echo $prev | grep -q '^\-[^-].*' && $(_rerunHasOptsArgument ${RERUN_MODULES} ${opts_module} ${opts_command} ${prev}) && {
-                local default
-                default=$(_rerunGetOptsDefault ${RERUN_MODULES} ${opts_module} ${opts_command} ${prev})
-                [ -n "$default" ] && {
-                    COMPREPLY=( $(compgen -W "$default" -- ${cur}) )
-                    return 0
-                }  
-                [ -z "$default" ] && {
-                    echo $prev | egrep -q '^\--file.*|^\--out.*|^\--.*?file$|^\--xml.*' && {
-                        # use filename completion in these cases
-                	COMPREPLY=( $(compgen -o filenames -A file -- ${cur}) )
-                    }
-                    return 0
-            	}
-            } || {
-        	# present the other options but filter out the previously used ones
-            	usedargs=
-	        for arg in ${comp_line##*--}
-    	        do
-        	    echo $arg | grep -q '\-[^-]*' && usedargs="$usedargs ${arg}"
-            	done
-
-                [ -n "$opts_module" ] && {
-                    remaningargs=$(_lsubtract "$(_rerunListOpts ${RERUN_MODULES} ${opts_module} ${opts_command})" "$usedargs")
-                    COMPREPLY=( $(compgen -W "$remaningargs" -- ${cur}) )
-    	        }
-            }
-	}
-	return 0
-    }
     
     # Module context: list commands
-    [ -n "$opts_module" -a -z "$opts_command" ] && {
-		local commands=$(_rerunListCommands ${RERUN_MODULES} ${opts_module})
+    [ -n "$cntx_module" -a -z "$cntx_command" ] && {
+		local commands=$(rerun:module:commands ${cntx_module})
         COMPREPLY=( $(compgen -W "$commands" -- ${cur}) )
         return 0
     }
     
-    # Empty context: list modules
-    [ -z "$opts_module" ]  && {
-		local modules=$(_listdirnames $RERUN_MODULES)
-        COMPREPLY=( $(compgen -W "$modules" -S ':' -o nospace -- ${cur}) )
-        return 0
-    }    
+
+    echo "cntx_options=$cntx_options" >> /tmp/completion.out
+
+    # Command context. list options
+    options=$(rerun:command:options ${cntx_module} ${cntx_command} "--")
+
+    if [ -n "$cntx_command" -a -z "$cntx_options"  ]; then
+        COMPREPLY=( $(compgen -W "$options" -- "${cur}") )
+        return 0 
+    fi
+
+    if [ -n "$cntx_options"  ]; then
+        if [[ $prev == -* ]]; then
+            # check if current option takes an argument ...
+            if rerun:option:has-argument ${cntx_module} ${cntx_command} ${prev}; then
+                # ... and has a default value
+                local default=$(rerun:option:default ${cntx_module} ${cntx_command} ${prev})
+                if [ -n "$default" ]; then
+                    COMPREPLY=( $(compgen -W "$default" -- ${cur}) )
+                    return 0
+                else
+                    # ... or wants option specific completion
+                    case "$prev" in
+                        --file*|--out*|--xml|--template)
+                	        COMPREPLY=( $(compgen -o filenames -A file -- ${cur}) )  ;;
+                        --dir*|--logs*)
+                	        COMPREPLY=( $(compgen -o dirnames -A directory -- ${cur}) ) ;;
+                        --module)
+                            modules=$(rerun:modules)
+                            COMPREPLY=( $(compgen -W "$modules" -- ${cur}) ) ;;
+                    esac
+                    return 0
+            	fi
+            fi
+        else
+        	# Show the remaining/unused option choices
+            remaining=$(rerun:options:remaining "$cntx_options" "$options")
+
+            COMPREPLY=( $(compgen -W "$remaining" -- ${cur}) )
+
+	    fi
+	    return 0
+    fi
+
+
+
 }
 # register the _rerun completion function
 complete -F _rerun rerun
