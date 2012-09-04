@@ -108,8 +108,11 @@ rerun:option:default()
 rerun:option:has-argument()
 {
     local module=$1 command=$2 opt=$3
-    args=$(awk -F= '/^ARGUMENTS/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option)
-    [ "$args" = "true" ] && return 0 || return 1
+    [ -f $RERUN_MODULES/$module/commands/$command/${opt##*-}.option ] && {
+        args=$(awk -F= '/^ARGUMENTS/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option)
+        [ "$args" = "true" ] && return 0 
+    }
+    return 1
 }
 
 # rerun:options:remaining - list remaining options
