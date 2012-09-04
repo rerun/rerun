@@ -231,7 +231,7 @@ printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(caps $opt) $(caps $opt) $(rerun_optionD
 done)
 # Check required options are set
 $(for opt in $(echo $optionsRequired|sort); do
-printf "[ -z \"$%s\" ] && { echo \"missing required option: --%s\" ; return 2 ; }\n" $(caps $opt) $opt
+printf "[ -z \"$%s\" ] && { echo \"missing required option: --%s\" >&2 ; return 2 ; }\n" $(caps $opt) $opt
 done)
 #
 return 0
