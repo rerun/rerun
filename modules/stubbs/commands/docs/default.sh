@@ -80,6 +80,7 @@ rerun_option_summary() {
 	printf "%s %s\n" "$PAD" "$opt_usage"
 }
 
+[ -d "$RERUN_MODULES/$MODULE/metadata" ] || rerun_die "module not found: $MODULE"
 
 [ -z "$DOC" ] && DOC=$RERUN_MODULES/$MODULE/${MODULE}.1
 #
