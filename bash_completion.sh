@@ -137,12 +137,6 @@ _rerun() {
     # Shift over to the command options
     shift;
 
-    echo "\$@=$@" > /tmp/completion.out
-    echo "prev=${prev}" >>/tmp/completion.out
-    echo "cur=${cur}" >>/tmp/completion.out
-    echo "COMP_LINE=$COMP_LINE" >> /tmp/completion.out
-    echo "\${BASH_REMATCH[5]}=${BASH_REMATCH[5]}" >> /tmp/completion.out
-
     # Empty context: list modules
     [ -z "$cntx_module" ]  && {
 		local modules=$(rerun:modules $RERUN_MODULES)
@@ -157,9 +151,6 @@ _rerun() {
         return 0
     }
     
-
-    echo "cntx_options=$cntx_options" >> /tmp/completion.out
-
     # Command context. list options
     options=$(rerun:command:options ${cntx_module} ${cntx_command} "--")
 
