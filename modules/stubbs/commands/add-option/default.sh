@@ -12,13 +12,13 @@
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 
-# Upper case the string
-caps() { echo "$1" | tr '[:lower:]' '[:upper:]' ; }
+# Upper case the string and change dashes to underscores.
+trops() { echo "$1" | tr '[:lower:]' '[:upper:]' | tr  '-' '_' ; }
 
 # Used to generate an entry inside options.sh
 add_optionparser() {
 	local optName=$1
-    local optNameCap=$(echo $optName | tr "[:lower:]" "[:upper:]")
+    local optVarname=$(trops $optName)
 	local ARGUMENTS=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $optName)
 	local SHORT=$(rerun_optionShort $RERUN_MODULES $MODULE $COMMAND $optName)
 	if [ -n "${SHORT}" ] 
@@ -29,10 +29,10 @@ add_optionparser() {
     fi
 	if [ "$ARGUMENTS" == "false" ]
 	then
-		printf " %s) %s=true ;;\n" "${argstring}" "$optName" "$optNameCap"
+		printf " %s) %s=true ;;\n" "${argstring}" "$optName" "$optVarname"
 	else
     	printf " %s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" \
-			"$argstring" "$optNameCap"
+			"$argstring" "$optVarname"
 	fi
 }
 
@@ -213,7 +213,9 @@ rerun_option_check() {
 while [ "\$#" -gt 0 ]; do
     OPT="\$1"
     case "\$OPT" in
-        $(for o in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do printf "%8s\n" "$(add_optionparser $o)"; done)
+$(for o in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do 
+printf "      %s\n" "$(add_optionparser $o)"; 
+done)
         # unknown option
         -?)
             rerun_option_error
@@ -227,11 +229,11 @@ done
 
 # If defaultable options variables are unset, set them to their DEFAULT
 $(for opt in $(echo $optionsWithDefaults|sort); do
-printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(caps $opt) $(caps $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
+printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(trops $opt) $(trops $opt) $(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
 done)
 # Check required options are set
 $(for opt in $(echo $optionsRequired|sort); do
-printf "[ -z \"$%s\" ] && { echo \"missing required option: --%s\" >&2 ; return 2 ; }\n" $(caps $opt) $opt
+printf "[ -z \"$%s\" ] && { echo \"missing required option: --%s\" >&2 ; return 2 ; }\n" $(trops $opt) $opt
 done)
 #
 return 0
