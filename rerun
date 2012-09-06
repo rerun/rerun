@@ -25,12 +25,21 @@ echo $(tput sgr 0 1)"Examples:$(tput sgr0)
 }
 
 #
-# colorizing functions
+# colorizing and text effect functions
 #
-# bold - bold the given text
-bold() { echo -e "\033[1m$*\033[0m" ; reset ; }
-# reset the terminal
-reset () { tput sgr0 ; }
+txtrst () { tput sgr0 ; }
+bold() { echo -e "\033[1m$*\033[0m" ; txtrst ; }
+dim() { tput dim ; echo " $*" ; txtrst ; }
+[ -n "$RERUN_COLOR" ] && {
+    ul="\033[4m" ; _ul="\033[0m" ; # underline
+    gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
+    bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
+}
+
+
+
+
+
 # print a ascii art banner with version info
 banner() {
 echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
@@ -38,7 +47,7 @@ echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
 echo $(tput setaf 3) "| | |  __/ |  | |_| | | | |"
 echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
 echo $(tput setaf 5) "Version: v0.1. License: Apache 2.0."
-reset
+txtrst
 }
 # print help. A banner or the unix manual if it exists
 man() {
@@ -229,7 +238,7 @@ shift; # Shift over to the command options
 
 # Module listing
 [ -z "$MODULE" -a -z "$COMMAND" ] && {
-	bold "[modules]"
+	echo -e $gray"Available modules in \"$RERUN_MODULES:\":"$_gray
     for mod in $RERUN_MODULES/*
 	do
        	$(rerun_existsModule $(basename $mod)) && {
@@ -244,20 +253,21 @@ shift; # Shift over to the command options
 # Command listing
 [ -n "$MODULE" -a -z "$COMMAND" ] && {
 	$(rerun_existsModule $MODULE) || die "module not found: $MODULE"
-    bold "[commands]"
+    echo -e $gray"Available commands in module, \"$RERUN_MODULES/$MODULE\":"$_gray
     shopt -s nullglob # enable
     for cmd in $RERUN_MODULES/$MODULE/commands/*/default.sh
 	do
 		cmd_name=$(basename $(dirname $cmd))
 		cmd_metadata=$RERUN_MODULES/$MODULE/commands/${cmd_name}/metadata
 		[ -f $cmd_metadata ] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
-  	    echo " ${cmd_name}: ${cmd_desc}" 
+  	    bold "${cmd_name}: ${cmd_desc}"
 		# List the options
 		if [ -d $RERUN_MODULES/$MODULE/commands/${cmd_name} ]
-		then
-			printf "%s%s\n" "$PAD" "[options]"
+		then            
 			shopt -s nullglob # enable
-			for opt_metadata in $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option; do
+            optfiles=( $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option )
+
+			for opt_metadata in ${optfiles[*]}; do
 		    	cmd_param=$(basename $(echo ${opt_metadata%%.option}))
 		    	opt_name=$(rerun_metadataLookup NAME $opt_metadata)
 		    	opt_desc=$(rerun_metadataLookup DESCRIPTION $opt_metadata)
@@ -274,14 +284,14 @@ shift; # Shift over to the command options
 					argstring=$(printf " --%s" "${opt_name}" )
 			    fi		  
 			    [ "true" == "${opt_arg}" ] && {
-			        argstring=$(printf "%s <%s>" $argstring ${opt_def})
+			        argstring=$(printf "%s <${ul}%s${_ul}>" $argstring ${opt_def})
 			    }
 		    	[ "true" != "${opt_req}" ] && {
-					opt_usage=$(printf "[%s: %s]" "${argstring}" "${opt_desc}") 
+					opt_usage=$(printf "[%s]: %s" "${argstring}" "${opt_desc}") 
 		    	} || {
 				    opt_usage=$(printf "%s: %s" "${argstring}" "${opt_desc}")
 				}
-		    	printf "%s %s\n" "$PAD" "$opt_usage"
+		    	echo -e "$PAD $opt_usage"
 			done
 	    fi
     done
@@ -299,7 +309,7 @@ shift; # Shift over to the command options
 #
 if ( rerun_existsHandler $MODULE $COMMAND )
 then
-    export RERUN RERUN_MODULES MODULE COMMAND
+    export RERUN RERUN_MODULES 
     MODULE_DIR=`rerun_lookupModule $MODULE`
     export MODULE_DIR 
     CMD_SCRIPT=`rerun_lookupHandler $MODULE $COMMAND`
@@ -358,7 +368,7 @@ then
 			$DIFF $RERUN_LOGS/rerun-$$.checklog $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
 			RETVAL=$?
 			[ $RETVAL -eq 1 ] && {
-				bold "[diff]"
+				echo -e ${bold}"[diff]"${_bold}
 				cat $RERUN_LOGS/rerun-$$.diff
 			}
 			rm -f $RERUN_LOGS/rerun-$$.{log,checklog,diff}
