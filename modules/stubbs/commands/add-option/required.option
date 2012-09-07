@@ -1,5 +1,5 @@
 NAME=required
-DESCRIPTION="required option?"
+DESCRIPTION="required option (true|false)"
 ARGUMENTS=true
 REQUIRED=false
 DEFAULT=false
