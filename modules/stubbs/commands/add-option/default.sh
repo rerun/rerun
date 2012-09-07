@@ -29,7 +29,7 @@ add_optionparser() {
     fi
 	if [ "$ARGUMENTS" == "false" ]
 	then
-		printf " %s) %s=true ;;\n" "${argstring}" "$optName" "$optVarname"
+		printf " %s) %s=true ;;\n" "${argstring}" "$optVarname"
 	else
     	printf " %s) rerun_option_check \$# ; %s=\$2 ; shift ;;\n" \
 			"$argstring" "$optVarname"
@@ -180,14 +180,16 @@ echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.op
 optionsWithDefaults=
 for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
     default=$(rerun_optionDefault $RERUN_MODULES $MODULE $COMMAND $opt)
-    [ -n "$default" ] && optionsWithDefaults="$optionsWithDefaults $opt"
+    args=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $opt)
+    [ -n "$default" -a "$args" == "true" ] && optionsWithDefaults="$optionsWithDefaults $opt"
 done
 
 # list the options that are required
 optionsRequired=
 for opt in $(rerun_options $RERUN_MODULES $MODULE $COMMAND); do
     required=$(rerun_optionRequired $RERUN_MODULES $MODULE $COMMAND $opt)
-    [ "$required" == "true"  ] && optionsRequired="$optionsRequired $opt"
+    args=$(rerun_optionArguments $RERUN_MODULES $MODULE $COMMAND $opt)
+    [ "$required" == "true" -a "$args" = "true" ] && optionsRequired="$optionsRequired $opt"
 done
 
 # Generate option parser script.
