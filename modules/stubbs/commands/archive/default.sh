@@ -90,6 +90,11 @@ if [ -e "payload.tar" ]; then
 else
     rerun_die "payload.tar does not exist"
 fi
+
+#
+# Make the archive executable
+#
+chmod +x ${FILE} || rerun_die "failed setting archive executable"
 #
 # Clean up the temp directory
 #
