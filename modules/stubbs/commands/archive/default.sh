@@ -93,7 +93,7 @@ fi
 #
 # Clean up the temp directory
 #
-rm -r $PAYLOAD
+rm -rf $PAYLOAD
 
 
 echo "Wrote self extracting archive script: ${FILE}"
