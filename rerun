@@ -154,7 +154,7 @@ rerun_metadataLookup() {
 
 # Use env var property if it exists otherwise...
 # ...the default modules base directory is cwd.
-[ -n "$RERUN_MODULES" ] || RERUN_MODULES=$(pwd)/modules
+[ -n "$RERUN_MODULES" ] || RERUN_MODULES=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)/modules
 
 #
 # process command line options
