@@ -301,8 +301,8 @@ shift; # Shift over to the command options
 #
 # Execution mode
 #
-[ -z $MODULE  ]  && rerun_syntax_error "module not specified"
-[ -z $COMMAND ]  && rerun_syntax_error "command not specified"
+[ -z "$MODULE"  ]  && rerun_syntax_error "module not specified"
+[ -z "$COMMAND" ]  && rerun_syntax_error "command not specified"
 
 #
 #  If the script exists for the specified command, execute it
