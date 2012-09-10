@@ -112,3 +112,20 @@ rerun_testDescription() {
 		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
 	}
 }
+
+rerun_absolutePath() {
+    local infile="${1:-$0}"
+    {
+        if [[ "${infile#/}" = "${infile}" ]]; then
+            echo $(pwd)/${infile}
+        else
+            echo ${infile}
+        fi
+    } | sed '
+    :a
+    s;/\./;/;g
+    s;//;/;g
+    s;/[^/][^/]*/\.\./;/;g
+    ta'
+}
+
