@@ -210,6 +210,11 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+[ -n "$REPLAY" -a -z "$RERUN_LOGS" ] && {
+    echo "Usage error: --replay <file> also requires -L <dir>" >&2 ; 
+    exit 2
+}
+
 # Read the module:command context
 #
 # Define regex pattern to parse command line input
@@ -322,14 +327,15 @@ then
     #
 	if [ -n "$RERUN_LOGS" -a -d "$RERUN_LOGS" ]
 	then
-	    # set up the log file
+
 		TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
+	    # set up the log file
 		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.running
 		#
 		# Execute the command script
 		#
-	    $SH $VERBOSE $CMD_SCRIPT "$@" >> $LOG
-	    RETVAL=$?
+	    $SH $VERBOSE $CMD_SCRIPT "$@" | tee $LOG
+	    RETVAL=${PIPESTATUS[0]}
 		
 		# Generate replay metadata
 		(
@@ -350,11 +356,12 @@ then
 		) > ${LOG%*.running}.metadata || die
 		
 		#
-		# Generate .replay
-		cat ${LOG%*.running}.metadata $LOG > $RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay || die		
+		# Generate .replay log file. 
+        REPLAYLOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$r${RANDOM}.replay
+		cat ${LOG%*.running}.metadata $LOG > $REPLAYLOG || die		
 		rm -f $LOG ${LOG%*.running}.metadata; # cleanup working files
 		# New log
-		LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP.replay
+		LOG=$REPLAYLOG
 		
 		# Reset the "latest" symlink
 		rm -f $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; #remove old symlink
