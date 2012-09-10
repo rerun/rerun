@@ -1,4 +1,4 @@
-.TH stubbs 1 "Mon Sep 26 08:37:07 PDT 2011" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Mon Sep 10 15:29:54 PDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -8,134 +8,177 @@ stubbs \- "Simple rerun module builder"
 rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
-.SH stubbs:add-command \f[]-module <> -name <> -ovewrite <false> -template <$RERUN_MODULES/stubbs/templates/default.sh>
+.SH stubbs:add-command \f[]--command <> --desc <> --module <> --overwrite <false> --template <$RERUN_MODULES/stubbs/templates/default.sh>
 "add command to module"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-module \f[]"the module name"\f[]
-required: \f[I]true\f[]
+.B \--command \f[]"the command name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-name \f[]"the command name"\f[]
-required: \f[I]true\f[]
+.B \--desc \f[]"the command description"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-ovewrite \f[]"ovewrite the command default.sh?"\f[]
-required: \f[I]true\f[]
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
-default: \f[I]false\f[]
 .RS
 .RE
 .TP
-.B \-template \f[]"default script template"\f[]
-required: \f[I]true\f[]
+.B \--overwrite \f[]"overwrite the command default.sh (true|false)"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
-default: \f[I]$RERUN_MODULES/stubbs/templates/default.sh\f[]
+, default: \f[I]false\f[]
 .RS
 .RE
-.SH stubbs:add-module \f[]-description <> -name <>
+.TP
+.B \--template \f[]"default script template"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]$RERUN_MODULES/stubbs/templates/default.sh\f[]
+.RS
+.RE
+.SH stubbs:add-module \f[]--description <> --module <>
 "add a new module"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-description \f[]"the module description"\f[]
-required: \f[I]true\f[]
+.B \--description \f[]"the module description"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-name \f[]"the module name"\f[]
-required: \f[I]true\f[]
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:add-option \f[][-arg <false>] -command <> -desc <> -module <> -name <> [-required <false>]
+.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --desc <> [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
 "add a command option"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-arg \f[]"option argument?"\f[]
-required: \f[I]false\f[]
+.B \--arg \f[]"option takes argument (true|false)"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
-default: \f[I]false\f[]
+, default: \f[I]false\f[]
 .RS
 .RE
 .TP
-.B \-command \f[]"the command name"\f[]
-required: \f[I]true\f[]
-arguments: \f[I]true\f[]
-.RS
-.RE
-.TP
-.B \-desc \f[]"the option description"\f[]
-required: \f[I]true\f[]
+.B \--command \f[]"the command name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-module \f[]"the module name"\f[]
-required: \f[I]true\f[]
+.B \--default \f[]"default value"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-name \f[]"the option name"\f[]
-required: \f[I]true\f[]
+.B \--desc \f[]"the option description"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-required \f[]"the option required?"\f[]
-required: \f[I]false\f[]
+.B \--long \f[]"long option name"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
-default: \f[I]false\f[]
 .RS
 .RE
-.SH stubbs:archive \f[]-file <> -modules <"*">
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--option \f[]"the option name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--range \f[]"argument value range"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]"*"\f[]
+.RS
+.RE
+.TP
+.B \--required \f[]"required option (true|false)"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]false\f[]
+.RS
+.RE
+.TP
+.B \--short \f[]"short option name"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:archive \f[][--file <>] --modules <"*"> [--version <>]
 "build a self extracting rerun" 
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-file \f[]"self extracting archive file"\f[]
-required: \f[I]true\f[]
+.B \--file \f[]"self extracting archive file"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-modules \f[]"module glob list"\f[]
-required: \f[I]true\f[]
+.B \--modules \f[]"module glob list"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
-default: \f[I]"*"\f[]
+, default: \f[I]"*"\f[]
 .RS
 .RE
-.SH stubbs:docs \f[]-name <>
+.TP
+.B \--version \f[]"the archive version"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:docs \f[]--module <>
 "generate the docs"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-name \f[]"module name"\f[]
-required: \f[I]true\f[]
+.B \--module \f[]"module name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:test \f[][-logs <>] -name <>
+.SH stubbs:test \f[][--command <>] [--logs <>] --module <>
 "run module test scripts"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \-logs \f[]"logs directory"\f[]
-required: \f[I]false\f[]
+.B \--command \f[]"the command name"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \-name \f[]"the module name"\f[]
-required: \f[I]true\f[]
+.B \--logs \f[]"logs directory"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE

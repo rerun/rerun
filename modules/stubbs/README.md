@@ -45,7 +45,7 @@ Add a command named "dance" to the freddy module:
 
 The `add-command` module will generate a boilerplate script file you can edit.
 
-	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/commands/dance/default.sh
+	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
 
 Of course, stubbs doesn't write the implementation for you, merely a stub.
@@ -54,7 +54,7 @@ See the "Command implementation" section below to learn about
 the `default.sh` script.
 
 See the "Testing" section below to learn about
-the `test.sh` script.
+the test script.
 
 ### add-option
 
@@ -84,9 +84,7 @@ Users will now be able to specify a "--jumps" argument to the `freddy:dance` com
 
     $ rerun freddy
     freddy:
-    [commands]
      dance: tell freddy to dance
-      [options]
         --jumps <>: "jump #num times"
 
 ### archive
@@ -121,9 +119,7 @@ will see freddy's commands listed:
 
     $ bash rerun.bin
     freddy:
-    [commands]
      dance: tell freddy to dance
-      [options]
         --jumps <>: "jump #num times"
 
 Now run the `freddy:dance` command.
@@ -176,27 +172,32 @@ Run `rerun --manual <module>` to display it:
 	
 ### test
 
-Run module test suite
+Run module test suite. 
 
 *Usage*
 
-    rerun stubbs:test [--module <>] [--command <>] [--logs <>]
+    rerun stubbs:test [--module <>] [--command <>] 
     
 *Example*
 
 Run the test suite for the module named "freddy":
 
-    rerun stubbs:test --name freddy
+    rerun stubbs:test --module freddy
 
 The `test` command will print output similar to the following:
 
-	[tests]  
-	  freddy:dance: OK
+    =========================================================
+     Module: freddy 
+    =========================================================
+    freddy:dance
+      it_runs_without_arguments:                       [PASS]
+    =========================================================
+    Tests:    1 | Passed:   1 | Failed:   0
 
 Each command that has any unit test scripts will be tested.
 
 See the "Testing" section below to learn about
-the test framework.
+how to define tests for your module.
 
 ## Command implementation
 
@@ -226,6 +227,9 @@ File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
     [ -r $RERUN_MODULES/freddy/commands/dance/options.sh ] && {
        . $RERUN_MODULES/freddy/commands/dance/options.sh
     } 
+     
+    # Exit immediately upon non-zero exit. See [set](http://ss64.com/bash/set.html)
+    set -e
      
     # ------------------------------
     # Your implementation goes here.
@@ -285,7 +289,7 @@ time use its `--default <>` parameter to set the default value.
 Here the "--jumps" option is set to a default value, "1":
 
     rerun stubbs:add-option \
-      --name jumps -description "jump #num times" --module freddy --command dance \
+      --option jumps -description "jump #num times" --module freddy --command dance \
       --default 1
 
 The `add-option` will update the `jumps.option` metadata file with the
@@ -313,8 +317,8 @@ to the value of the "--jumps" argument.
     # Tue Sep 13 20:11:52 PDT 2011
      
     # print error message and exit non-zero
-    rerun_option_error() {
-        echo "SYNTAX ERROR" >&2 ; exit 2;
+    rerun_option_usage() {
+        echo "$USAGE" >&2 ; exit 2;
     }
     # check option has its argument
     rerun_option_check() {
@@ -328,7 +332,7 @@ to the value of the "--jumps" argument.
             -j|--jumps) rerun_option_check $# ; JUMPS=$2 ; shift ;;
             # unknown option
             -?)
-                rerun_option_error
+                rerun_option_usage
                 ;;
             # end of options, just arguments left
             *)
@@ -430,13 +434,13 @@ Create the `freddy:study` command:
 	rerun stubbs:add-command --command study \
 	   --description "tell freddy to study" --module freddy
 
-Define an option called "-subject":
+Define an option called "--subject":
 
 	rerun stubbs:add-option --option subject \
 	   --description "subject to study" --module freddy --command study \
 	   --default math --required false
 
-Edit the default implementation (`RERUN_MODULES/freddy/commands/study/default.sh`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/study/default.sh`).
 The implementation should echo what freddy is studying:
 
 	# ------------------------------
@@ -454,7 +458,7 @@ Define an option called "--jumps":
 		   --description "jump #num times" --module freddy --command dance \
 		   --default 1 --required false
 
-Edit the default implementation (`RERUN_MODULES/freddy/commands/dance/default.sh`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/dance/default.sh`).
 The implementation should echo how many jumps:
 
 	# ------------------------------
@@ -464,13 +468,10 @@ The implementation should echo how many jumps:
 The freddy commands, their options and default implementations are completed.
 Use rerun listing to show the command usage:
 
-	$ ./rerun freddy
-	[commands]
+	$ rerun freddy
 	 dance: "tell freddy to dance"
-	  [options]
 	    [-j|--jumps <1>: "jump #num times"]
 	 study: "tell freddy to study"
-	  [options]
 	    [-s|--subject <math>: "subject to study"]
 
 The "dance" and "study" commands are listed. 
@@ -481,28 +482,26 @@ the subject "math" will be printed.
 
 Without option:
 
-	$ ./rerun freddy: study
+	$ rerun freddy: study
 	studying (math)
 
 With option:
 
-	$ ./rerun freddy: study --subject locking
+	$ rerun freddy: study --subject locking
 	studying (locking)
 
 ## Testing 
 
-Stubbs provides very basic support for unit testing modules.
+Stubbs provides basic support for unit testing modules through
+the use of [roundup](http://bmizerany.github.com/roundup/).
 Each module can contain a test suite of scripts.
-Stubbs will run a module's tests via the `test` command.
+Stubbs will run a module's tests via the `stubbs:test` command.
 
 Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 
 	rerun stubbs:test --module freddy
-	[tests]  
-	  freddy:dance: OK
-	  freddy:study: OK
 
-A successful unit test will print `OK` while a failed one 
+A successful unit test will print `PASS` while a failed one 
 will print `FAIL` and cause rerun to exit non zero.
 
 Stubbs creates a unit test for every command that is created
@@ -511,12 +510,8 @@ When `add-command` is run, a boiler plate unit test script
 is generated and added to the module's test suite.
 
 Below is a partial view of "freddy" module files. Notice
-how the `tests` directory closely parallels the `commands`
-directory.
-
-If the contents of the `tests` directory remind you
-of a rerun module structure, you would be correct!
-Rerun test suites are based on rerun modules themselves.
+how the `tests` directory contains files named after
+each command and ends with the suffix "-test.sh".
 
 	modules/freddy
 	├── commands
@@ -528,110 +523,67 @@ Rerun test suites are based on rerun modules themselves.
 	├── etc
 	├── metadata
 	└── tests
-	    ├── commands
-	    │   └── dance
-	    │       ├── default.sh
-	    │       └── metadata
-	    └── metadata
+	    │   dance-1-test.sh
 
-You can see this by listing the unit tests in the suite.
-Below you see the `-M <dir>` option used to
-specify the freddy module directory as the modules directory:
-	
-	$ rerun -M $RERUN_MODULES/freddy tests
-	[commands]
-	 dance: "test freddy dance"
-	  [options]
+To run the test suite for a single command use the `--command <>` option:
 
-This example shows there is one unit test in the 
-freddy test suite.
+	rerun stubbs:test --module freddy --command dance
 
-### Test logs
-
-The output from the test script execution is stored in
-the directory specified by `--logs <>` option or it will
-defaulted to `$(pwd)/tests-reports`.
-
-Here's a sample test report listing for the 'freddy' test suite.
-
-	test-reports
-	├── TEST-freddy.txt
-	├── TEST-freddy:dance.default.sh.txt
-	├── TEST-freddy:dance.default.sh.txt.stderr
-	├── TEST-freddy:dance.txt
-	├── freddy-dance-2011-0921-194512.log
-	└── tests-dance-2011-0921-194511.log
-
-Cat the file named TEST-$MODULE.txt to see a summary:
-
-	$ cat test-reports/TEST-freddy.txt 
-	Testsuite: freddy
-	Tests run: 1, Failures: 0, Time elapsed: 1 s
+This will run any tests named "dance-*-test.sh".
 
 ### Tests scripts
 
-Test scripts should return with a 0 (zero) exit 
+A *roundup* test-plan is a simple script that contains 
+functions whose names are prefixed with `it_`.
+Roundup will extract these function names and run
+them in a sandbox.
+Tests should return with a 0 (zero) return 
 status upon successful test validation.
 
 The implementation of the individual test scripts 
 are completely open to anything the author wishes
 to do. 
 
-That said, it is possible to further leverage rerun
-conventions to facilitate testing.
-
 Here's an example script that began as a boiler
 plate generated by `add-command`. Notice how
 this script contains several rough sections:
 
-1.  The rerun executable and module path are declared.
-2.  Test functions loaded.
-3.  Test session is created defining the command execution.
-4.  Test shell functions used to define unit tests.
+1.  Helper function definitions
+2.  The plan description
+3.  Test function
 
-File listing: `$RERUN_MODULES/freddy/tests/dance/commands/default.sh`
+File listing: `$RERUN_MODULES/freddy/tests/dance-1-test.sh`
 
-    # Commands covered: dance
+    #!/usr/bin/env roundup
     #
     # This file contains test scripts to run for the dance command.
     # Execute it by invoking: 
     #    
-    #                rerun stubbs:test -m freddy -c dance
+    #     rerun stubbs:test -m freddy -c dance
     #
-    # The test report can be found in:
-    #
-    #                test-reports/TEST-freddy:dance.txt
-    #
-     
-    # 
-    # The rerun command environment
-    #
-    RERUN="./rerun"
-    RERUN_MODULES="/Users/alexh/rerun-workspace/rerun/modules"
-    # 
-    # Load the test function library
-    #
-    source $RERUN_MODULES/stubbs/lib/test.sh || exit 1
-     
-    #
-    # Create a test execution session for the command
-    #
-    typeset -a test
-    test=( $(test:session $RERUN $RERUN_MODULES freddy dance "") ) || {
-        test:exit 1 "error creating session" 
+    # Helpers
+    # ------------
+    
+    rerun() {
+        command $RERUN -M $RERUN_MODULES "$@"
     }
-     
-    #
-    # test 1
-    #
-    test:pass $test || test:fail $test "test1: execution failure"
+    
+    # The Plan
+    # --------
 
+    describe "freddy:dance"
 
+    it_runs_without_arguments() {
+        test "$(rerun freddy:dance)" = "jumps (1)"
+    }
+ 
+If  setup and tear down procedures are needed, create a 
+`before` and/or `after` function. These will be run
+before and after each test in the plan.
 
-It's also possible to execute this test script directly.
+It's also possible to execute this test directly via `roundup`.
 
-	$ bash $RERUN_MODULES/freddy/tests/commands/dance/default.sh 
-	jumps (3)
+	$ ( cd $RERUN_MODULES/freddy/tests ; roundup dance-1-test.sh )
 
 
 # LICENSE

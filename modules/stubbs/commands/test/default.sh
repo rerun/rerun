@@ -48,11 +48,12 @@ done
 
 if [ ! -d "$RERUN_MODULES/$MODULE/tests" ]
 then
-    rerun_die "No tests"
+    # there should always be at least one test!
+    rerun_die "No tests" 
 fi
 
 echo "========================================================="
-echo " $MODULE $COMMAND"
+echo " Module: $MODULE"
 echo "========================================================="
 (
     # Resolve relative path to rerun
@@ -67,7 +68,7 @@ echo "========================================================="
 
     # Run the tests
     #
-   $ROUNDUP $COMMAND-test.sh
+    $ROUNDUP $COMMAND-test.sh
 ) 
 
 # Done

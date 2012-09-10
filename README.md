@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [command_args]]]
+	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [options]]]
 
 # DESCRIPTION
 
@@ -106,18 +106,14 @@ For syntax and example usage execute `rerun` using the `--help` flag:
 Without arguments, `rerun` will list existing modules:
 
     $ rerun
-    [modules]
       freddy: "A dancer in a red beret and matching suspenders"
 
 To list the commands available from the 'freddy' module run:
 
     $ rerun freddy
-    [commands]
      study: "tell freddy to study"
-      [options]
        --subject <math>: "the summer school subject"
      dance: "tell freddy to dance"
-      [options]
        --jumps <1>: "jump #num times"
 
 The listing consists of info about command options 
@@ -211,7 +207,6 @@ Here the archive is executed without arguments which causes the archive
 to list the modules contained within it.
 
     $ ./rerun.bin
-    [modules]
       freddy: "A dancer in a red beret and matching suspenders"
       .
       . listing output ommitted
@@ -273,12 +268,12 @@ These .replay files can be edited or executed as scripts.
 
 Each replay log is named using the following pattern:
 
-    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MM-DD-THHMMSS.replay
+    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MM-DD-THHMMSS-PID.replay
 
 To list the replay logs for the `freddy:dance` command use `ls`:
 
 	$ ls -l $RERUN_LOGS/freddy-dance*.replay
-	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-09-21T195402.replay
+	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-09-21T195402-2344.replay
 	
 
 *File format*

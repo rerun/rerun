@@ -1,7 +1,0 @@
-NAME=ovewrite
-DESCRIPTION="ovewrite the command default.sh?"
-ARGUMENTS=true
-REQUIRED=true
-DEFAULT=false
-SHORT=
-RANGE="(true|false)"
