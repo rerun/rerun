@@ -86,7 +86,7 @@ man() {
     if [ ! -f $RERUN_MODULES/$module/$module.1 \
            -a -f $RERUN_MODULES/stubbs/commands/docs/default.sh ]
     then
-       $RERUN stubbs:docs -name $module 
+       $RERUN stubbs:docs --module $module 
     fi
     if [ -f $RERUN_MODULES/$module/$module.1 ]
     then
