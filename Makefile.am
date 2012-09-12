@@ -50,6 +50,11 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/docs/metadata \
 	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
+	modules/stubbs/commands/rm-option/command.option \
+	modules/stubbs/commands/rm-option/default.sh \
+	modules/stubbs/commands/rm-option/metadata \
+	modules/stubbs/commands/rm-option/module.option \
+	modules/stubbs/commands/rm-option/option.option \
 	modules/stubbs/commands/test/default.sh \
 	modules/stubbs/commands/test/logs.option \
 	modules/stubbs/commands/test/metadata \
@@ -75,3 +80,19 @@ install-data-hook:
 	cp -p $(srcdir)/bash_completion.sh \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
 
+#
+# Testing targets
+#
+unexport RERUN_COLOR
+test: test-configure test-rerun test-stubbs
+test-rerun:
+	@echo "Testing rerun ..."
+	cd ./tests && ../modules/stubbs/lib/roundup
+test-stubbs:
+	@echo "Testing stubbs module..."
+	./rerun stubbs:test --module stubbs
+
+test-configure:
+	rm -f autom4te.cache config INSTALL Makefile.in aclocal.m4 configure
+	autoreconf --install
+	./configure
