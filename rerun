@@ -57,6 +57,7 @@ dim() { tput dim ; echo " $*" ; txtrst ; }
 [ -n "$RERUN_COLOR" ] && {
     ul="\033[4m" ; _ul="\033[0m" ; # underline
     gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
+    red="\033[31m" ; _red="\033[0m" ; # red
     bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
 }
 
@@ -90,9 +91,9 @@ man() {
     fi
     if [ -f $RERUN_MODULES/$module/$module.1 ]
     then
-        nroff -man $RERUN_MODULES/$module/$module.1 | ${PAGER:more}
+        nroff -man $RERUN_MODULES/$module/$module.1 | ${PAGER:-more}
     else
-        echo "Manual not found."
+        echo "Manual could not be generated." >&2
     fi
 }
 
@@ -101,7 +102,10 @@ man() {
 # Print the message and exit.
 # Use text effects if `RERUN_COLOR` environment variable set.
 die() {
-    [[ "$RERUN_COLOR" == "true" ]] && bold "ERROR: $*" >&2 || echo "ERROR: $*" >&2
+    if [[ "$RERUN_COLOR" == "true" ]]
+    then echo -e ${red}"ERROR: $*"${_red} >&2 
+    else echo "ERROR: $*" >&2
+    fi
     exit 1
 }
 
@@ -381,7 +385,7 @@ shift;
 #  Exit, if the command script is not found.
 # User specified a command that did not exist in the RERUN_MODULES directory.
 ! rerun_existsCommandScript $MODULE $COMMAND && {
-    die command not found: \"$COMMAND\"
+    die command not found: \"$MODULE:$COMMAND\"
 }
 
 # Ready to run. Export rerun executable environment.
