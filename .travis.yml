@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: ./configure && make test
+script: autoreconf --install && ./configure && make test

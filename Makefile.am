@@ -86,15 +86,10 @@ install-data-hook:
 unexport RERUN_COLOR
 RERUN := ./rerun
 RERUN_MODULES := ./modules
-test: test-configure test-rerun test-stubbs
+test: test-rerun test-stubbs
 test-rerun:
 	@echo "Testing rerun ..."
 	cd ./tests && ../modules/stubbs/lib/roundup
 test-stubbs:
 	@echo "Testing stubbs module..."
 	./rerun stubbs:test --module stubbs
-
-test-configure:
-	rm -f autom4te.cache config INSTALL Makefile.in aclocal.m4 configure
-	autoreconf --install
-	./configure
