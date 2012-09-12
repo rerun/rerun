@@ -57,17 +57,20 @@ it_runs_replay() {
     rerun -L $logdir freddy:dance --jumps 6
     rerun -L $logdir freddy:dance --jumps 7
 
+    # sort log files so earliest are first in the list.
     logs=( $(ls -rt $logdir) )
 
+    # Should have 3 recorded executions + 1 symlink.
     test ${#logs[*]} = 4
+  
+    # Repeat executions should succeed.
+    last=$(readlink $logdir/freddy-dance-latest.replay)
+    rerun -L $logdir --replay $last freddy:dance --jumps 7
 
-    # test the last run
-    rerun -L $logdir --replay $logdir/${logs[0]} freddy:dance --jumps 7
+    # Run it like the first time.
+    rerun -L $logdir --replay $logdir/${logs[0]} freddy:dance --jumps 5
 
-    # this should always succeed
-    rerun -L $logdir --replay $logdir/freddy-dance-latest.replay freddy:dance --jumps 7
-
-    # this should never match and produce a diff
+    # This should never match and produce a diff
     rerun -L $logdir --replay $logdir/${logs[2]} freddy:dance --jumps $$ | grep '\[diff]'
 	test "${PIPESTATUS[0]}" = 1
 

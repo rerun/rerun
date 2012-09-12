@@ -36,6 +36,7 @@ REQUIRED=false
 DEFAULT=3
 LONG=jumps
 SHORT=j
+ARGUMENTS=true
 EOF
     # freddy:dance options parser
     cat > $moddir/freddy/commands/dance/options.sh <<EOF
@@ -84,6 +85,7 @@ REQUIRED=false
 DEFAULT=math
 LONG=subject
 SHORT=s
+ARGUMENTS=true
 EOF
     # freddy:study option parser
     cat > $moddir/freddy/commands/study/options.sh <<EOF
