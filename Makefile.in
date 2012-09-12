@@ -246,6 +246,11 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/docs/metadata \
 	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
+	modules/stubbs/commands/rm-option/command.option \
+	modules/stubbs/commands/rm-option/default.sh \
+	modules/stubbs/commands/rm-option/metadata \
+	modules/stubbs/commands/rm-option/module.option \
+	modules/stubbs/commands/rm-option/option.option \
 	modules/stubbs/commands/test/default.sh \
 	modules/stubbs/commands/test/logs.option \
 	modules/stubbs/commands/test/metadata \
@@ -737,6 +742,7 @@ install-data-hook:
 	mkdir -p $(DESTDIR)$(sysconfdir)/bash_completion.d
 	cp -p $(srcdir)/bash_completion.sh \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
+
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
