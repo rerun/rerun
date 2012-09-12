@@ -22,7 +22,7 @@ after() {
 validate() {
     test -d $RERUN_MODULES/freddy/commands/dance
     test -f $RERUN_MODULES/freddy/commands/dance/metadata
-    source  $RERUN_MODULES/freddy/commands/dance/metadata
+    .  $RERUN_MODULES/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
     test -f $RERUN_MODULES/freddy/commands/dance/default.sh

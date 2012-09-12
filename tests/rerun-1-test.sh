@@ -7,7 +7,7 @@ unset RERUN_COLORS
 
 # Helpers
 # ------------
-source ./functions.sh || { echo "Failed loading test functions" ; exit 2 ; }
+. ./functions.sh || { echo "Failed loading test functions" ; exit 2 ; }
 
 rerun() {
     command $RERUN "$@"

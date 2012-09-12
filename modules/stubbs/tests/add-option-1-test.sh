@@ -23,7 +23,7 @@ validate() {
     #
     # Check the metadata file
     test -f $RERUN_MODULES/freddy/commands/dance/jumps.option
-    source  $RERUN_MODULES/freddy/commands/dance/jumps.option
+    .  $RERUN_MODULES/freddy/commands/dance/jumps.option
     test -n "$NAME" -a $NAME = jumps 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
     #

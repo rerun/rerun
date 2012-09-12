@@ -12,7 +12,8 @@ rerun() {
 }
 
 after() {
-    [ -d $RERUN_MODULES ] && rm -rf $RERUN_MODULES/freddy
+   # [ -d $RERUN_MODULES ] && rm -rf $RERUN_MODULES/freddy
+:
 }
 
 # The Plan

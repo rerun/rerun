@@ -13,7 +13,7 @@ rerun() {
 
 validate() {
     test -f $RERUN_MODULES/freddy/metadata
-    source  $RERUN_MODULES/freddy/metadata
+    .  $RERUN_MODULES/freddy/metadata
     test -n "$NAME" -a $NAME = freddy 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "A dancer in a red beret and matching suspenders"
 }
