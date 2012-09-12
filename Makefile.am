@@ -83,9 +83,7 @@ install-data-hook:
 #
 # Testing targets
 #
-unexport RERUN_COLOR
-RERUN := ./rerun
-RERUN_MODULES := ./modules
+
 test: test-rerun test-stubbs
 test-rerun:
 	@echo "Testing rerun ..."
