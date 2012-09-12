@@ -27,7 +27,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/add-command/module.option \
 	modules/stubbs/commands/add-command/command.option \
 	modules/stubbs/commands/add-command/options.sh \
-	modules/stubbs/commands/add-command/ovewrite.option \
+	modules/stubbs/commands/add-command/overwrite.option \
 	modules/stubbs/commands/add-command/template.option \
 	modules/stubbs/commands/add-module/default.sh \
 	modules/stubbs/commands/add-module/description.option \
