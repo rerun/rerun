@@ -131,7 +131,9 @@ done
 
 # Verify this command exists
 #
-[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || rerun_die "command does not exist: \""$MODULE:$COMMAND\"""
+[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || {
+    rerun_die "command does not exist: \""$MODULE:$COMMAND\"""
+}
 
 # Generate metadata for new option
 
@@ -154,9 +156,26 @@ echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.op
 
 
 # Generate option parser script.
-rerun_generateOptionsParser $RERUN_MODULES $MODULE $COMMAND > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
-echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
+optionScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh
+rerun_generateOptionsParser \
+    $RERUN_MODULES $MODULE \
+    $COMMAND > $optionScript || rerun_die
+echo "Wrote options script: $optionScript"
+
+# Update variable summary in command script.
+commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh
+if [ -f "$commandScript" ]
+then
+    rerun_rewriteCommandScriptHeader \
+        $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
+        rerun_die "Error updating command script header"
+    }
+    mv $commandScript.$$ $commandScript || {
+        rerun_die "Error updating command script header"
+    }
+    echo "Updated command script header: $commandScript"
+fi
 
 # Done
-
+exit $?
 

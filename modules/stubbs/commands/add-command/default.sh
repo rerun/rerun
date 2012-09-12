@@ -87,11 +87,14 @@ done
 # Create command structure
 mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die
 
+VARIABLES=$(generate_optionVariableSummary $RERUN_MODULES $MODULE $COMMAND)
+
 # Generate a boiler plate implementation
 [ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh -o -n "$OVEWRITE" ] && {
     sed -e "s/@NAME@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
+    -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh || rerun_die
     echo "Wrote command script: $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh"
 }

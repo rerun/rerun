@@ -42,7 +42,7 @@ it_displays_command_listing() {
     rerun -M $modules freddy > $OUT
     head -1 $OUT | grep -q "Available commands in module"
     grep -q 'study: "tell freddy to study"' $OUT
-    grep -q '\[ -s|--subject <math>]: "subject to study"' $OUT
+    grep -q '\[ --subject|-s <math>]: "subject to study"' $OUT
 }
 
 it_runs_command_without_options() {

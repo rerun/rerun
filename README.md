@@ -9,21 +9,21 @@ standard operating procedure.
 
 # DESCRIPTION
 
-Rerun is a lightweight tool building framework useful to those
-implementing management procedure with shell scripts. Rerun will help you
-organize your implementation into well defined modular interfaces.
+Rerun is a simple command runner that turns loose shell scripts
+into modular automation. Rerun will help you
+organize your implementation into well defined command interfaces.
 Collections of management modules can be archived and delivered as
 a single executable to facilitate team hand offs.
 Using the "stubbs" module, rerun will even facilitate unit tests.
 When users execute rerun module commands, rerun can record 
 execution data into log files that can later be replayed.
 
-Rerun provides two interfaces:
+Rerun provides two modes of operation:
 
 1. *Listing*: Rerun lists modules and commands. Listing
 information includes name, description and command line usage syntax.
 2. *Execution*: Rerun provides option processing (possibly defaulting
-unspecified arguments) and executes the specified module command.
+unspecified arguments) and executes a script for the specified module command.
 
 For the module developer, rerun is a trivial framework following
 simple conventions that easily fit in a shell environment.
@@ -60,26 +60,26 @@ for additional documentation including:
 : Print help and usage then exit.
 
 `--replay *LOG*`
-: Compare the results of an execution to those of a replay log and show the diff.
+: Compare the results of a _command_ execution to that in a replay log and show the difference in output if any.
 
 `-M` *DIRECTORY*
 : Module library directory path.
 
 `-L` *DIRECTORY*
-: Log directory path.
+: Recorded _command_ execution logs stored in this directory. Also settable via `RERUN_LOGS`.
 
 `-v` 
-: Execute command in verbose mode. 
+: Execute _command_ in verbose mode. 
 
 `-V` 
-: Execute command and rerun in verbose mode. 
+: Execute `rerun` and _command_ in verbose mode. 
 
 
 # USING
 
 ## Help
 
-For syntax and example usage execute `rerun` using the `--help` flag:
+For command line syntax and example usage execute `rerun` using the `--help` flag:
 
 	$ ./rerun --help
 	 _ __ ___ _ __ _   _ _ __
@@ -156,29 +156,30 @@ After accepting a command, typing the tab key will show arguments.
 
 The `freddy:study` command accepts one option (--subject <>).
     
-## Executing
+## Command execution
 
-Commands are executed by supplying the module,
+Commands are executed by stating the module,
 command and possibly options. The basic usage form is
-"module:command [args]".
+"`rerun` _module_:_command_ [_options_]".
 
-To run freddy module's "study" command, type:
+To run the "study" command in the freddy module, type:
 
     $ rerun freddy:study
     studying (math)
 
-The string "studying (math)" is the printed result. 
-And, "math" is the subject option's default value
+The outputed string "studying (math)" is the printed result. 
+In this example, "math" is the subject option's default value
 as defined in the module metadata.
     
-Arguments are passed after the "module:command" string. 
-Tell freddy to study the subject, "biology":
+Command options are passed after the "module:command" string. 
+Tell freddy to study the subject, "biology" by specifying 
+the `--subject <>` option:
 
     $ rerun freddy:study --subject biology
     studying (biology)
 
 If the 'freddy' module is stored in `/var/rerun`, then the command usage
-should be:
+would be:
 
     $ rerun -M /var/rerun freddy:study
     studying (math)
@@ -191,9 +192,9 @@ the same exact interface as rerun,... all in one file!
 
 Specifically, an archive is a set of modules 
 and `rerun` itself packaged into a self extracting
-script (by default "rerun.bin"). 
+script (by default in a file named "rerun.bin"). 
 Archives can be useful if you want
-to share a single self contained executable that contains any needed modules.
+to share a single self contained executable that contains all the needed modules.
 
 Run an archive script like you would run `rerun`.
 
@@ -211,12 +212,12 @@ to list the modules contained within it.
       .
       . listing output ommitted
 
-Note, ".bin" is just a suffix naming convention for a bash self-extracting script.
-The file can be named anything you wish.
+Note, ".bin" is just a suffix naming convention for a self-extracting script.
+The archive file can be named anything you wish.
 
 Run the `freddy:dance` command in the archive:
 
-	$ bash ./rerun.bin freddy:dance --jumps 3
+	$ ./rerun.bin freddy:dance --jumps 3
 	jumps (3)
 
 See `stubbs:archive` for further information about creating and 
@@ -228,10 +229,10 @@ Rerun supports basic command replay logging (See "Logs" section below).
 When rerun logs a command it does so in a form that can be re-executed 
 (i.e., "replayed"). It's possible to have rerun compare the results of a 
 given replay log against a new command execution.
-
-Use the `--replay <log>` option to compare replay output from a command log.
 Replay logs are normally found in the directory specified by the `RERUN_LOGS`
 environment variable (or the `-L <dir>` option).
+
+Use the `--replay <log>` option to compare replay output from a command log.
 
 Below you can see the results of a comparison between this run of
 `freddy:dance --jumps 2`  against an earlier command execution. 
@@ -253,11 +254,11 @@ below the `[diff]` label and exit with a non-zero exit status.
 
 # LOGS
 
-Rerun logs all command execution, if the `-L <dir>` 
+Rerun records command execution as replay logs, if the `-L <dir>` 
 argument is set or the `RERUN_LOGS` environment variable is set.
 Be sure to set `RERUN_LOGS` to a writable directory. 
 
-Each command execution is stored in the form of a "replay" log
+Each command execution is recorded in the form of a "replay" log
 file (ending with `.replay`).
 This log file contains information about the command
 execution, as well as, the output from the execution.
@@ -301,9 +302,9 @@ Here's the metadata as specified in the file template:
 	OPTIONS="$*"
 	USER="$USER"
 	DATE="$(date '+%Y-%m%d-%H%M%S')"
-	__LOG_BELOW__
+	__COMMAND_OUT_BELOW__
 	
-Any command output is stored below the line delimiter, `__LOG_BELOW__`.
+Any command output is stored below the line delimiter, `__COMMAND_OUT_BELOW__`.
 
 Here's an example replay file for the `freddy:dance` command:
 
@@ -316,7 +317,7 @@ Here's an example replay file for the `freddy:dance` command:
 	OPTIONS=""
 	USER="alexh"
 	DATE="2011-0921-195402"
-	__LOG_BELOW__
+	__COMMAND_OUT_BELOW__
 
 	jumps (1)
 
@@ -325,7 +326,7 @@ replay log:
 
 	rerun_extractLog() {
 		[ -f $1 ] || die "file does not exist: $1"
-		SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $1) || die "failed sizing output"
+		SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $1) || die "failed sizing output"
 		tail -n+$SIZE $1 || die "failed extracting output"
 	}
 
@@ -358,43 +359,44 @@ A rerun module assumes the following structure:
     ├── metadata (module metadata)
     └── lib
 
-## Scripts
+## Command Scripts
 
-Rerun's internal dispatch logic uses the layout convention 
+Rerun's internal dispatch logic uses the directory layout
 described above to find and execute scripts for each command.
 
 Rerun expects a default implementation script for each command
 but can also invoke an OS specific script, if present.
 
 * default.sh: Generic implementation.
-* `uname -s`.sh: OS specific implementation
+* $(uname -s).sh: OS specific implementation
 * options.sh: Script sourceable by default and OS specific scripts
-  to parse options.
+  to parse options (also generated by stubbs).
 
 ## Metadata
 
-The metadata file format uses line separated KEY=value 
-pairs to define module attributes. 
+The metadata file format uses line separated _KEY=value_
+pairs to define module attributes. The module metadata
+file declares two properties:
 
 * NAME: Declare name displayed to user.
 * DESCRIPTION: Brief explanation of use.
 
-For example, a module named `freddy` and can be named
-and described as such in a file called `MODULE_DIR/metadata`:
+For example, a module named `freddy` is named
+and described in a file called `RERUN_MODULES/freddy/metadata`:
 
     NAME="freddy"
     DESCRIPTION="A dancer in a red beret and matching suspenders"
 
-Command metadata are described in a file called
-`MODULE_DIR/commands/<command>/metadata`.
-Here's one for the "study" command:
+Command metadata is described in a file called
+`RERUN_MODULES/<module>/commands/<command>/metadata`.
+Here's the command metadata for the "study" command:
 
     NAME="study"
     DESCRIPTION="tell freddy to study"
 
-Options can be described in a file called 
-`MODULE_DIR/commands/<command>/<option>.option`.
-Beyond just NAME and DESCRIPTION, options can declare:
+Options are described in a file called 
+`RERUN_MODULES/<module>/commands/<command>/<option>.option`.
+Beyond just NAME and DESCRIPTION, options can also declare:
 
 * ARGUMENTS: Does the option take an argument.
 * REQUIRED: Is the option required.
@@ -431,15 +433,21 @@ are illustrated here:
 
 `RERUN_MODULES`
 : Path to directory containing rerun modules.
+If RERUN_MODULES is not set, it is defaulted
+relative to the location of the rerun executable.
 
 `RERUN_LOGS`
-: Path to directory where rerun will write log files.
+: Path to directory where rerun will record command
+executions as replay log files.
 
 `RERUN_COLOR`
 : Set 'true' if you want ANSI text effects. Makes
 labels in text to print bold in the console.
 Syntax errors will also print bold.
 
+`DIFF`
+: Set to the particular `diff` command to use for
+replay log comparisons.
 
 # SEE ALSO
 

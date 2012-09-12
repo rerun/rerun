@@ -40,11 +40,11 @@ ARGUMENTS=true
 EOF
     # freddy:dance options parser
     cat > $moddir/freddy/commands/dance/options.sh <<EOF
-rerun_option_error() { 
-    echo "$USAGE" >&2 ; return 2 ; 
+rerun_option_usage() { 
+    echo "\$USAGE" >&2 ; return 2 ; 
 }
 rerun_option_check() {  
-    [ "\$1" -lt 2 ] && rerun_option_error 
+    [ "\$1" -lt 2 ] && rerun_option_usage
 }
 
 while [ "\$#" -gt 0 ]; do
@@ -53,7 +53,7 @@ while [ "\$#" -gt 0 ]; do
           -j|--jumps) JUMPS="\$2" ; shift ;;
         # unknown option
         -?)
-            rerun_option_error
+            rerun_option_usage
             ;;
         # end of options, just arguments left
         *)
@@ -89,11 +89,11 @@ ARGUMENTS=true
 EOF
     # freddy:study option parser
     cat > $moddir/freddy/commands/study/options.sh <<EOF
-rerun_option_error() { 
-    echo "$USAGE" >&2 ; return 2 ; 
+rerun_option_usage() { 
+    echo "\$USAGE" >&2 ; return 2 ; 
 }
 rerun_option_check() {  
-    [ "\$1" -lt 2 ] && rerun_option_error 
+    [ "\$1" -lt 2 ] && rerun_option_usage 
 }
 
 while [ "\$#" -gt 0 ]; do
@@ -102,7 +102,7 @@ while [ "\$#" -gt 0 ]; do
           -s|--subject) SUBJECT="\$2" ; shift ;;
         # unknown option
         -?)
-            rerun_option_error
+            rerun_option_usage
             ;;
         # end of options, just arguments left
         *)

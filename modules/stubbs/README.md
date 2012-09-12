@@ -4,10 +4,10 @@ Use `stubbs` to define new *rerun* modules and commands.
 
 Stubbs provides a small set of commands that 
 help you define and organize modules according to
-rerun layout conventions and metadata format. 
+the *rerun* layout conventions and metadata format. 
 
-It won't write your implementations for you but
-helps you stay in between the guard rails!
+Stubbs won't write your implementations for you but
+it will help keep you between the guard rails!
 
 ## Commands
 
@@ -31,7 +31,7 @@ The `add-module` command will print:
 
 ### add-command
 
-Create a command in the specified module and generate a default implementation.
+Create a command in the specified module and generate a default command script implementation.
 
 *Usage*
 
@@ -43,7 +43,7 @@ Add a command named "dance" to the freddy module:
 
     rerun stubbs:add-command --command dance --description "tell freddy to dance" --module freddy
 
-The `add-command` module will generate a boilerplate script file you can edit.
+The `add-command` module generates a boilerplate command script file you can edit.
 
 	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
@@ -51,9 +51,9 @@ The `add-command` module will generate a boilerplate script file you can edit.
 Of course, stubbs doesn't write the implementation for you, merely a stub.
 
 See the "Command implementation" section below to learn about 
-the `default.sh` script.
+the `default.sh` command script.
 
-See the "Testing" section below to learn about
+See the *Testing* section below to learn about
 the test script.
 
 ### add-option
@@ -199,12 +199,13 @@ Each command that has any unit test scripts will be tested.
 See the "Testing" section below to learn about
 how to define tests for your module.
 
-## Command implementation
+## Command scripts
 
-Running `stubbs:add-command` as shown above will generate a stub default implementation
-for the new command: `$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh`:
+Running `stubbs:add-command` as shown above will generate a stub default
+script implementation for the new command: 
+`$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh`:
 
-The dance command's `default.sh` stub is shown below.
+The "dance" command's `default.sh` script is shown below.
 
 File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
 
@@ -244,9 +245,10 @@ A `rerun_die` function is provided for convenience in case things go awry.
 
 Rather than implement a specialized option parser logic inside
 each command implementation, `add-option` generates a reusable
-script sourced by the command implementation script.
-When your command is run all arguments passed after the "--"
-are parsed by the options.sh script.
+script sourced by the command  script.
+When your command is run, all options and their arguments 
+are parsed by the options.sh script and returned as shell
+variables to your command script.
 
 Naturally, your implementation code goes between the rows
 of dashes. 
@@ -355,15 +357,15 @@ additional options being created. It also helps "stubbs"
 preserve changes you make to `default.sh` or other scripts
 that source `options.sh`.
 
-### OS specific command implementations
+### OS-specific command scripts
 
-Your command's `default.sh` implementation may not work in all operating
+Your command's `default.sh` script may not work in all operating
 system environments due to command and/or syntax differences.
 
 Rerun will look for an operating system specific 
 command implementation and run it instead, if it exists.
 
-Effectively, rerun checks for a file named: 
+Effectively, rerun checks for a command script named: 
 `$MODULE/commands/$COMMAND/$(uname -s).sh`
 
 For example, run `uname -s` on a centos host to see the name of the
@@ -399,12 +401,12 @@ The result comes from rerun's execution of the new `Linux.sh` script.
 
 ### Verbosity?
 
-What happens when your command implementation fails and
+What happens when your command script fails and
 all you see is one line of cryptic error text?
 Shed more light by enabling verbose output using rerun's `-v` flag.
 
 Adding '-v' effectively has `rerun` call the command
-implementation script with bash's "-vx" flags. 
+script using bash's "-vx" flags. 
 
 Here's a snippet of the `freddy:dance` command with verbose output:
 
@@ -494,8 +496,10 @@ With option:
 
 Stubbs provides basic support for unit testing modules through
 the use of [roundup](http://bmizerany.github.com/roundup/).
+Stubbs bundles roundup, so it's not necessary to create
+a global install (unless you want to in which case you should!).
 Each module can contain a test suite of scripts.
-Stubbs will run a module's tests via the `stubbs:test` command.
+Stubbs runs module tests via the `stubbs:test` command.
 
 Here the unit tests for the "freddy" module are executed via `stubbs:test`:
 
@@ -529,7 +533,7 @@ To run the test suite for a single command use the `--command <>` option:
 
 	rerun stubbs:test --module freddy --command dance
 
-This will run any tests named "dance-*-test.sh".
+This will cause roundup to run any tests named "dance-*-test.sh".
 
 ### Tests scripts
 
@@ -537,8 +541,9 @@ A *roundup* test-plan is a simple script that contains
 functions whose names are prefixed with `it_`.
 Roundup will extract these function names and run
 them in a sandbox.
-Tests should return with a 0 (zero) return 
-status upon successful test validation.
+Tests should return with a 0 (zero) 
+upon successful test validation. Non-zero
+causes the test to fail.
 
 The implementation of the individual test scripts 
 are completely open to anything the author wishes
@@ -580,6 +585,11 @@ File listing: `$RERUN_MODULES/freddy/tests/dance-1-test.sh`
 If  setup and tear down procedures are needed, create a 
 `before` and/or `after` function. These will be run
 before and after each test in the plan.
+
+ See the 
+[test](http://ss64.com/bash/test.html) and
+[expr](http://ss64.com/bash/expr.html) commands
+to declare assertions.
 
 It's also possible to execute this test directly via `roundup`.
 

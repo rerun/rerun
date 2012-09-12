@@ -139,7 +139,7 @@ rerun_resolveCommandScript() {
 # return 0 if exists, 1 otherwise
 rerun_existsCommandScript() {
     [ ! $# -eq 2 ] && { 
-	    die 'wrong # args: should be: rerun_resolveCommandScript module command'
+	    die 'wrong # args: should be: rerun_existsCommandScript module command'
     }
     local module=$1 command=$2
     if [ -f "$(rerun_resolveCommandScript $module $command)" ]
@@ -167,7 +167,7 @@ rerun_extractLog() {
     [ -f $file ] || { 
         die "file does not exist: $file"
     }
-    local SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
+    local SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
     tail -n+$SIZE $file || die "failed extracting log"
 }
 
@@ -198,7 +198,7 @@ OPTIONS="$*"
 USER="$USER"
 DATE="$TSTAMP"
 EXIT_STATUS="$RETVAL"
-__LOG_BELOW__
+__COMMAND_OUT_BELOW__
        
 EOF
     )
@@ -345,7 +345,7 @@ shift;
                 (    argstring= summary=                  
                     . $opt_metadata ; # Read the option's metadata.                    
                     [ -n "${SHORT}" ] && {                    
-                       argstring=$(printf ' -%s|--%s' "$SHORT" "$NAME")
+                       argstring=$(printf ' --%s|-%s'  "$NAME" "$SHORT")
                     } || {
                        argstring=$(printf " --%s" "$NAME" )
                     }	  
@@ -423,7 +423,7 @@ else
     # Generate execution metadata for the replay file.
     # This metadata describes the command execution context and is
     # sufficient to re-execute the command.
-    # Output from the execution is delimited by `__LOG_BELOW__`.
+    # Output from the execution is delimited by `__COMMAND_OUT_BELOW__`.
     rerun_catReplayMetadata $@ > ${LOG%*.running}.metadata || die "Failed generating replay log."
     REPLAYLOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.replay
     cat ${LOG%*.running}.metadata $LOG > $REPLAYLOG || die "Failed generating replay log."

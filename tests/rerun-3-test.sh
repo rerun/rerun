@@ -18,7 +18,7 @@ rerun() {
 rerun_extractLog() {
 	file=$1
 	[ -f $file ] || die "file does not exist: $file"
-	SIZE=$(awk '/^__LOG_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
+	SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
 	tail -n+$SIZE $file || die "failed extracting log"
 }
 

@@ -54,7 +54,7 @@ it_displays_command_listing() {
     rerun freddy > $OUT
     head -1 $OUT | grep -q "Available commands in module"
     grep -q 'dance: "tell freddy to dance"' $OUT
-    grep -q '\[ -j|--jumps <3>]: "jump #num times"' $OUT
+    grep -q '\[ --jumps|-j <3>]: "jump #num times"' $OUT
     rm $OUT
 }
 
