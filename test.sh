@@ -3,8 +3,8 @@
 set -e
 
 unset RERUN_COLOR
-RERUN=`pwd`/rerun
-RERUN_MODULES=`pwd`/modules
+export RERUN=`pwd`/rerun
+export RERUN_MODULES=`pwd`/modules
 
 autoreconf --install 
 ./configure 
