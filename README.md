@@ -59,14 +59,14 @@ for additional documentation including:
 `-h`
 : Print help and usage then exit.
 
-`--replay *LOG*`
-: Compare the results of a _command_ execution to that in a replay log and show the difference in output if any.
-
 `-M` *DIRECTORY*
 : Module library directory path.
 
 `-L` *DIRECTORY*
 : Recorded _command_ execution logs stored in this directory. Also settable via `RERUN_LOGS`.
+
+`--replay *LOG*`
+: Compare the results of a _command_ execution to that in a replay log and show the difference in output if any.
 
 `-v` 
 : Execute _command_ in verbose mode. 
@@ -223,34 +223,6 @@ Run the `freddy:dance` command in the archive:
 See `stubbs:archive` for further information about creating and 
 understanding rerun archives.
 
-### Replay
-
-Rerun supports basic command replay logging (See "Logs" section below).
-When rerun logs a command it does so in a form that can be re-executed 
-(i.e., "replayed"). It's possible to have rerun compare the results of a 
-given replay log against a new command execution.
-Replay logs are normally found in the directory specified by the `RERUN_LOGS`
-environment variable (or the `-L <dir>` option).
-
-Use the `--replay <log>` option to compare replay output from a command log.
-
-Below you can see the results of a comparison between this run of
-`freddy:dance --jumps 2`  against an earlier command execution. 
-After the command completes, rerun uses the `diff` command 
-to compare the log output.
-
-	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance --jumps 2
-	jumps (2)
-	[diff]
-	2c2
-	< jumps ()
-	---
-	> jumps (2)
-
-In this case, the replay contained "jumps ()" while the new
-execution printed "jumps (2)".
-When a difference is detected, `rerun` will print the differences
-below the `[diff]` label and exit with a non-zero exit status.
 
 # LOGS
 
@@ -282,7 +254,7 @@ To list the replay logs for the `freddy:dance` command use `ls`:
 Replay logs follow a simple format that combines 
 command execution metadata and log output.
 
-metadata:
+Replay log metadata:
 
 * RERUN: The rerun executable
 * MODULE: The module name
@@ -336,6 +308,34 @@ Running this shell function for a given replay log looks similar to this:
 
 	jumps (1)
 
+## Replay
+
+Rerun supports basic command replay logging (See "Logs" section below).
+When rerun logs a command it does so in a form that can be re-executed 
+(i.e., "replayed"). It's possible to have rerun compare the results of a 
+given replay log against a new command execution.
+Replay logs are normally found in the directory specified by the `RERUN_LOGS`
+environment variable (or the `-L <dir>` option).
+
+Use the `--replay <log>` option to compare replay output from a command log.
+
+Below you can see the results of a comparison between this run of
+`freddy:dance --jumps 2`  against an earlier command execution. 
+After the command completes, rerun uses the `diff` command 
+to compare the log output.
+
+	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance --jumps 2
+	jumps (2)
+	[diff]
+	2c2
+	< jumps ()
+	---
+	> jumps (2)
+
+In this case, the replay contained "jumps ()" while the new
+execution printed "jumps (2)".
+When a difference is detected, `rerun` will print the differences
+below the `[diff]` label and exit with a non-zero exit status.
 
 # MODULES
 
@@ -457,13 +457,16 @@ To create modules, see
 # ERROR CODE
 
 `0`
-: All commands executed successfully
+: All commands executed successfully.
 
 `1`
-: One or more commands failed
+: One or more commands failed.
+
+`2`
+: Option error.
 
 `127`
-: Unknown error case
+: Unknown error case.
 
 # LICENSE
 
