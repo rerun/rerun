@@ -1,0 +1,7 @@
+NAME=long
+DESCRIPTION="long option name"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=
+SHORT=
+RANGE=
