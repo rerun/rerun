@@ -39,7 +39,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:rm-option"
+describe "rm-option"
 
 # Run it in interactive mode.
 it_runs_interactively() {

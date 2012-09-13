@@ -8,9 +8,10 @@
 #
 #   add command to module
 #
+#/ usage: stubbs:add-command  --command|-c <> --module|-m <> [-overwrite] [-template <>]
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
 
 
 # Init the handler
@@ -22,36 +23,37 @@ TEMPLATE=$RERUN_MODULES/stubbs/templates/default.sh
 while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
-        # options without arguments
+    # options without arguments
 	# options with arguments
 	-c|--command)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    COMMAND="$2"
 	    shift
 	    ;;
 	--description)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    DESC="$2"
 	    shift
 	    ;;
 	-m|--module)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
 	    shift
 	    ;;
 	--overwrite)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    OVERWRITE="$2"
 	    shift
 	    ;;
 	-t|--template)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    TEMPLATE="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    rerun_option_error
+	    rerun_option_usage
+        exit 2
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -81,13 +83,13 @@ done
 }
 
 [ ! -r "$TEMPLATE" ] && {
-    rerun_die "TEMPLATE does not exist: $TEMPLATE"
+    rerun_option_error "TEMPLATE does not exist: $TEMPLATE"
 }
 
 # Create command structure
 mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die
 
-VARIABLES=$(generate_optionVariableSummary $RERUN_MODULES $MODULE $COMMAND)
+VARIABLES=$(list_optionVariables $RERUN_MODULES $MODULE $COMMAND)
 
 # Generate a boiler plate implementation
 [ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh -o -n "$OVEWRITE" ] && {

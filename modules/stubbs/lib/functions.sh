@@ -2,29 +2,54 @@
 # common rerun functions
 #
 
-#
-# colorizing functions
-#
-# bold - bold the given text
-bold() { echo -e "\033[1m$*\033[0m" ; reset ; }
-# reset the terminal
-reset () { tput sgr0 ; }
 
-# print error message and exit
+# __Colorizing functions__
+
+# Unset `RERUN_COLOR` to disable.
+txtrst () { tput sgr0 ; }
+bold() { echo -e "\033[1m$*\033[0m" ; txtrst ; }
+dim() { tput dim ; echo " $*" ; txtrst ; }
+[ -n "$RERUN_COLOR" ] && {
+    ul="\033[4m" ; _ul="\033[0m" ; # underline
+    gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
+    red="\033[31m" ; _red="\033[0m" ; # red
+    bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
+}
+
+
+# Print the message and exit.
+# Use text effects if `RERUN_COLOR` environment variable set.
 rerun_die() {
-    [[ "$RERUN_COLOR" == "true" ]] && bold "$*" >&2 || echo "$*" >&2
+    if [[ "$RERUN_COLOR" == "true" ]]
+    then echo -e ${red}"ERROR: $*"${_red} >&2 
+    else echo "ERROR: $*" >&2
+    fi
     exit 1
 }
 
 # print USAGE and exit
 rerun_option_error() {
-    echo "$*" >&2
+    if [[ "$RERUN_COLOR" == "true" ]]
+    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
+    else echo "SYNTAX: $*" >&2
+    fi
     exit 2
 }
 
 # check option has its argument
 rerun_option_check() {
-    [ "$1" -lt 2 ] && rerun_option_error
+    [ "$1" -lt 2 ] && {
+        rerun_option_error "option requires argument: $2"
+    }
+}
+
+# print USAGE and exit
+rerun_option_usage() {
+    if [ -f $0 ]
+    then grep '^#/ usage:' <"$0" | cut -c4- >&2
+    else echo "usage: check command for usage." >&2
+    fi
+    return 2
 }
 
 # Bootstrap a command handler
@@ -258,9 +283,9 @@ EOF
     # generated to stdout
 }
 
-add_optionVariableSummary() {
+list_optionVariables() {
     [ $# = 3 ] || { 
-        echo "usage add_optionVariableSummary <moddir> <module> <command>" 
+        echo "usage list_optionVariables <moddir> <module> <command>" 
         return 1 ; 
     }
     local moddir=$1 module=$2 command=$3
@@ -277,7 +302,7 @@ rerun_rewriteCommandScriptHeader() {
         return 1 ; 
     }
     local moddir=$1 module=$2 command=$3
-    local variables=$(add_optionVariableSummary $moddir $module $command) || rerun_die
+    local variables=$(list_optionVariables $moddir $module $command) || rerun_die
     local usage=$(add_commandUsage $moddir $module $command) || rerun_die
     local commandScript=$moddir/$module/commands/$command/default.sh
     [ ! -f "$commandScript" ] && {

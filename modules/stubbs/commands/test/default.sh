@@ -8,6 +8,7 @@
 #
 #   run module test scripts
 #
+#/ usage: stubbs:test --module|-m <> [--plan|-p <*>] [--logs <>] 
 
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
@@ -22,19 +23,20 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	    -m|--module)
-	        rerun_option_check "$#"
+	        rerun_option_check "$#" "$1"
 	        MODULE="$2"
 	        shift
 	        ;;
-	    -c|--command)
-	        rerun_option_check "$#"
-	        COMMAND="${2}-*"
+	    -p|--plan)
+	        rerun_option_check "$#" "$1"
+	        PLAN="${2}-*"
 	        shift
 	        ;;
 
     # unknown option
 	    -?)
-	        echo "$USAGE" >&2 ; exit 2 ;
+	        rerun_option_usage
+            exit 2
 	        ;;
 	  # end of options, just arguments left
 	    *)
@@ -43,8 +45,8 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-[ -z "$MODULE" ] &&  { echo "missing required option: --module" >&2; exit 2 ; }
-[ -z "$COMMAND" ] && COMMAND="*"
+[ -z "$MODULE" ] &&  { rerun_option_error "missing required option: --module"; }
+[ -z "$PLAN" ] && PLAN="*"
 
 if [ ! -d "$RERUN_MODULES/$MODULE/tests" ]
 then
@@ -53,7 +55,7 @@ then
 fi
 
 echo "========================================================="
-echo " Module: $MODULE"
+echo " TESTING MODULE: $MODULE "
 echo "========================================================="
 (
     # Resolve relative path to rerun
@@ -68,7 +70,7 @@ echo "========================================================="
 
     # Run the tests
     #
-    $ROUNDUP $COMMAND-test.sh
+    $ROUNDUP $PLAN-test.sh
 ) 
 
 # Done

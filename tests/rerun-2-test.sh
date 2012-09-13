@@ -23,7 +23,7 @@ describe "rerun(2) Use external module directory"
 it_fails_with_invalid_modules_dir() {
     # Check for expected error message.
     rerun -M /garbage/path 2>&1 | \
-        grep "ERROR: RERUN_MODULES not set to an existing directory: /garbage/path"
+        grep "ERROR: RERUN_MODULES directory not found or does not exist: /garbage/path"
 }
 
 it_displays_modules_when_no_arguments() {

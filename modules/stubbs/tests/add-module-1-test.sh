@@ -21,7 +21,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:add-module"
+describe "add-module"
 
 
 it_runs_interactively() {

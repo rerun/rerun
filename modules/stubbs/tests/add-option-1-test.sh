@@ -38,7 +38,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:add-option"
+describe "add-option"
 
 
 it_runs_interactively() {

@@ -8,6 +8,7 @@
 #
 #   add a command option
 #
+#/ usage: stubbs:add-option [--arg <false>] --command|-c <> [--default|-d <>] --description <> [--long <>] --module|-m <> --option|-o <> [--required <false>] [--short <>]
 
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
@@ -23,17 +24,17 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-o|--option)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    OPTION="$2"
 	    shift
 	    ;;
 	--desc*)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    DESC="$2"
 	    shift
 	    ;;
 	-c|--command)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 		# Parse if command is named "module:command"
 	 	regex='([^:]+)(:)([^:]+)'
 		if [[ $2 =~ $regex ]]
@@ -46,38 +47,34 @@ while [ "$#" -gt 0 ]; do
 	    shift
 	    ;;
 	-m|--module)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
 	    shift
 	    ;;
 	--req*)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    REQ="$2"
 	    shift
 	    ;;
 	--arg*)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    ARGS="$2"
 	    shift
 	    ;;
 	--long)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    LONG="$2"
 	    shift
-	    ;;
-	-range)
-	    rerun_option_check "$#"
-	    RANGE="$2"
-	    shift
-	    ;;			
+	    ;;	
 	-d|--default)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    DEFAULT="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    rerun_option_error
+	    rerun_option_usage
+        exit 2
 	    ;;
 	  # end of options, just arguments left
 	*)
@@ -86,16 +83,6 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-# Post process the options
-[ -z "$OPTION" ] && {
-    echo "Option: "
-    read OPTION
-}
-
-[ -z "$DESC" ] && {
-    echo "Description: "
-    read DESC
-}
 
 [ -z "$MODULE" ] && {
     echo "Module: "
@@ -115,6 +102,23 @@ done
     done
 }
 
+# Verify this command exists
+#
+[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || {
+    rerun_option_error "command not found: \""$MODULE:$COMMAND\"""
+}
+
+# Post process the options
+[ -z "$OPTION" ] && {
+    echo "Option: "
+    read OPTION
+}
+
+[ -z "$DESC" ] && {
+    echo "Description: "
+    read DESC
+}
+
 [ -z "$REQ" ] && {
     echo "Required (true/false): "
     select REQ in true false;
@@ -123,16 +127,9 @@ done
     done
 }
 
-
 [ -z "$DEFAULT" ] && {
     echo "Default: "
     read DEFAULT
-}
-
-# Verify this command exists
-#
-[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || {
-    rerun_die "command does not exist: \""$MODULE:$COMMAND\"""
 }
 
 # Generate metadata for new option
@@ -148,7 +145,6 @@ REQUIRED=${REQ:-true}
 SHORT=${OPTION:0:1}
 LONG=${LONG:-$OPTION}
 DEFAULT=$DEFAULT
-RANGE=$RANGE
 
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option || rerun_die

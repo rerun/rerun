@@ -8,6 +8,7 @@
 #
 #   add a new module
 #
+#/ usage: stubbs:add-module  --module|-m <> --description <>
 
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
@@ -21,18 +22,19 @@ while [ "$#" -gt 0 ]; do
         # options without arguments
 	# options with arguments
 	-m|--module)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
 	    shift
 	    ;;
 	--description)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    DESC="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    rerun_option_error
+	    rerun_option_usage
+        exit 2
 	    ;;
 	  # end of options, just arguments left
 	*)

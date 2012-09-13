@@ -26,7 +26,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:docs"
+describe "docs"
 
 
 it_runs_interactively() {

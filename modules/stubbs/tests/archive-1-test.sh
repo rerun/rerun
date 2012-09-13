@@ -30,7 +30,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:archive"
+describe "archive"
 
 
 it_runs_without_options() {

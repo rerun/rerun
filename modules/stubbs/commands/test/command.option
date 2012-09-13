@@ -1,8 +1,0 @@
-NAME=command
-DESCRIPTION="the command name"
-ARGUMENTS=true
-REQUIRED=false
-DEFAULT=
-SHORT=c
-LONG=command
-RANGE=

@@ -8,6 +8,7 @@
 #
 #   remove a command option
 #
+#/ usage: stubbs:rm-option --command|-c <> --module|-m <> --option|-o <>
 
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
@@ -22,12 +23,12 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
 	# options with arguments
 	-o|--option)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    OPTION="$2"
 	    shift
 	    ;;
 	-c|--command)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 		# Parse if command is named "module:command"
 	 	regex='([^:]+)(:)([^:]+)'
 		if [[ $2 =~ $regex ]]
@@ -40,13 +41,14 @@ while [ "$#" -gt 0 ]; do
 	    shift
 	    ;;
 	-m|--module)
-	    rerun_option_check "$#"
+	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
 	    shift
 	    ;;
         # unknown option
 	-?)
-	    rerun_option_error
+	    rerun_option_usage
+        exit 2
 	    ;;
 	  # end of options, just arguments left
 	*)

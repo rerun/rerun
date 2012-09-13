@@ -8,6 +8,7 @@
 #
 #   Build a self extracting archive
 #
+#/ usage: stubbs:archive [ --file|-f <>] --modules <*> [ --version|-v <>]
 
 # Source common function library
 source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
@@ -25,7 +26,7 @@ CWD=$(pwd); #remember current working directory.
 # Prepend curren working directory if relative file path.
 [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
-[ ! -d $(dirname ${FILE}) ] && rerun_die "directory not found: $(dirname ${FILE})"
+[ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
 
 # Default version to blank if unspecified.
 [ -z "${VERSION}" ] && VERSION=

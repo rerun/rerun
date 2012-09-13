@@ -19,7 +19,7 @@ after() {
 # The Plan
 # --------
 
-describe "stubbs functional tests"
+describe "functional: integration and functional tests"
 
 it_builds_a_functional_module() {
     # Create module: freddy

@@ -16,7 +16,7 @@ rerun() {
 # The Plan
 # --------
 
-describe "@MODULE@:@COMMAND@"
+describe "@COMMAND@"
 
 it_runs_without_arguments() {
     rerun @MODULE@:@COMMAND@

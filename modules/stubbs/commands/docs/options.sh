@@ -3,8 +3,10 @@
 
 # print USAGE and exit
 rerun_option_error() {
-    [ -z "$USAGE"  ] && echo "$USAGE" >&2
-    [ -z "$SYNTAX" ] && echo "$SYNTAX $*" >&2
+    if [[ "$RERUN_COLOR" == "true" ]]
+    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
+    else echo "SYNTAX: $*" >&2
+    fi
     exit 2
 }
 

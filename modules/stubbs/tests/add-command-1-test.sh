@@ -32,7 +32,7 @@ validate() {
 # The Plan
 # --------
 
-describe "stubbs:add-command"
+describe "add-command"
 
 
 it_runs_interactively() {
