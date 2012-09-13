@@ -125,6 +125,18 @@ rerun:options:remaining()
     list:subtract "$options" "$used"
 }
 
+rerun:parse:module() 
+{
+    local cmdline=$@
+    local module
+    local regex="[ ]+--module[ ]([[:alnum:]]+)[ ]*"
+    if [[ "$cmdline" =~ $regex ]]
+    then
+        module=${BASH_REMATCH[1]}
+    fi
+    echo $module
+}
+
 #
 # _rerun - program completion for the `rerun` command.
 #
@@ -206,7 +218,16 @@ _rerun() {
                         --module)
                             # module completion
                             modules=$(rerun:modules)
+
                             COMPREPLY=( $(compgen -W "$modules" -- ${cur}) ) ;;
+                        --command)
+                            # command completion
+                            module=$(rerun:parse:module ${COMP_WORDS[*]} )
+                            [ -n "$module" ] && {
+                                commands=$(rerun:module:commands ${module})
+                                COMPREPLY=( $(compgen -W "$commands" -- ${cur}) ) 
+                            }
+                            ;;
                     esac
                     return 0
             	fi
