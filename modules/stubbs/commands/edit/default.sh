@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+#
+# NAME
+#
+#   edit
+#
+# DESCRIPTION
+#
+#   edit a command script
+#
+#/ usage: stubbs:edit --command|-c <> --module|-m <> 
+
+# Source common function library
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
+
+
+# Init the handler
+rerun_init 
+
+# Get the options
+while [ "$#" -gt 0 ]; do
+    OPT="$1"
+    case "$OPT" in
+	# options with arguments
+	-c|--command)
+	    rerun_option_check "$#" "$1"
+		# Parse if command is named "module:command"
+	 	regex='([^:]+)(:)([^:]+)'
+		if [[ $2 =~ $regex ]]
+		then
+			MODULE=${BASH_REMATCH[1]}
+			COMMAND=${BASH_REMATCH[3]}
+		else
+	    	COMMAND="$2"		
+	    fi
+	    shift
+	    ;;
+	-m|--module)
+	    rerun_option_check "$#" "$1"
+	    MODULE="$2"
+	    shift
+	    ;;
+        # unknown option
+	-?)
+	    rerun_option_usage
+        exit 2
+	    ;;
+	  # end of options, just arguments left
+	*)
+	    break
+    esac
+    shift
+done
+
+# Post process the options
+
+[ -z "$MODULE" ] && {
+    echo "Module: "
+    select MODULE in $(rerun_modules $RERUN_MODULES);
+    do
+	echo "You picked module $MODULE ($REPLY)"
+	break
+    done
+}
+
+[ -z "$COMMAND" ] && {
+    echo "Command: "
+    select COMMAND in $(rerun_commands $RERUN_MODULES $MODULE);
+    do
+	echo "You picked command $COMMAND ($REPLY)"
+	break
+    done
+}
+
+# Verify this command exists
+#
+[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || {
+    rerun_die "command not found: \""$MODULE:$COMMAND\"""
+}
+
+[ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh ] && {
+    rerun_die "command script not found for $MODULE:$COMMAND. Create one with stubbs:add-command."
+}
+
+# Open the the command script
+
+: ${EDITOR:=vi}
+
+exec $EDITOR $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh
+
+# Done
+
+
