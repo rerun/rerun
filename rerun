@@ -111,7 +111,11 @@ die() {
 
 # Print USAGE and exit.
 rerun_syntax_error() {
-    die "$USAGE"
+    if [[ "$RERUN_COLOR" == "true" ]]
+    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
+    else echo "ERROR: $*" >&2
+    fi
+    exit 2
 }
 
 # Check option has an argument.
@@ -293,7 +297,7 @@ shift;
 
 # Ensure the modules directory path is defined and is a directory.
 [ -n "$RERUN_MODULES" -a -d "$RERUN_MODULES" ] || {
-    die "RERUN_MODULES not set to an existing directory: $RERUN_MODULES"
+    die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
 }
 
 
@@ -385,7 +389,7 @@ shift;
 #  Exit, if the command script is not found.
 # User specified a command that did not exist in the RERUN_MODULES directory.
 ! rerun_existsCommandScript $MODULE $COMMAND && {
-    die command not found: \"$MODULE:$COMMAND\"
+    rerun_syntax_error command not found: \"$MODULE:$COMMAND\"
 }
 
 # Ready to run. Export rerun executable environment.
@@ -449,8 +453,6 @@ else
 
     if [ -n "$REPLAY" ]
     then
-
-
         rerun_extractLog $REPLAY > $RERUN_LOGS/rerun-$$.checklog
         rerun_extractLog $LOG > $RERUN_LOGS/rerun-$$.log
         
