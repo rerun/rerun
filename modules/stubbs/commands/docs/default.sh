@@ -8,6 +8,8 @@
 #
 #   generate the docs
 #
+#/ usage: stubbs:docs --module|-m <>
+
 
 # Parse the command options
 [ -r $RERUN_MODULES/stubbs/commands/docs/options.sh ] && {
