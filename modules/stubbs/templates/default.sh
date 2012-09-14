@@ -7,7 +7,9 @@
 #/ variables: @VARIABLES@
 
 # Read module function library.
-source $RERUN_MODULES/@MODULE@/lib/functions.sh || { echo "Failed loading function library" >&2 ; exit 1 ; }
+source $RERUN_MODULES/@MODULE@/lib/functions.sh || { 
+  echo "Failed loading function library" >&2 ; exit 1 ; 
+}
 
 # Parse the command options.
 [ -r $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh ] && {
