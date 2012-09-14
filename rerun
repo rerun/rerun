@@ -84,14 +84,14 @@ man() {
         die "wrong # args: should be: man module" 
     }
     local module=$1
-    if [ ! -f $RERUN_MODULES/$module/$module.1 \
-           -a -f $RERUN_MODULES/stubbs/commands/docs/default.sh ]
+    if [ ! -f "$RERUN_MODULES/$module/$module.1" \
+           -a -f "$RERUN_MODULES/stubbs/commands/docs/default.sh" ]
     then
        $RERUN stubbs:docs --module $module 
     fi
-    if [ -f $RERUN_MODULES/$module/$module.1 ]
+    if [ -f "$RERUN_MODULES/$module/$module.1" ]
     then
-        nroff -man $RERUN_MODULES/$module/$module.1 | ${PAGER:-more}
+        nroff -man "$RERUN_MODULES/$module/$module.1" | ${PAGER:-more}
     else
         echo "Manual could not be generated." >&2
     fi
@@ -163,7 +163,7 @@ rerun_existsModule() {
 	    die 'wrong # args: should be: rerun_existsModule module'
     }
     local module=$1
-    [ -f $RERUN_MODULES/$module/metadata ] && return 0 || return 1
+    [ -f "$RERUN_MODULES/$module/metadata" ] && return 0 || return 1
 }
 
 # Extract the log data from the replay log file.
@@ -274,8 +274,7 @@ done
 
 # Replay requires that a log directory is also set.
 [ -n "$REPLAY" -a -z "$RERUN_LOGS" ] && {
-    echo "Usage error: --replay <file> also requires -L <dir>" >&2 ; 
-    exit 2
+    rerun_syntax_error "usage error: --replay <file> also requires -L <dir>" 
 }
 
 # __Parse rerun command and their options__
@@ -317,7 +316,8 @@ shift;
 # module's name and description.
 # Modules are read from the directory referenced 
 # using the `$RERUN_MODULES` environment variable.
-[ -z "$MODULE" -a -z "$COMMAND" ] && {
+if [ -z "$MODULE" -a -z "$COMMAND" ]
+then
     echo -e $gray"Available modules in \"$RERUN_MODULES\":"$_gray
     for module in $RERUN_MODULES/*; do
        	$(rerun_existsModule $(basename $module)) && {
@@ -327,24 +327,25 @@ shift;
         }
     done
     exit 0
-}
+fi
 
 # __Command listing__ 
 
 # If a module name is specified, show the command set.
 # For each command, show that command's option list in summary form
 # displaying requirement, name, flags, defaults and description.
-[ -n "$MODULE" -a -z "$COMMAND" ] && {
-    $(rerun_existsModule $MODULE) || die "module not found: $MODULE"
+if [ -n "$MODULE" -a -z "$COMMAND" ] 
+then
+    $(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
     echo -e $gray"Available commands in module, \"$RERUN_MODULES/$MODULE\":"$_gray
     shopt -s nullglob # enable
     for cmd in $RERUN_MODULES/$MODULE/commands/*/default.sh
 	do
         cmd_name=$(basename $(dirname $cmd))
         cmd_metadata=$RERUN_MODULES/$MODULE/commands/${cmd_name}/metadata
-        [ -f $cmd_metadata ] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
+        [ -f "$cmd_metadata" ] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
         bold "${cmd_name}: ${cmd_desc}"
-        if [ -d $RERUN_MODULES/$MODULE/commands/${cmd_name} ]
+        if [ -d "$RERUN_MODULES/$MODULE/commands/${cmd_name}" ]
         then            
             shopt -s nullglob # enable
             optfiles=( $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option )
@@ -371,7 +372,7 @@ shift;
         fi
     done
     exit 0
-}
+fi
 
 # Command Execution
 # -----------------
