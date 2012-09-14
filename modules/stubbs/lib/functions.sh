@@ -244,6 +244,15 @@ rerun_option_usage() {
     return 2
 }
 
+# print SYNTAX and exit
+rerun_option_error() {
+    if [[ "\$RERUN_COLOR" == "true" ]]
+    then echo -e "${red}""SYNTAX: \$*""${_red}" >&2
+    else echo "SYNTAX: \$*" >&2
+    fi
+    exit 2
+}
+
 # check option has its argument
 rerun_option_check() {
     [ "\$1" -lt 2 ] && rerun_option_usage
