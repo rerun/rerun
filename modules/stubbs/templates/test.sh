@@ -1,9 +1,9 @@
 #!/usr/bin/env roundup
 #
-# This file contains test scripts to run for the @COMMAND@ command.
-# Execute it by invoking: 
+# This file contains the test plan for the @COMMAND@ command.
+# Execute the plan by invoking: 
 #    
-#     rerun stubbs:test -m @MODULE@ -c @COMMAND@
+#     rerun stubbs:test -m @MODULE@ -p @COMMAND@
 #
 
 # Helpers
