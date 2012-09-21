@@ -743,6 +743,17 @@ install-data-hook:
 	cp -p $(srcdir)/bash_completion.sh \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
 
+#
+# Testing targets
+#
+
+test: test-rerun test-stubbs
+test-rerun:
+	@echo "Testing rerun ..."
+	cd ./tests && ../modules/stubbs/lib/roundup
+test-stubbs:
+	@echo "Testing stubbs module..."
+	./rerun stubbs:test --module stubbs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
