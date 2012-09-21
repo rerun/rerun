@@ -1,5 +1,5 @@
-AC_INIT([rerun], [0.1], [rerun-discuss@googlegroups.com],
-             [rerun], [https://github.com/dtolabs/rerun/wiki])
+AC_INIT([rerun], [0.9], [rerun-discuss@googlegroups.com],
+             [rerun], [https://github.com/rerun/rerun/wiki])
 
 dnl Created by thompson@dtosolutions, 27SEP11
 AC_PREREQ([2.61])
