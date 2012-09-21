@@ -1,11 +1,11 @@
-.TH stubbs 1 "Mon Sep 10 15:29:54 PDT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Thu Sep 13 18:51:22 PDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
 .SH SYNOPSIS
 .PP
 \f[CR] 
-rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | test ] [OPTIONS]
+rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | rm-option | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
 .SH stubbs:add-command \f[]--command <> --desc <> --module <> --overwrite <false> --template <$RERUN_MODULES/stubbs/templates/default.sh>
@@ -138,7 +138,7 @@ arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \--modules \f[]"module glob list"\f[]
+.B \--modules \f[]"modules glob pattern"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 , default: \f[I]"*"\f[]
@@ -160,16 +160,48 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:test \f[][--command <>] [--logs <>] --module <>
-"run module test scripts"
+.SH stubbs:edit \f[]--command <> --module <>
+"edit a command script"
 .PP
 \f[I]OPTIONS\f[]
 .TP
 .B \--command \f[]"the command name"\f[]
-required: \f[I]false\f[] ,
+required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:rm-option \f[]--command <> --module <> --option <>
+"remove a command option"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--command \f[]"the command name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--option \f[]"the option name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:test \f[][--logs <>] --module <> [--plan <>]
+"run module test scripts"
+.PP
+\f[I]OPTIONS\f[]
 .TP
 .B \--logs \f[]"logs directory"\f[]
 required: \f[I]false\f[] ,
@@ -179,6 +211,12 @@ arguments: \f[I]true\f[]
 .TP
 .B \--module \f[]"the module name"\f[]
 required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--plan \f[]"the test plan"\f[]
+required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
