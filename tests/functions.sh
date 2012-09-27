@@ -77,7 +77,7 @@ EOF
 source  $moddir/freddy/commands/study/options.sh || exit 2
 echo "studying (\$SUBJECT)"
 EOF
-    # freddy:dance [-s|--subject <>]
+    # freddy:study [-s|--subject <>]
     cat > $moddir/freddy/commands/dance/subject.option <<EOF
 NAME=subject
 DESCRIPTION="subject to study"
