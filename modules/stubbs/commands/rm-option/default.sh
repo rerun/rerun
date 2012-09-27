@@ -99,12 +99,24 @@ then
     echo "Removed $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option"
 fi
 
-# Regenerate the option.sh
 
 # Generate option parser script.
 rerun_generateOptionsParser $RERUN_MODULES $MODULE $COMMAND > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
 echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 
+# Update variable summary in command script.
+commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh
+if [ -f "$commandScript" ]
+then
+    rerun_rewriteCommandScriptHeader \
+        $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
+        rerun_die "Error updating command script header"
+    }
+    mv $commandScript.$$ $commandScript || {
+        rerun_die "Error updating command script header"
+    }
+    echo "Updated command script header: $commandScript"
+fi
 # Done
 
 
