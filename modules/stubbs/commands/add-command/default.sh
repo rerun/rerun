@@ -98,6 +98,7 @@ VARIABLES=$(list_optionVariables $RERUN_MODULES $MODULE $COMMAND)
 	-e "s/@DESCRIPTION@/$DESC/g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh || rerun_die
+    chmod +x $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh || rerun_die
     echo "Wrote command script: $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh"
 }
 
