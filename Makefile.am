@@ -91,3 +91,16 @@ test-rerun:
 test-stubbs:
 	@echo "Testing stubbs module..."
 	./rerun stubbs:test --module stubbs
+
+#
+# RPM packaging target:
+#
+rpmbuild:
+	@echo "Packaging rerun as an RPM ..."
+	[ -n "${RELEASE}" ] || RELEASE=1
+	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
+	if [ -n "${RELEASE}" ]; then \
+	  rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec; \
+	else \
+	  rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release 1" -bb --clean SPECS/rerun.spec; \
+	fi
