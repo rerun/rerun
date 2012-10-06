@@ -12,6 +12,7 @@ EXTRA_DIST = setup.sh bash_completion.sh
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
+docdir = ${datadir}/doc/${PACKAGE} 
 dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
 
 # the main script
