@@ -100,6 +100,6 @@ RELEASE ?= 1
 
 rpmbuild:
 	@echo "Packaging rerun as an RPM ..."
-	mkdir -p SOURCES BUILD
+	mkdir -p SOURCES BUILD BUILDROOT RPMS
 	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
-	rpmbuild --target noarch --define "_topdir ${PWD}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec
+	rpmbuild --target noarch --buildroot ${PWD}/BUILDROOT/rerun-${VERSION}-${RELEASE}.noarch --define "_topdir ${PWD}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec

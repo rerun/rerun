@@ -28,6 +28,7 @@ A simple command runner because it's easy to forget standard operating procedure
 %build
  
 %install
+echo "Building in: \"%{buildroot}\""
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}/usr/bin
 mv %{_builddir}/rerun-%{version}/rerun %{buildroot}/usr/bin
