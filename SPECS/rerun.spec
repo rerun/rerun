@@ -10,7 +10,7 @@ Release: %{release}
 Source0: rerun-%{version}.zip
 URL: http://rerun.github.com/rerun
  
-License: LGPL
+License: ASL 2.0
 Group: Applications/System
 
 # Disables debug packages and stripping of binaries:

@@ -93,14 +93,12 @@ test-stubbs:
 	./rerun stubbs:test --module stubbs
 
 #
-# RPM packaging target:
+# RPM packaging target (defaulting the release if none specified externally):
 #
+RELEASE ?= 1
+
 rpmbuild:
 	@echo "Packaging rerun as an RPM ..."
-	[ -n "${RELEASE}" ] || RELEASE=1
+	mkdir -p SOURCES
 	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
-	if [ -n "${RELEASE}" ]; then \
-	  rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec; \
-	else \
-	  rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release 1" -bb --clean SPECS/rerun.spec; \
-	fi
+	rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec
