@@ -39,7 +39,8 @@ mv %{_builddir}/rerun-%{version}/modules %{buildroot}/usr/lib/rerun/modules
 
 %files
 %defattr(-,root,root)
-/
+/usr/bin/rerun
+/usr/lib/rerun
  
 %changelog
 
