@@ -102,4 +102,4 @@ rpmbuild:
 	@echo "Packaging rerun as an RPM ..."
 	mkdir -p SOURCES
 	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
-	rpmbuild --target noarch --define "_topdir ${abs_srcdir}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec
+	rpmbuild --target noarch --define "_topdir ${PWD}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec
