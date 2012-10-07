@@ -12,6 +12,7 @@ EXTRA_DIST = setup.sh bash_completion.sh
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
+docdir = ${datadir}/doc/${PACKAGE} 
 dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
 
 # the main script
@@ -91,3 +92,14 @@ test-rerun:
 test-stubbs:
 	@echo "Testing stubbs module..."
 	./rerun stubbs:test --module stubbs
+
+#
+# RPM packaging target (defaulting the release if none specified externally):
+#
+RELEASE ?= 1
+
+rpmbuild:
+	@echo "Packaging rerun as an RPM ..."
+	mkdir -p SOURCES BUILD BUILDROOT RPMS
+	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
+	rpmbuild --target noarch --buildroot ${PWD}/BUILDROOT/rerun-${VERSION}-${RELEASE}.noarch --define "_topdir ${PWD}" --define "version ${VERSION}" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec

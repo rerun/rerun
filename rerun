@@ -238,9 +238,17 @@ answerOptions() {
 # and command options.
 
 # Check for the `RERUN_MODULES` environment variable 
-# otherwise set module directory relative to the `rerun` executable.
 [ -n "$RERUN_MODULES" ] || {
-    RERUN_MODULES=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)/modules
+    RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+
+    if [ "$RERUN_LOCATION" = "/usr/bin" ]
+    then
+      # Linux FSH convention:
+      RERUN_MODULES="/usr/lib/rerun/modules"
+    else
+      # Set module directory relative to the `rerun` script:
+      RERUN_MODULES=${RERUN_LOCATION}/modules
+    fi
 }
 
 # Clear MODULE and COMMAND in case they were incidentally
