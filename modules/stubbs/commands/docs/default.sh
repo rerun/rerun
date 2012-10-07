@@ -84,7 +84,7 @@ rerun_option_summary() {
 
 [ -f "$RERUN_MODULES/$MODULE/metadata" ] || rerun_die "module not found: $MODULE"
 
-[ -z "$DOC" ] && DOC=$RERUN_MODULES/$MODULE/${MODULE}.1
+
 #
 # Document head
 (
@@ -99,11 +99,11 @@ $MODULE \- $(rerun_module_metadata "description" $MODULE)
 $(basename ${RERUN}) [ARGS] $(rerun_module_synopsys $MODULE) [OPTIONS]
 \f[]
 EOF
-) > $DOC || rerun_die
+) > $FILE || rerun_die
 #
 # COMMANDS section
 #
-echo ".SH COMMANDS" >> $DOC
+echo ".SH COMMANDS" >> $FILE
 for command in $(rerun_commands $RERUN_MODULES $MODULE)
 do
 (
@@ -127,7 +127,7 @@ echo .RS
 echo .RE
 done)
 EOF
-) >> $DOC || rerun_die
+) >> $FILE || rerun_die
 done || rerun_die
 #
 # AUTHORS section
@@ -139,9 +139,19 @@ Successful completion: 0
 .SH AUTHORS
 $USER
 EOF
-) >> $DOC || rerun_die
+) >> $FILE || rerun_die
+#
+# SEE ALSO section
+(
+cat <<EOF
+.SH "SEE ALSO"
+rerun
+.SH KEYWORDS
+$MODULE
+EOF
+) >> $FILE || rerun_die
 
-echo "Generated unix manual: $DOC"
+echo "Generated unix manual: $FILE"
 exit $?
 
 # Done

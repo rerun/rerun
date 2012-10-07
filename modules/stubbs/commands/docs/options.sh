@@ -31,6 +31,7 @@ while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
          -m|--module) rerun_option_check $# ; MODULE=$2 ; shift ;;
+         -f|--file) rerun_option_check $# ; FILE=$2 ; shift ;;
         # unknown option
         -?)
             rerun_option_usage
@@ -43,11 +44,12 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-# If defaultable options variables are unset, set them to their DEFAULT
-
 
 # Post processes the options
 [ -z "$MODULE" ] && {
     echo "Module name: "
     read MODULE
 }
+
+# If defaultable options variables are unset, set them to their DEFAULT
+[ -z "$FILE" ] && FILE=$RERUN_MODULES/$MODULE/${MODULE}.1
