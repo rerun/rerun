@@ -10,7 +10,7 @@
 [ "$1" == '-version' ] && { grep "^# version:" $0|cut -f3 -d" " ; exit 0 ; }
 
 # Function to print error message and exit
-die() { echo "ERROR: $* " ; exit 1 ; }
+die() { echo "ERROR: $* " >&2 ; exit 1 ; }
 
 umask 0002
 
