@@ -110,14 +110,16 @@ die() {
 rerun_syntax_error() {
     if [[ "$RERUN_COLOR" == "true" ]]
     then echo -e ${red}"SYNTAX: $*"${_red} >&2 
-    else echo "ERROR: $*" >&2
+    else echo "SYNTAX: $*" >&2
     fi
     exit 2
 }
 
 # Check option has an argument.
 rerun_syntax_check() {
-    [ "$1" -lt 2 ] && rerun_syntax_error
+    [ "$1" -lt 2 ] && {
+        rerun_syntax_error "option requires argument: $2"
+    }
 }
 
 # Resolve the handler script for specified command in module.
@@ -273,29 +275,29 @@ while [ "$#" -gt 0 ]; do
 	    set -vx
 	    ;;
 	--man*)
-	    rerun_syntax_check "$#"
+	    rerun_syntax_check "$#" "$1"
 	    man $2
 	    exit 0
 	    ;;	
 	-M)
-	    rerun_syntax_check "$#"
+	    rerun_syntax_check "$#" "$1"
 	    RERUN_MODULES="$2"
 	    shift
 	    ;;
 	-L)        
-	    rerun_syntax_check "$#"
+	    rerun_syntax_check "$#" "$1"
 	    RERUN_LOGS="$2" ; # Record log dir.
 	    shift
 	    ;;	
 	--replay)
-	    rerun_syntax_check "$#"
+	    rerun_syntax_check "$#" "$1"
 	    REPLAY="$2"
 	    shift
 	    ;;	
 	--answers)
-	    rerun_syntax_check "$#"
+	    rerun_syntax_check "$#" "$1"
 	    ANSWERS="$2"
-        [ ! -f $ANSWERS ] && die "answers file not found: $ANSWERS"
+        [ ! -f $ANSWERS ] && rerun_syntax_error "answers file not found: $ANSWERS"
 	    shift
 	    ;;	
 	  # Ignore remaining arguments as they are for the module.

@@ -35,7 +35,7 @@ it_displays_help() {
 
 it_displays_usage() {
     usage=$(rerun -help|grep ^Usage)
-    test "$usage" = "Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [options]]]"
+    test "$usage" = "Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [--answer <file>] [module:[command [options]]]"
 }
 
 it_displays_version_and_license() {
