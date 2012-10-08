@@ -22,12 +22,10 @@ describe "rerun(4) Use an answer file"
 
 it_fails_with_missing_answers_file() {
     # Check for expected error message.
-    rerun --answers 2>&1 | \
-        grep "SYNTAX"
+    rerun --answers 2>&1 | grep "SYNTAX: option requires argument: --answers"
 
     # Check for expected error message.
-    rerun --answers foo 2>&1 | \
-        grep "ERROR: answers file not found: foo"
+    rerun --answers foo 2>&1 | grep "SYNTAX: answers file not found: foo"
 }
 
 it_overrides_option_default() {

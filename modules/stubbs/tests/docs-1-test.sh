@@ -38,8 +38,8 @@ EOF
 }
 
 it_runs_fully_optioned() {
-    rerun stubbs:docs --module "stubbs"
+    rerun stubbs:docs --module "stubbs" --file /tmp/stubbs.1
     
-    validate $RERUN_MODULES/stubbs/stubbs.1
+    validate /tmp/stubbs.1
 }
 

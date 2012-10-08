@@ -8,7 +8,7 @@
 # version: @VERSION@
 
 # Function to print error message and exit
-die() { echo "ERROR: $* " ; exit 1 ; }
+die() { echo "ERROR: $* " >&2 ; exit 1 ; }
 
 # Check for required environment variables 
 [ -z "${CWD}" ] && die "CWD not set" ;# user's current working directory
@@ -24,7 +24,7 @@ die() { echo "ERROR: $* " ; exit 1 ; }
 export RERUN_MODULES=$PAYLOAD/rerun/modules
 
 # move into the current working directory
-cd $CWD || die "couldn't change to cwd: $CWD"
+cd $CWD || die "couldn't change to current working directory: $CWD"
 
 # launch it!
 exec $PAYLOAD/rerun/rerun $*
