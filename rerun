@@ -130,8 +130,7 @@ rerun_resolveCommandScript() {
     [ ! $# -eq 2 ] && { 
 	    die 'wrong # args: should be: rerun_resolveCommandScript module command'
     }
-    local module=$1 command=$2
-    local module_dir=$RERUN_MODULES/$module
+    local module_dir=$1 command=$2
     local command_dir=$module_dir/commands/${command}
     local os=$(uname -s)
     if [ -f  "$command_dir/${os}.sh" ]
@@ -144,10 +143,10 @@ rerun_resolveCommandScript() {
 # return 0 if exists, 1 otherwise
 rerun_existsCommandScript() {
     [ ! $# -eq 2 ] && { 
-	    die 'wrong # args: should be: rerun_existsCommandScript module command'
+	    die 'wrong # args: should be: rerun_existsCommandScript module_dir command'
     }
-    local module=$1 command=$2
-    if [ -f "$(rerun_resolveCommandScript $module $command)" ]
+    local module_dir=$1 command=$2
+    if [ -f "$(rerun_resolveCommandScript $module_dir $command)" ]
     then return 0
     else return 1
     fi
@@ -160,7 +159,23 @@ rerun_existsModule() {
 	    die 'wrong # args: should be: rerun_existsModule module'
     }
     local module=$1
-    [ -f "$RERUN_MODULES/$module/metadata" ] && return 0 || return 1
+
+    # Give precedence to finding the module in $RERUN_MODULES:
+    if [ -f "$RERUN_MODULES/$module/metadata" ]
+    then
+       echo $RERUN_MODULES/$module
+       return 0
+    fi
+
+    # If running an installed version of Rerun check the system location for the module:
+    if [ "${RERUN_LOCATION}" = "/usr/bin" -a -f "/usr/lib/rerun/modules/$module/metadata" ]
+    then
+       echo /usr/lib/rerun/modules/$module
+       return 0
+    fi
+
+    echo ""
+    return 1
 }
 
 # Extract the log data from the replay log file.
@@ -239,10 +254,12 @@ answerOptions() {
 # There are two sets of options, `rerun` specific arguments 
 # and command options.
 
+# Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
+# modules located in /usr/lib/rerun/modules are appended to the modules in RERUN_MODULES.
+RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+
 # Check for the `RERUN_MODULES` environment variable 
 [ -n "$RERUN_MODULES" ] || {
-    RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
-
     if [ "$RERUN_LOCATION" = "/usr/bin" ]
     then
       # Linux FSH convention:
@@ -355,12 +372,26 @@ if [ -z "$MODULE" -a -z "$COMMAND" ]
 then
     echo -e $gray"Available modules in \"$RERUN_MODULES\":"$_gray
     for module in $RERUN_MODULES/*; do
-       	$(rerun_existsModule $(basename $module)) && {
+       	module_dir=$(rerun_existsModule $(basename $module)) && {
            module_name=$(basename $module)
            module_desc=$(rerun_metadataLookup DESCRIPTION $module/metadata)
            echo "${PAD}${module_name}: ${module_desc}" 
         }
     done
+
+    if [[ $RERUN_LOCATION = "/usr/bin" && $RERUN_MODULES != "/usr/lib/rerun/modules" ]]
+    then
+      echo
+      echo -e $gray"Available modules in \"/usr/lib/rerun/modules\":"$_gray
+      for module in /usr/lib/rerun/modules/*; do
+                module_dir=$(rerun_existsModule $(basename $module)) && {
+             module_name=$(basename $module)
+             module_desc=$(rerun_metadataLookup DESCRIPTION $module/metadata)
+             echo "${PAD}${module_name}: ${module_desc}" 
+          }
+      done
+    fi
+
     exit 0
 fi
 
@@ -371,19 +402,19 @@ fi
 # displaying requirement, name, flags, defaults and description.
 if [ -n "$MODULE" -a -z "$COMMAND" ] 
 then
-    $(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
-    echo -e $gray"Available commands in module, \"$RERUN_MODULES/$MODULE\":"$_gray
+    module_dir=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
+    echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
     shopt -s nullglob # enable
-    for cmd in $RERUN_MODULES/$MODULE/commands/*/default.sh
+    for cmd in $module_dir/commands/*/default.sh
 	do
         cmd_name=$(basename $(dirname $cmd))
-        cmd_metadata=$RERUN_MODULES/$MODULE/commands/${cmd_name}/metadata
+        cmd_metadata=$module_dir/commands/${cmd_name}/metadata
         [ -f "$cmd_metadata" ] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
         bold "${cmd_name}: ${cmd_desc}"
-        if [ -d "$RERUN_MODULES/$MODULE/commands/${cmd_name}" ]
+        if [ -d "$module_dir/commands/${cmd_name}" ]
         then            
             shopt -s nullglob # enable
-            optfiles=( $RERUN_MODULES/$MODULE/commands/${cmd_name}/*.option )
+            optfiles=( $module_dir/commands/${cmd_name}/*.option )
             for opt_metadata in ${optfiles[*]}; do
                 cmd_param=$(basename $(echo ${opt_metadata%%.option}))
                 (    argstring= summary=                  
@@ -422,9 +453,11 @@ fi
 [ -z "$MODULE"  ]  && rerun_syntax_error "module not specified"
 [ -z "$COMMAND" ]  && rerun_syntax_error "command not specified"
 
+RERUN_MODULE_DIR=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
+
 #  Exit, if the command script is not found.
 # User specified a command that did not exist in the RERUN_MODULES directory.
-! rerun_existsCommandScript $MODULE $COMMAND && {
+! rerun_existsCommandScript $RERUN_MODULE_DIR $COMMAND && {
     rerun_syntax_error command not found: \"$MODULE:$COMMAND\"
 }
 
@@ -435,13 +468,10 @@ then
 fi
 
 # Ready to run. Export rerun executable environment.
-export RERUN RERUN_MODULES
-
-# Setup RERUN_MODULE_DIR:
-export RERUN_MODULE_DIR=$RERUN_MODULES/$MODULE
+export RERUN RERUN_MODULES RERUN_MODULE_DIR
 
 # Lookup the path to the command handler script.
-COMMAND_SCRIPT=$(rerun_resolveCommandScript $MODULE $COMMAND)
+COMMAND_SCRIPT=$(rerun_resolveCommandScript $RERUN_MODULE_DIR $COMMAND)
 
 # If the  `-L` flag is set, record execution.
 if [ -z "$RERUN_LOGS" -o ! -d "$RERUN_LOGS" ]
