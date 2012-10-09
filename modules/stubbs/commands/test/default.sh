@@ -11,7 +11,7 @@
 #/ usage: stubbs:test --module|-m <> [--plan|-p <*>] [--logs <>] 
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
+source $RERUN_MODULE_DIR/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
 
 
 rerun_init
@@ -60,7 +60,7 @@ echo "========================================================="
 (
     # Resolve relative path to rerun
     export RERUN=$(rerun_absolutePath $RERUN)
-    export ROUNDUP=$(rerun_absolutePath $RERUN_MODULES/stubbs/lib/roundup)
+    export ROUNDUP=$(rerun_absolutePath $RERUN_MODULE_DIR/lib/roundup)
 
     # Set modules path
     export RERUN_MODULES=$RERUN_MODULES

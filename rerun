@@ -435,7 +435,11 @@ then
 fi
 
 # Ready to run. Export rerun executable environment.
-export RERUN RERUN_MODULES 
+export RERUN RERUN_MODULES
+
+# Setup RERUN_MODULE_DIR:
+export RERUN_MODULE_DIR=$RERUN_MODULES/$MODULE
+
 # Lookup the path to the command handler script.
 COMMAND_SCRIPT=$(rerun_resolveCommandScript $MODULE $COMMAND)
 

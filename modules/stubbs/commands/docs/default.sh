@@ -12,13 +12,13 @@
 
 
 # Parse the command options
-[ -r $RERUN_MODULES/stubbs/commands/docs/options.sh ] && {
-  source $RERUN_MODULES/stubbs/commands/docs/options.sh
+[ -r $RERUN_MODULE_DIR/commands/docs/options.sh ] && {
+  source $RERUN_MODULE_DIR/commands/docs/options.sh
 }
 
 # Read module function library
-[ -r $RERUN_MODULES/stubbs/lib/functions.sh ] && {
-  source $RERUN_MODULES/stubbs/lib/functions.sh
+[ -r $RERUN_MODULE_DIR/lib/functions.sh ] && {
+  source $RERUN_MODULE_DIR/lib/functions.sh
 }
 
 rerun_module_metadata() {

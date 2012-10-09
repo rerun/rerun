@@ -11,11 +11,11 @@
 #/ usage: stubbs:archive [ --file|-f <>] --modules <*> [ --version|-v <>]
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
+source $RERUN_MODULE_DIR/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
 
 # Parse the command options
-[ -r $RERUN_MODULES/stubbs/commands/archive/options.sh ] && {
-  . $RERUN_MODULES/stubbs/commands/archive/options.sh
+[ -r $RERUN_MODULE_DIR/commands/archive/options.sh ] && {
+  . $RERUN_MODULE_DIR/commands/archive/options.sh
 }
 
 CWD=$(pwd); #remember current working directory.
@@ -55,7 +55,7 @@ popd >/dev/null
 cp $RERUN $PAYLOAD/rerun || rerun_die
 
 # Copy in the extract and launcher scripts used during execution
-for template in $RERUN_MODULES/stubbs/templates/{extract,launcher}
+for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
 do
     # replace the template substitution tokens ...
     sed -e "s/@GENERATOR@/stubbs:archive/" \

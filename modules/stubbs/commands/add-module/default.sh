@@ -11,7 +11,7 @@
 #/ usage: stubbs:add-module  --module|-m <> --description <>
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
+source $RERUN_MODULE_DIR/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
 
 rerun_init
 
@@ -74,7 +74,7 @@ EOF
 
 # Copy a basic function library
 mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die
-sed "s/@MODULE@/$MODULE/g" $RERUN_MODULES/stubbs/templates/functions.sh \
+sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/templates/functions.sh \
    > $RERUN_MODULES/$MODULE/lib/functions.sh || rerun_die
 
 # Done

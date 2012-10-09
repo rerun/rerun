@@ -33,7 +33,7 @@ it_runs_interactively() {
     rerun stubbs:docs <<EOF
 stubbs
 EOF
-    validate $RERUN_MODULES/stubbs/stubbs.1
+    validate $RERUN_MODULE_DIR/stubbs.1
 
 }
 
