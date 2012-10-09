@@ -23,10 +23,12 @@ dist_man_MANS = modules/stubbs/stubbs.1
 
 # The module
 nobase_dist_pkgdata_DATA = \
+	modules/stubbs/README.md \
+	modules/stubbs/commands/add-command/command.option \
 	modules/stubbs/commands/add-command/default.sh \
+	modules/stubbs/commands/add-command/desc.option \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/module.option \
-	modules/stubbs/commands/add-command/command.option \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/overwrite.option \
 	modules/stubbs/commands/add-command/template.option \
@@ -36,21 +38,31 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/add-module/module.option \
 	modules/stubbs/commands/add-option/arg.option \
 	modules/stubbs/commands/add-option/command.option \
+	modules/stubbs/commands/add-option/default.option \
 	modules/stubbs/commands/add-option/default.sh \
 	modules/stubbs/commands/add-option/desc.option \
+	modules/stubbs/commands/add-option/long.option \
 	modules/stubbs/commands/add-option/metadata \
 	modules/stubbs/commands/add-option/module.option \
 	modules/stubbs/commands/add-option/option.option \
+	modules/stubbs/commands/add-option/range.option \
 	modules/stubbs/commands/add-option/required.option \
+	modules/stubbs/commands/add-option/short.option \
 	modules/stubbs/commands/archive/default.sh \
 	modules/stubbs/commands/archive/file.option \
 	modules/stubbs/commands/archive/metadata \
 	modules/stubbs/commands/archive/modules.option \
 	modules/stubbs/commands/archive/options.sh \
+	modules/stubbs/commands/archive/version.option \
 	modules/stubbs/commands/docs/default.sh \
+	modules/stubbs/commands/docs/file.option \
 	modules/stubbs/commands/docs/metadata \
 	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
+	modules/stubbs/commands/edit/command.option \
+	modules/stubbs/commands/edit/default.sh \
+	modules/stubbs/commands/edit/metadata \
+	modules/stubbs/commands/edit/module.option \
 	modules/stubbs/commands/rm-option/command.option \
 	modules/stubbs/commands/rm-option/default.sh \
 	modules/stubbs/commands/rm-option/metadata \
@@ -60,15 +72,24 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/test/logs.option \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/module.option \
+	modules/stubbs/commands/test/plan.option \
 	modules/stubbs/lib/functions.sh \
+	modules/stubbs/lib/roundup \
+	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
-	modules/stubbs/README.md \
 	modules/stubbs/stubbs.1 \
 	modules/stubbs/templates/default.sh \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/functions.sh \
 	modules/stubbs/templates/launcher \
-	modules/stubbs/templates/test.sh
+	modules/stubbs/templates/test.sh \
+	modules/stubbs/tests/add-command-1-test.sh \
+	modules/stubbs/tests/add-module-1-test.sh \
+	modules/stubbs/tests/add-option-1-test.sh \
+	modules/stubbs/tests/archive-1-test.sh \
+	modules/stubbs/tests/docs-1-test.sh \
+	modules/stubbs/tests/functional-1-test.sh \
+	modules/stubbs/tests/rm-option-1-test.sh
 
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
