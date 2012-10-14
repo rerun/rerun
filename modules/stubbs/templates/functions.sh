@@ -25,8 +25,8 @@ dim() { tput dim ; echo " $*" ; txtrst ; }
 # Use text effects if `RERUN_COLOR` environment variable set.
 rerun_die() {
     if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"ERROR: $*"${_red} >&2 
-    else echo "ERROR: $*" >&2
+    then echo >&2 -e ${red}"ERROR: $*"${_red} 
+    else echo >&2 "ERROR: $*" 
     fi
     exit 1
 }

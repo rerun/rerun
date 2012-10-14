@@ -16,10 +16,10 @@
   source $RERUN_MODULES/stubbs/commands/docs/options.sh
 }
 
-# Read module function library
-[ -r $RERUN_MODULES/stubbs/lib/functions.sh ] && {
-  source $RERUN_MODULES/stubbs/lib/functions.sh
-}
+# Source common function library
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
+
+
 
 rerun_module_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")

@@ -11,7 +11,7 @@
 #/ usage: stubbs:add-option [--arg <false>] --command|-c <> [--default|-d <>] --description <> [--long <>] --module|-m <> --option|-o <> [--required <false>] [--short <>]
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed laoding function library" ; exit 1 ; }
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
 
 
 # Init the handler
@@ -92,6 +92,8 @@ done
 	break
     done
 }
+# check the chosen module exists
+[ ! -f $RERUN_MODULES/$MODULE/metadata ] && rerun_die "module not found: $MODULE"
 
 [ -z "$COMMAND" ] && {
     echo "Command: "

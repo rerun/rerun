@@ -11,7 +11,7 @@
 #/ usage: stubbs:add-command  --command|-c <> --module|-m <> [-overwrite] [-template <>]
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo "failed loading function library" ; exit 1 ; }
+source $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
 
 
 # Init the handler

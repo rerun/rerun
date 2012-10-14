@@ -21,8 +21,8 @@ dim() { tput dim ; echo " $*" ; txtrst ; }
 # Use text effects if `RERUN_COLOR` environment variable set.
 rerun_die() {
     if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"ERROR: $*"${_red} >&2 
-    else echo "ERROR: $*" >&2
+    then echo >&2 -e ${red}"ERROR: $*"${_red} 
+    else echo >&2 "ERROR: $*" 
     fi
     exit 1
 }
@@ -30,8 +30,8 @@ rerun_die() {
 # print USAGE and exit
 rerun_option_error() {
     if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
-    else echo "SYNTAX: $*" >&2
+    then echo >&2 -e ${red}"SYNTAX: $*"${_red} 
+    else echo >&2 "SYNTAX: $*" 
     fi
     exit 2
 }
@@ -47,7 +47,7 @@ rerun_option_check() {
 rerun_option_usage() {
     if [ -f $0 ]
     then grep '^#/ usage:' <"$0" | cut -c4- >&2
-    else echo "usage: check command for usage." >&2
+    else echo >&2 "usage: check command for usage." 
     fi
     return 2
 }
@@ -123,6 +123,11 @@ rerun_testDescription() {
 		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
 	}
 }
+rerun_commandDescription() {
+	[ -f $1/$2/commands/$3/metadata ] && {
+		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/commands/$3/metadata
+	}
+}
 
 rerun_absolutePath() {
     local infile="${1:-$0}"
@@ -190,7 +195,7 @@ add_optionparser() {
 }
 
 add_commandUsage() {
-    [ $# = 3 ] || { echo "usage add_commandUsage <moddir> <module> <command>" ; return 1 ; }
+    [ $# = 3 ] || { echo >&2 "usage add_commandUsage <moddir> <module> <command>" ; return 1 ; }
     local moddir=$1 module=$2 command=$3
 
     for opt in $(rerun_options $moddir $module $command); do
@@ -220,7 +225,7 @@ add_commandUsage() {
 # Generate option parser script.
 rerun_generateOptionsParser() {
     [ $# = 3 ] || { 
-        echo "usage add_generateOptionsParser <moddir> <module> <command>" 
+        echo >&2 "usage add_generateOptionsParser <moddir> <module> <command>" 
         return 1 ; 
     }
     local moddir=$1 module=$2 command=$3
@@ -247,8 +252,8 @@ rerun_option_usage() {
 # print SYNTAX and exit
 rerun_option_error() {
     if [[ "\$RERUN_COLOR" == "true" ]]
-    then echo -e "${red}""SYNTAX: \$*""${_red}" >&2
-    else echo "SYNTAX: \$*" >&2
+    then echo >&2 -e "${red}""SYNTAX: \$*""${_red}"
+    else echo >&2 "SYNTAX: \$*" 
     fi
     exit 2
 }
@@ -283,7 +288,7 @@ printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(trops $opt) $(trops $opt) $(rerun_optio
 done)
 # Check required options are set
 $(for opt in $(echo $optionsRequired|sort); do
-printf "[ -z \"$%s\" ] && { echo \"missing required option: --%s\" >&2 ; return 2 ; }\n" $(trops $opt) $opt
+printf "[ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" $(trops $opt) $opt
 done)
 #
 return 0
@@ -294,7 +299,7 @@ EOF
 
 list_optionVariables() {
     [ $# = 3 ] || { 
-        echo "usage list_optionVariables <moddir> <module> <command>" 
+        echo >&2 "usage list_optionVariables <moddir> <module> <command>" 
         return 1 ; 
     }
     local moddir=$1 module=$2 command=$3
@@ -307,10 +312,11 @@ list_optionVariables() {
 
 rerun_rewriteCommandScriptHeader() {
     [ $# = 3 ] || { 
-        echo "usage rerun_rewriteCommandScriptHeader <moddir> <module> <command>" 
+        echo >&2 "usage rerun_rewriteCommandScriptHeader <moddir> <module> <command>" 
         return 1 ; 
     }
     local moddir=$1 module=$2 command=$3
+    local desc=$(rerun_commandDescription $moddir $module $command)
     local variables=$(list_optionVariables $moddir $module $command) || rerun_die
     local usage=$(add_commandUsage $moddir $module $command) || rerun_die
     local commandScript=$moddir/$module/commands/$command/default.sh
@@ -318,6 +324,7 @@ rerun_rewriteCommandScriptHeader() {
         rerun_die "command script not found: $commandScript"
     }
     sed "
+        s,#/ command: .*,#/ command: $module:$command: \"$desc\",
         s,#/ variables: .*,#/ variables: $variables,
         s,#/ usage: .*,#/ usage: rerun $module:$command $usage,
         " $commandScript 

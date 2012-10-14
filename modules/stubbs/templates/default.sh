@@ -8,7 +8,7 @@
 
 # Read module function library.
 . $RERUN_MODULES/@MODULE@/lib/functions.sh || { 
-  echo "Failed loading function library" >&2 ; exit 1 ; 
+  echo >&2 "Failed loading function library" ; exit 1 ; 
 }
 
 # Parse the command options.
