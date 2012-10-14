@@ -1,4 +1,4 @@
-.TH stubbs 1 "Thu Sep 13 18:51:22 PDT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Sun Oct 14 12:07:41 ADT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -150,10 +150,17 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:docs \f[]--module <>
+.SH stubbs:docs \f[][--file <"$RERUN_MODULES/$MODULE/${MODULE}.1">] --module <>
 "generate the docs"
 .PP
 \f[I]OPTIONS\f[]
+.TP
+.B \--file \f[]"file name"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]"$RERUN_MODULES/$MODULE/${MODULE}.1"\f[]
+.RS
+.RE
 .TP
 .B \--module \f[]"module name"\f[]
 required: \f[I]true\f[] ,
@@ -225,3 +232,7 @@ arguments: \f[I]true\f[]
 Successful completion: 0
 .SH AUTHORS
 alexh
+.SH "SEE ALSO"
+rerun
+.SH KEYWORDS
+stubbs
