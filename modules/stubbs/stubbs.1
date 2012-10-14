@@ -8,7 +8,7 @@ stubbs \- "Simple rerun module builder"
 rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | rm-option | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
-.SH stubbs:add-command \f[]--command <> --desc <> --module <> --overwrite <false> --template <$RERUN_MODULES/stubbs/templates/default.sh>
+.SH stubbs:add-command \f[]--command <> --desc <> --module <> --overwrite <false> --template <$RERUN_MODULE_DIR/templates/default.sh>
 "add command to module"
 .PP
 \f[I]OPTIONS\f[]
@@ -41,7 +41,7 @@ arguments: \f[I]true\f[]
 .B \--template \f[]"default script template"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
-, default: \f[I]$RERUN_MODULES/stubbs/templates/default.sh\f[]
+, default: \f[I]$RERUN_MODULE_DIR/templates/default.sh\f[]
 .RS
 .RE
 .SH stubbs:add-module \f[]--description <> --module <>

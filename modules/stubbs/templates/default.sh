@@ -12,8 +12,8 @@
 }
 
 # Parse the command options.
-[ -r $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh ] && {
-  . $RERUN_MODULES/@MODULE@/commands/@NAME@/options.sh || exit 2 ;
+[ -r $RERUN_MODULE_DIR/commands/@NAME@/options.sh ] && {
+  . $RERUN_MODULE_DIR/commands/@NAME@/options.sh || exit 2 ;
 }
 
 # Exit immediately upon non-zero exit. See [set](http://ss64.com/bash/set.html)

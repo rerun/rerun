@@ -12,14 +12,12 @@
 
 
 # Parse the command options
-[ -r $RERUN_MODULES/stubbs/commands/docs/options.sh ] && {
-  source $RERUN_MODULES/stubbs/commands/docs/options.sh
+[ -r $RERUN_MODULE_DIR/commands/docs/options.sh ] && {
+  source $RERUN_MODULE_DIR/commands/docs/options.sh
 }
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
-
-
+. $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
 
 rerun_module_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")

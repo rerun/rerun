@@ -11,13 +11,13 @@
 #/ usage: stubbs:add-command  --command|-c <> --module|-m <> [-overwrite] [-template <>]
 
 # Source common function library
-source $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
+. $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
 
 
 # Init the handler
 rerun_init 
 
-TEMPLATE=$RERUN_MODULES/stubbs/templates/default.sh
+TEMPLATE=$RERUN_MODULE_DIR/templates/default.sh
 
 # Get the options
 while [ "$#" -gt 0 ]; do
@@ -110,7 +110,7 @@ mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests direct
 	-e "s/@COMMAND@/$COMMAND/g" \
 	-e "s;@RERUN@;${RERUN};g" \
 	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
-	$RERUN_MODULES/stubbs/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
+	$RERUN_MODULE_DIR/templates/test.sh > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
     echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh"
 }
 

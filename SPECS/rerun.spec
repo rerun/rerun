@@ -32,6 +32,8 @@ echo "Building in: \"%{buildroot}\""
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}/usr/bin
 mv %{_builddir}/rerun-%{version}/rerun %{buildroot}/usr/bin
+install -d -m 755 %{buildroot}/etc/rerun
+mv %{_builddir}/rerun-%{version}/bash_completion.sh %{buildroot}/etc/rerun
 install -d -m 755 %{buildroot}/usr/lib/rerun
 mv %{_builddir}/rerun-%{version}/modules %{buildroot}/usr/lib/rerun/modules
 
@@ -39,6 +41,7 @@ mv %{_builddir}/rerun-%{version}/modules %{buildroot}/usr/lib/rerun/modules
 
 %files
 %defattr(-,root,root)
+/etc/rerun
 /usr/bin/rerun
 /usr/lib/rerun
  
