@@ -13,6 +13,9 @@ rerun() {
 
 before() {
     mkdir -p $RERUN_MODULES/freddy/commands/dance
+    cat > $RERUN_MODULES/freddy/metadata <<EOF
+NAME=freddy
+EOF
 }
 
 after() {
