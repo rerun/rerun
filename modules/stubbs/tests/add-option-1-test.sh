@@ -61,3 +61,19 @@ it_runs_fully_optioned() {
 
     validate
 }
+
+it_exports_option_variable() {
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" --required true \
+        --default 3 --export true
+    rerun stubbs:add-option --module freddy --command dance \
+        --option height --description "jump #height" --required false \
+        --default 3 --export false
+
+    validate
+    # Check the option metadata
+    grep "EXPORT=true"  $RERUN_MODULES/freddy/commands/dance/jumps.option
+    # Check the option parser
+    grep '^export JUMPS$' $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep -v '^export HEIGHT$' $RERUN_MODULES/freddy/commands/dance/options.sh
+}

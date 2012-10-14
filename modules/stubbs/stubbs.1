@@ -1,4 +1,4 @@
-.TH stubbs 1 "Sun Oct 14 12:07:41 ADT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Sun Oct 14 13:20:08 EDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -60,7 +60,7 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --desc <> [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
+.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --desc <> [--export <false>] [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
 "add a command option"
 .PP
 \f[I]OPTIONS\f[]
@@ -87,6 +87,13 @@ arguments: \f[I]true\f[]
 .B \--desc \f[]"the option description"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--export \f[]"export option variable (true|false)"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]false\f[]
 .RS
 .RE
 .TP
@@ -150,7 +157,7 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:docs \f[][--file <"$RERUN_MODULES/$MODULE/${MODULE}.1">] --module <>
+.SH stubbs:docs \f[][--file <"$RERUN_MODULE_DIR/${MODULE}.1">] --module <>
 "generate the docs"
 .PP
 \f[I]OPTIONS\f[]
@@ -158,7 +165,7 @@ arguments: \f[I]true\f[]
 .B \--file \f[]"file name"\f[]
 required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
-, default: \f[I]"$RERUN_MODULES/$MODULE/${MODULE}.1"\f[]
+, default: \f[I]"$RERUN_MODULE_DIR/${MODULE}.1"\f[]
 .RS
 .RE
 .TP

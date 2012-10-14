@@ -5,6 +5,11 @@
 # for testing rerun.
 #
 
+die() {
+    echo >&2 "$*"
+    exit 1
+}
+
 # make_freddy --
 #
 #     Creates the freddy module containing commands: dance,study

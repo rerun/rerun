@@ -8,7 +8,7 @@
 #
 #   add a command option
 #
-#/ usage: stubbs:add-option [--arg <false>] --command|-c <> [--default|-d <>] --description <> [--long <>] --module|-m <> --option|-o <> [--required <false>] [--short <>]
+#/ usage: stubbs:add-option [--arg <false>] --command|-c <> [--default|-d <>] --description <> [--export|-e <false>] [--long <>] --module|-m <> --option|-o <> [--required <false>] [--short <>]
 
 # Source common function library
 . $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
@@ -49,6 +49,11 @@ while [ "$#" -gt 0 ]; do
 	-m|--module)
 	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
+	    shift
+	    ;;
+	--export|-e)
+	    rerun_option_check "$#" "$1"
+	    EXPORT="$2"
 	    shift
 	    ;;
 	--req*)
@@ -134,6 +139,8 @@ done
     read DEFAULT
 }
 
+[ -z "$EXPORT" ] && EXPORT=false
+
 # Generate metadata for new option
 
 (
@@ -147,6 +154,7 @@ REQUIRED=${REQ:-true}
 SHORT=${OPTION:0:1}
 LONG=${LONG:-$OPTION}
 DEFAULT=$DEFAULT
+EXPORT=$EXPORT
 
 EOF
 ) > $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option || rerun_die

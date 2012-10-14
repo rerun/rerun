@@ -14,6 +14,7 @@ rerun() {
 }
 
 before() {
+    [ -z "$RERUN_MODULES" ] && die "RERUN_MODULES not set"
     OUT=$(mktemp "/tmp/rerun.test.XXXXX")
 }
 
