@@ -7,7 +7,7 @@
 #/ variables: @VARIABLES@
 
 # Read module function library.
-. $RERUN_MODULES/@MODULE@/lib/functions.sh || { 
+. $RERUN_MODULE_DIR/lib/functions.sh || { 
   echo >&2 "Failed loading function library" ; exit 1 ; 
 }
 
