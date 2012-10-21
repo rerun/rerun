@@ -15,7 +15,7 @@
 #      # 
 #      # Load the test function library
 #      #
-#      source $RERUN_MODULES/stubbs/lib/test.sh || exit 1
+#      source $RERUN_MODULE_DIR/lib/test.sh || exit 1
 #       
 #      #
 #      # Create a test execution session for the command

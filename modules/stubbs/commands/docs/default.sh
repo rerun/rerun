@@ -17,7 +17,7 @@
 }
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
+. $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
 
 rerun_module_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")

@@ -11,7 +11,7 @@
 #/ usage: stubbs:archive [ --file|-f <>] --modules <*> [ --version|-v <>]
 
 # Source common function library
-. $RERUN_MODULES/stubbs/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
+. $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
 
 # Parse the command options
 [ -r $RERUN_MODULE_DIR/commands/archive/options.sh ] && {
