@@ -51,3 +51,12 @@ it_runs_fully_optioned() {
     rm /tmp/rerun.bin.$$
 }
 
+it_builds_the_stubbs_module_rpm() {
+    TMPDIR=$(/bin/mktemp -d)
+    pushd $TMPDIR
+    rerun stubbs:archive --format rpm --modules stubbs
+    rpm -qi -p rerun-stubbs-1.0.0-1.noarch.rpm
+    popd
+    rm -rf $TMPDIR
+}
+

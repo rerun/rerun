@@ -8,7 +8,7 @@
 #
 #   Build a self extracting archive
 #
-#/ usage: stubbs:archive [ --file|-f <>] --modules <*> [ --version|-v <>]
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <*> [ --release|-r <1>] [ --version|-v <>] 
 
 # Source common function library
 . $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
@@ -18,91 +18,152 @@
   . $RERUN_MODULE_DIR/commands/archive/options.sh
 }
 
-CWD=$(pwd); #remember current working directory.
+buildbinarchive() {
+  CWD=$(pwd); #remember current working directory.
 
-# Check if file option was specified and if not set it to rerun.bin.
-[ -z "${FILE}"  ] && FILE=rerun.bin 
+  # Check if file option was specified and if not set it to rerun.bin.
+  [ -z "${FILE}"  ] && FILE=rerun.bin 
 
-# Prepend curren working directory if relative file path.
-[[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
+  # Prepend curren working directory if relative file path.
+  [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
-[ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
+  [ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
 
-# Default version to blank if unspecified.
-[ -z "${VERSION}" ] && VERSION=
+  # Default version to blank if unspecified.
+  [ -z "${VERSION}" ] && VERSION=
 
-# create a work directory the archive content
-export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die
+  # create a work directory the archive content
+  export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die
 
-#
-# Start preparing the payload content.
-#
+  #
+  # Start preparing the payload content.
+  #
 
-# Iterate through the the specified modules and add them to payload
-mkdir -p $PAYLOAD/rerun/modules || rerun_die
-pushd $RERUN_MODULES >/dev/null || rerun_die
-for module in $MODULES
-do
-    # Check for a commands subdir to be sure it looks like a module
-    if [ -d $RERUN_MODULES/$module/commands ]
-    then
+  # Iterate through the the specified modules and add them to payload
+  mkdir -p $PAYLOAD/rerun/modules || rerun_die
+  pushd $RERUN_MODULES >/dev/null || rerun_die
+  for module in $MODULES
+  do
+      # Check for a commands subdir to be sure it looks like a module
+      if [ -d $RERUN_MODULES/$module/commands ]
+      then
 	cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
-    fi
-done
-popd >/dev/null
+      fi
+  done
+  popd >/dev/null
 
-# Copy rerun itself to the payload
-cp $RERUN $PAYLOAD/rerun || rerun_die
+  # Copy rerun itself to the payload
+  cp $RERUN $PAYLOAD/rerun || rerun_die
 
-# Copy in the extract and launcher scripts used during execution
-for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
-do
-    # replace the template substitution tokens ...
-    sed -e "s/@GENERATOR@/stubbs:archive/" \
-	-e "s/@DATE@/$(date)/" \
-	-e "s/@USER@/$USER/" \
-	-e "s/@VERSION@/$VERSION/" \
-	$template > $PAYLOAD/$(basename $template) || rerun_die
-    # ... and save it to the payload --^
-done
+  # Copy in the extract and launcher scripts used during execution
+  for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
+  do
+      # replace the template substitution tokens ...
+      sed -e "s/@GENERATOR@/stubbs:archive/" \
+	  -e "s/@DATE@/$(date)/" \
+	  -e "s/@USER@/$USER/" \
+	  -e "s/@VERSION@/$VERSION/" \
+	  $template > $PAYLOAD/$(basename $template) || rerun_die
+      # ... and save it to the payload --^
+  done
 
-#
-# Archive the content
-#
+  #
+  # Archive the content
+  #
 
-cd $PAYLOAD
+  cd $PAYLOAD
 
-# make the payload.tar file
-tar cf payload.tar launcher extract rerun || rerun_die
+  # make the payload.tar file
+  tar cf payload.tar launcher extract rerun || rerun_die
 
-# compress and base64 encode the tar file
-if [ -e "payload.tar" ]; then
-    gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
+  # compress and base64 encode the tar file
+  if [ -e "payload.tar" ]; then
+      gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
 
-    if [ -e "payload.tgz.base64" ]; then
-	#
-	# Prepend the extract script to the payload.
-	#    and thus turn the thing into a shell script!
-	#
-        cat extract payload.tgz.base64 > ${FILE} || rerun_die
-    else
-        rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
-    fi
-else
-    rerun_die "payload.tar does not exist"
-fi
+      if [ -e "payload.tgz.base64" ]; then
+	  #
+	  # Prepend the extract script to the payload.
+	  #    and thus turn the thing into a shell script!
+	  #
+          cat extract payload.tgz.base64 > ${FILE} || rerun_die
+      else
+          rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
+      fi
+  else
+      rerun_die "payload.tar does not exist"
+  fi
 
-#
-# Make the archive executable
-#
-chmod +x ${FILE} || rerun_die "failed setting archive executable"
-#
-# Clean up the temp directory
-#
-rm -rf $PAYLOAD
+  #
+  # Make the archive executable
+  #
+  chmod +x ${FILE} || rerun_die "failed setting archive executable"
+  #
+  # Clean up the temp directory
+  #
+  rm -rf $PAYLOAD
 
 
-echo "Wrote self extracting archive script: ${FILE}"
+  echo "Wrote self extracting archive script: ${FILE}"
+}
+
+buildrpmarchive() {
+  for MODULE_DIR in $RERUN_MODULES/$MODULES
+  do
+     if [[ -r $MODULE_DIR/metadata ]]
+     then
+       # Setup a temporary directory to build the RPM:
+       RPMTOPDIR=$(/bin/mktemp -d) || rerun_die "couldn't make a temporary directory to build the rpm"
+       mkdir $RPMTOPDIR/SOURCES || rerun_die
+
+       # Source the module metadata:
+       unset NAME DESCRIPTION VERSION REQUIRES
+       . $MODULE_DIR/metadata
+
+       [[ -n $NAME ]] || rerun_die "no module name in \"$MODULE_DIR/metadata\""
+       [[ -n $DESCRIPTION ]] || rerun_die "no description in \"$MODULE_DIR/metadata\""
+
+       if [[ -z $VERSION ]]
+       then
+         VERSION=1.0.0
+         echo "warning: no version in \"$MODULE_DIR/metadata\", defaulting to $VERSION"
+       fi
+
+       if [[ -z $REQUIRES ]]
+       then
+         REQUIRES=rerun
+       else
+         REQUIRES=rerun,$REQUIRES
+       fi
+
+       # Build the RPM source archive:
+       pushd $MODULE_DIR > /dev/null
+       /bin/tar --transform="s/^\./rerun-${NAME}-${VERSION}/" -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz . || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
+
+       # Build the RPM:
+       /usr/bin/rpmbuild --quiet --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+       popd > /dev/null
+
+       # Move the RPM:
+       /bin/mv $RPMTOPDIR/RPMS/noarch/rerun-$NAME-$VERSION-$RELEASE.noarch.rpm . || rerun_die "failed to move rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+       echo "Wrote $(basename $MODULE_DIR) module rpm : rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+
+       # Clean up the temporary directory:
+       /bin/rm -rf $RPMTOPDIR
+     fi
+  done
+}
+case $FORMAT in
+  bin)
+    buildbinarchive
+    ;;
+  rpm)
+    buildrpmarchive
+    ;;
+  *)
+    rerun_die "invalid archive format \"$FORMAT\""
+    ;;
+esac
+
 exit 0
 
 # Done

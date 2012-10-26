@@ -1,4 +1,4 @@
-.TH stubbs 1 "Sun Oct 14 13:20:08 EDT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Fri Oct 26 15:54:56 PDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -134,7 +134,7 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:archive \f[][--file <>] --modules <"*"> [--version <>]
+.SH stubbs:archive \f[][--file <>] [--format <bin>] --modules <"*"> [--release <1>] [--version <>]
 "build a self extracting rerun" 
 .PP
 \f[I]OPTIONS\f[]
@@ -145,10 +145,24 @@ arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
+.B \--format \f[]"Specify the format of the archive(s) to build"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]bin\f[]
+.RS
+.RE
+.TP
 .B \--modules \f[]"modules glob pattern"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 , default: \f[I]"*"\f[]
+.RS
+.RE
+.TP
+.B \--release \f[]"Specify the release number of the archive"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]1\f[]
 .RS
 .RE
 .TP
@@ -238,7 +252,7 @@ arguments: \f[I]true\f[]
 .PP
 Successful completion: 0
 .SH AUTHORS
-alexh
+anthony
 .SH "SEE ALSO"
 rerun
 .SH KEYWORDS

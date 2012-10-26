@@ -68,6 +68,8 @@ cat <<EOF
 # $(date)
 NAME=$MODULE
 DESCRIPTION="$DESC"
+VERSION=
+REQUIRES=
 
 EOF
 ) > $RERUN_MODULES/$MODULE/metadata || rerun_die
