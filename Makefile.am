@@ -82,6 +82,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/functions.sh \
 	modules/stubbs/templates/launcher \
+	modules/stubbs/templates/rerun-module.spec \
 	modules/stubbs/templates/test.sh \
 	modules/stubbs/tests/add-command-1-test.sh \
 	modules/stubbs/tests/add-module-1-test.sh \
