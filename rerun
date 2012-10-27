@@ -13,17 +13,15 @@
 # See [wiki](http://github.com/rerun/rerun/wiki) for install and
 # setup instructions.
 #
+RERUN_VERSION=1.0
 # Usage and Prerequsites
 # ----------------------
 
 # Rerun uses bash from the PATH to help make it more portable.
-SH="/usr/bin/env bash"
+RERUN_SH="/usr/bin/env bash"
 # Save the name of the rerun executable to show in usage messages.
-PROG=$(basename $0)
-USAGE="
-Usage: $PROG [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [--answer <file>] [module:[command [options]]]
-"
-PAD="  "
+RERUN_PROG=$(basename "$0")
+
 
 # The `diff` command is used with the --replay option to compare execution output.
 # Export `DIFF` environment variable to specify a specific `diff` command.
@@ -34,26 +32,8 @@ PAD="  "
 # This helps chaining command executions across modules.
 export RERUN=$0
 
-# __Example usages__
+# To disable color effects: `unset RERUN_COLOR`.
 
-# The `-h` option uses examples to print command usages.
-
-examples() {
-echo $(tput sgr 0 1)"Examples:$(tput sgr0)
-| \$ $PROG 
-| => List all modules.
-| \$ $PROG freddy
-| => List all freddy commands.
-| \$ $PROG freddy:dance --jumps 3
-| => Execute the freddy dance command."
-}
-
-# __Colorizing and text effects__
-
-# Unset `RERUN_COLOR` to disable.
-txtrst () { tput sgr0 ; }
-bold() { echo -e "\033[1m$*\033[0m" ; txtrst ; }
-dim() { tput dim ; echo " $*" ; txtrst ; }
 [[ -n "$RERUN_COLOR" ]] && {
     ul="\033[4m" ; _ul="\033[0m" ; # underline
     gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
@@ -61,17 +41,80 @@ dim() { tput dim ; echo " $*" ; txtrst ; }
     bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
 }
 
+# __Utility functions__
+
+# Print the message and exit.
+# Use text effects if `RERUN_COLOR` environment variable set.
+rerun_die() {
+    if [[ -n "$RERUN_COLOR" ]]
+    then echo >&2 -e ${red}"ERROR: $*"${_red} 
+    else echo >&2 "ERROR: $*"
+    fi
+    exit 1
+}
+
+# Print USAGE and exit.
+rerun_syntax_error() {
+    if [[ -n "$RERUN_COLOR" ]]
+    then echo >&2 -e ${red}"SYNTAX: $*"${_red} 
+    else echo >&2 "SYNTAX: $*" 
+    fi
+    exit 2
+}
+
+# Check option has an argument.
+rerun_syntax_check() {
+    [[ "$1" -lt 2 ]] && {
+        rerun_syntax_error "option requires argument: $2"
+    }
+}
+
+
 # __ASCII art banner__
 
 #  Prints logo and version info with a rainbow of colors!
-banner() {
-echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
-echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
-echo $(tput setaf 3) "| | |  __/ |  | |_| | | | |"
-echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
-echo $(tput setaf 5) "Version: v0.1. License: Apache 2.0."
-txtrst
+rerun_banner() {
+    echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
+    echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
+    echo $(tput setaf 3) "| | |  __/ |  | |_| | | | |"
+    echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
+    echo $(tput setaf 5) "Version: $RERUN_VERSION. License: Apache 2.0."$(tput sgr0)
 }
+
+# __Print usage summary__
+
+rerun_usage() {
+    [[ ! $# = 1 ]] && { 
+        rerun_die "wrong # args: should be: rerun_usage prog" 
+    }
+    prog=$1    
+    usage="Usage: $prog [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [--answer <file>] [module:[command [options]]]"
+    echo $usage
+}
+
+# __Print usage examples___
+
+rerun_examples() {
+    [[ ! $# = 1 ]] && { 
+        rerun_die "wrong # args: should be: rerun_examples prog" 
+    }
+    if [[ "$RERUN_COLOR" = "true" ]]
+    then echo $(tput sgr 0 1)"Examples:"$(tput sgr0)
+    else echo "Examples:"
+    fi
+echo "| \$ $prog
+| => List all modules.
+| \$ $prog freddy
+| => List all freddy commands.
+| \$ $prog freddy:dance --jumps 3
+| => Execute the freddy dance command."
+}
+
+# __Colorizing and text effects__
+
+bold() { echo -e "\033[1m$*\033[0m" ; tput sgr0 ; }
+dim() { tput dim ; echo " $*" ; tput sgr0 ; }
+
 
 # __Man page generator__
 
@@ -81,7 +124,7 @@ txtrst
 # Display the man page with `nroff`.
 man() {
     [[ ! $# = 1 ]] && { 
-        die "wrong # args: should be: man module" 
+        rerun_die "wrong # args: should be: man module" 
     }
     local module=$1
     if [[ ! -f "$RERUN_MODULES/$module/$module.1" 
@@ -94,41 +137,13 @@ man() {
     fi
 }
 
-# __Utility functions__
-
-# Print the message and exit.
-# Use text effects if `RERUN_COLOR` environment variable set.
-die() {
-    if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"ERROR: $*"${_red} >&2 
-    else echo "ERROR: $*" >&2
-    fi
-    exit 1
-}
-
-# Print USAGE and exit.
-rerun_syntax_error() {
-    if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
-    else echo "SYNTAX: $*" >&2
-    fi
-    exit 2
-}
-
-# Check option has an argument.
-rerun_syntax_check() {
-    [ "$1" -lt 2 ] && {
-        rerun_syntax_error "option requires argument: $2"
-    }
-}
-
 # Resolve the handler script for specified command in module.
 # Uses `uname -s` to get OS name for specific handlers.
 # If the user created a script named after the OS,
 # then print that path otherwise print the default one.
 rerun_resolveCommandScript() {
     [[ ! $# -eq 2 ]] && { 
-	    die 'wrong # args: should be: rerun_resolveCommandScript module command'
+	    rerun_die 'wrong # args: should be: rerun_resolveCommandScript module command'
     }
     local module_dir=$1 command=$2
     local command_dir=$module_dir/commands/${command}
@@ -143,7 +158,7 @@ rerun_resolveCommandScript() {
 # return 0 if exists, 1 otherwise
 rerun_existsCommandScript() {
     [[ ! $# -eq 2 ]] && { 
-	    die 'wrong # args: should be: rerun_existsCommandScript module_dir command'
+	    rerun_die 'wrong # args: should be: rerun_existsCommandScript module_dir command'
     }
     local module_dir=$1 command=$2
     if [[ -f "$(rerun_resolveCommandScript $module_dir $command)" ]]
@@ -156,7 +171,7 @@ rerun_existsCommandScript() {
 # It's a module if it has a `metadata` file in the subdirectory.
 rerun_existsModule() {
     [[ ! $# -eq 1 ]] && { 
-	    die 'wrong # args: should be: rerun_existsModule module'
+	    rerun_die 'wrong # args: should be: rerun_existsModule module'
     }
     local module=$1
 
@@ -181,14 +196,14 @@ rerun_existsModule() {
 # Extract the log data from the replay log file.
 rerun_extractLog() {
     [[ ! $# -eq 1 ]] && { 
-	    die 'wrong # args: should be: rerun_extractLog file'
+	    rerun_die 'wrong # args: should be: rerun_extractLog file'
     }
     local file=$1
     [[ -f $file ]] || { 
-        die "file does not exist: $file"
+        rerun_die "file does not exist: $file"
     }
-    local SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $file) || die "failed sizing log"
-    tail -n+$SIZE $file || die "failed extracting log"
+    local SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $file) || rerun_die "failed sizing log"
+    tail -n+$SIZE $file || rerun_die "failed extracting log"
 }
 
 # Lookup a metadata property value.
@@ -217,7 +232,7 @@ COMMAND="$COMMAND"
 OPTIONS="$*"
 USER="$USER"
 DATE="$TSTAMP"
-EXIT_STATUS="$RETVAL"
+EXIT_STATUS="$RERUN_EXITSTATUS"
 __COMMAND_OUT_BELOW__
        
 EOF
@@ -225,9 +240,9 @@ EOF
 }
 
 # given a command set options based on answer file
-answerOptions() {
+rerun_answerOptions() {
     [[ $# -lt 2 ]] && {
-        echo "usage: answerOptions: module command ?answers?" >&2
+        echo "usage: rerun_answerOptions: module command ?answers?" >&2
         return 2
     }
     argline=
@@ -248,34 +263,226 @@ answerOptions() {
     echo "$argline"
 }
 
+
+# Module and Command Listing
+# --------------------------
+PAD="  "
+
+# **rerun** provides two listing modes: module and commands.
+# If a user specifies `rerun` without arguments, a listing
+# of module names and their descriptions is displayed.
+# If a user specifies a module name: `rerun <module>`,
+# then a listing of commands and their options are displayed.
+
+# __Module listing__ 
+rerun_modulesListing() {
+    [[ ! $# = 1 ]] && { 
+        rerun_die "wrong # args: should be: rerun_modulesListing RERUN_MODULES" 
+    }
+    RERUN_MODULES=$1
+    echo -e $gray"Available modules in \"$RERUN_MODULES\":"$_gray
+    shopt -s nullglob # enable
+    for module in $RERUN_MODULES/*
+    do
+       	module_dirname=$(rerun_existsModule $(basename "$module")) && {
+            module_name=$(basename "$module")
+            module_desc=$(rerun_metadataLookup DESCRIPTION "$module/metadata")
+            echo "${PAD}${module_name}: ${module_desc}" 
+        }
+    done
+
+    # When rerun is installed in the system location
+    # and rerun modules is different to the system location,
+    # then list the system installed ones separately.
+    # TODO: add a unit test for these assumptions
+    if [[ $RERUN_LOCATION = "/usr/bin" && $RERUN_MODULES != "/usr/lib/rerun/modules" ]]
+    then
+        echo
+        echo -e $gray"Available modules in \"/usr/lib/rerun/modules\":"$_gray
+        for module in /usr/lib/rerun/modules/*; do
+            module_dirname=$(rerun_existsModule $(basename "$module")) && {
+                module_name=$(basename "$module")
+                module_desc=$(rerun_metadataLookup DESCRIPTION $module/metadata)
+                echo "${PAD}${module_name}: ${module_desc}" 
+            }
+        done
+    fi
+}
+
+# __Command listing__ 
+rerun_commandListing() {
+    [[ ! $# = 1 ]] && { 
+        rerun_die "wrong # args: should be: rerun_commandListing module" 
+    }
+    MODULE=$1
+    module_dir=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
+    echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
+    shopt -s nullglob # enable
+    for cmd in $module_dir/commands/*/default.sh
+	do
+        cmd_name=$(basename $(dirname "$cmd"))
+        cmd_metadata=$module_dir/commands/${cmd_name}/metadata
+        [[ -f "$cmd_metadata" ]] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
+        bold "${cmd_name}: ${cmd_desc}"
+        if [[ -d "$module_dir/commands/${cmd_name}" ]]
+        then            
+            shopt -s nullglob # enable
+            optfiles=( $module_dir/commands/${cmd_name}/*.option )
+            for opt_metadata in ${optfiles[*]}; do
+                cmd_param=$(basename "$(echo ${opt_metadata%%.option})")
+                (    argstring= summary=                  
+                    . $opt_metadata ; # Read the option's metadata.                    
+                    [[ -n "${SHORT}" ]] && {                    
+                       argstring=$(printf ' --%s|-%s'  "$NAME" "$SHORT")
+                    } || {
+                       argstring=$(printf " --%s" "$NAME" )
+                    }	  
+                    [[ "$ARGUMENTS" == "true" ]] && {
+                        argstring=$(printf "%s <${ul}%s${_ul}>" "$argstring" "$DEFAULT")
+                    }
+                    [[ "$REQUIRED" != "true" ]] && {
+                        summary=$(printf "[%s]: \"%s\"" "${argstring}" "$DESCRIPTION") 
+                    } || {
+                        summary=$(printf "%s: \"%s\"" "${argstring}" "$DESCRIPTION")
+                    }
+                    echo -e "$PAD $summary"
+                )
+            done
+        fi
+    done
+}
+
+# There are two modes of execution: normal and replay. 
+# Normal mode is what you'd expect. The handler script for the
+# command is looked up an executed with user options.
+# Replay mode occurs when a user specifies a replay file and
+# its output is extracted and compared to a new execution.
+
+rerun_executeCommand() {
+    [[ ! $# -ge 2 ]] && { 
+        rerun_die "wrong # args: should be: rerun_executeCommand module command options" 
+    }
+    MODULE=$1; 
+    COMMAND=$2; 
+    shift; shift;
+
+
+    RERUN_MODULE_DIR=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
+
+#  Exit, if the command script is not found.
+# User specified a command that did not exist in the RERUN_MODULES directory.
+    ! rerun_existsCommandScript $RERUN_MODULE_DIR $COMMAND && {
+        rerun_syntax_error command not found: \"$MODULE:$COMMAND\"
+    }
+
+# Ready to run. Export rerun executable environment.
+    export RERUN RERUN_MODULES RERUN_MODULE_DIR
+
+# Lookup the path to the command handler script.
+    COMMAND_SCRIPT=$(rerun_resolveCommandScript $RERUN_MODULE_DIR $COMMAND)
+
+# If the  `-L` flag is set, record execution.
+    if [[ -z "$RERUN_LOGS" || ! -d "$RERUN_LOGS" ]]
+    then
+    # __Normal execution mode__
+    # 
+
+    # Execute the command script if it is executable
+    # otherwise run it using the same interpreter as rerun.
+    # Return the command script's exit code as the result.
+        if [[ -x $COMMAND_SCRIPT ]]
+        then
+            $COMMAND_SCRIPT "$@"
+            RERUN_EXITSTATUS=$?
+        else
+            $RERUN_SH $RERUN_VERBOSE $COMMAND_SCRIPT "$@"	
+            RERUN_EXITSTATUS=$?
+        fi
+    else
+    # __Recorded execution mode__
+    # 
+    # When logging is enabled, run the command script in replay mode.
+    #
+    # Save a timestamp for the log.
+
+        TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
+        LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.running
+    # Execute the command script and direct output to the log file.
+    # Get the exit code of the script execution (not the `tee` command).
+        $RERUN_SH $RERUN_VERBOSE $COMMAND_SCRIPT "$@" | tee $LOG
+
+        RERUN_EXITSTATUS=${PIPESTATUS[0]}
+    # Generate execution metadata for the replay file.
+    # This metadata describes the command execution context and is
+    # sufficient to re-execute the command.
+    # Output from the execution is delimited by `__COMMAND_OUT_BELOW__`.
+        rerun_catReplayMetadata $@ > ${LOG%*.running}.metadata || rerun_die "Failed generating replay log."
+        REPLAYLOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.replay
+        cat ${LOG%*.running}.metadata $LOG > $REPLAYLOG || rerun_die "Failed generating replay log."
+        rm -f $LOG ${LOG%*.running}.metadata; # cleanup working files
+        LOG=$REPLAYLOG
+	    
+    # Create a symlink to the "latest" replay log.
+        rm -f $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; #remove old symlink
+        ln -s $LOG $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; # recreate it
+
+    # Replay execution mode
+    # ---------------------
+
+    # If the `--replay` option is set, then extract the output
+    # from the log file and compare it to the results of this execution.
+    # Use the `diff` command to compare the two
+    # and show the diff output if execution output 
+    # doesn't match the replay file content.
+
+        if [[ -n "$REPLAY" ]]
+        then
+            rerun_extractLog $REPLAY > $RERUN_LOGS/rerun-$$.checklog
+            rerun_extractLog $LOG > $RERUN_LOGS/rerun-$$.log
+            
+            $DIFF $RERUN_LOGS/rerun-$$.checklog $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
+            RERUN_EXITSTATUS=$?
+            [[ $RERUN_EXITSTATUS -eq 1 ]] && {
+                echo -e ${bold}"[diff]"${_bold}
+                cat $RERUN_LOGS/rerun-$$.diff
+            }
+            rm -f $RERUN_LOGS/rerun-$$.{log,checklog,diff}
+        fi
+    fi
+
+}
+#
+#
+# ---------- End function library
+#
+
+#
+# Execution Mode
+# ===============
+
+# Check if this file is being sourced or executed.
+
+if [[ "$BASH_SOURCE" != "$RERUN" ]]
+then
+    return
+fi
+
+
+# Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
+# modules located in /usr/lib/rerun/modules are appended to the modules in RERUN_MODULES.
+RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+
+
+
 # Option parsing
 # --------------
 
 # There are two sets of options, `rerun` specific arguments 
 # and command options.
 
-# Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
-# modules located in /usr/lib/rerun/modules are appended to the modules in RERUN_MODULES.
-RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
-
-# Check for the `RERUN_MODULES` environment variable.
-# If it is not set, then default it to either the system
-# install location or relative to the rerun executable.
-# TODO: add a unit test for this.
-if [[ -z "$RERUN_MODULES" ]]
-then
-    if [[ "$RERUN_LOCATION" = "/usr/bin" ]]
-    then
-      # Linux FSH convention:
-      RERUN_MODULES="/usr/lib/rerun/modules"
-    else
-      # Set module directory relative to the `rerun` script:
-      RERUN_MODULES=${RERUN_LOCATION}/modules
-    fi
-fi
-
 # Clear MODULE and COMMAND in case they were incidentally
 # declared in the environment.
+
 MODULE="" COMMAND=""
 
 # Consume the `rerun` command line options first.
@@ -283,16 +490,16 @@ while [ "$#" -gt 0 ]; do
     OPT="$1"
     case "$OPT" in
 	-h*|--h*)
-        banner
-        bold "$USAGE"
-        examples		
+        rerun_banner
+        rerun_usage "$RERUN_PROG"
+        rerun_examples "$RERUN_PROG"
         exit 0
 	    ;;
   	-v)
-	    VERBOSE="-vx"
+	    RERUN_VERBOSE="-vx"
 	    ;;
   	-V)
-	    VERBOSE="-vx"
+	    RERUN_VERBOSE="-vx"
 	    set -vx
 	    ;;
 	--man*)
@@ -328,16 +535,36 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+# Default the RERUN_MODULES environment variable.
+# If it is not set, then default it to either the system
+# install location or relative to the rerun executable.
+# TODO: add a unit test for this.
+if [[ -z "$RERUN_MODULES" ]]
+then
+    if [[ "$RERUN_LOCATION" = "/usr/bin" ]]
+    then
+      # Linux FSH convention:
+      RERUN_MODULES="/usr/lib/rerun/modules"
+    else
+      # Set module directory relative to the `rerun` script:
+      RERUN_MODULES=${RERUN_LOCATION}/modules
+    fi
+fi
+
 # Replay requires that a log directory is also set.
 [[ -n "$REPLAY" && -z "$RERUN_LOGS" ]] && {
     rerun_syntax_error "usage error: --replay <file> also requires -L <dir>" 
 }
 
+# Ensure the modules directory path is defined and is a directory.
+[[ -n "$RERUN_MODULES" && -d "$RERUN_MODULES" ]] || {
+    rerun_die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
+}
+
 # __Parse rerun command and their options__
 #
 # Use regex to split up command strings.
-regex='([^:]+)([:]?[ ]?)([-A-Za-z0-9_]*)([ ]*)(.*)'
-if [[ "$@" =~ $regex ]]
+if [[ "$@" =~ ([^:]+)([:]?[ ]?)([-A-Za-z0-9_]*)([ ]*)(.*) ]]
 then
     MODULE=${BASH_REMATCH[1]};    # module
     [ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
@@ -350,213 +577,49 @@ fi
 # Shift over so the remaining arguments are left to the command options.
 shift; 
 
-# Ensure the modules directory path is defined and is a directory.
-[[ -n "$RERUN_MODULES" && -d "$RERUN_MODULES" ]] || {
-    die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
-}
+# Read answer file and set positional parameters from them.
+if [[ -n "$ANSWERS" && -f "$ANSWERS" ]]
+then
+    set -- $(rerun_answerOptions $MODULE $COMMAND $ANSWERS)
+fi
 
-
-# Module and Command Listing
-# --------------------------
-
-# **rerun** provides two listing modes: module and commands.
-# If a user specifies `rerun` without arguments, a listing
-# of module names and their descriptions is displayed.
-# If a user specifies a module name: `rerun <module>`,
-# then a listing of commands and their options are displayed.
-
-# __Module listing__ 
+# Listing Mode
+# ============
 
 # If no module or command are specified, 
 # display a listing of modules, showing each 
 # module's name and description.
 # Modules are read from the directory referenced 
 # using the `$RERUN_MODULES` environment variable.
+
 if [[ -z "$MODULE" && -z "$COMMAND" ]]
 then
-    echo -e $gray"Available modules in \"$RERUN_MODULES\":"$_gray
-    shopt -s nullglob # enable
-    for module in $RERUN_MODULES/*
-    do
-       	module_dir=$(rerun_existsModule $(basename "$module")) && {
-           module_name=$(basename "$module")
-           module_desc=$(rerun_metadataLookup DESCRIPTION "$module/metadata")
-           echo "${PAD}${module_name}: ${module_desc}" 
-        }
-    done
 
-    # When rerun is installed in the system location
-    # and rerun modules is different to the system location,
-    # then list the system installed ones separately.
-    # TODO: add a unit test for these assumptions
-    if [[ $RERUN_LOCATION = "/usr/bin" && $RERUN_MODULES != "/usr/lib/rerun/modules" ]]
-    then
-      echo
-      echo -e $gray"Available modules in \"/usr/lib/rerun/modules\":"$_gray
-      for module in /usr/lib/rerun/modules/*; do
-                module_dir=$(rerun_existsModule $(basename $module)) && {
-             module_name=$(basename $module)
-             module_desc=$(rerun_metadataLookup DESCRIPTION $module/metadata)
-             echo "${PAD}${module_name}: ${module_desc}" 
-          }
-      done
-    fi
-
+    rerun_modulesListing $RERUN_MODULES
     exit 0
-fi
-
-# __Command listing__ 
 
 # If a module name is specified, show the command set.
 # For each command, show that command's option list in summary form
 # displaying requirement, name, flags, defaults and description.
-if [[ -n "$MODULE" && -z "$COMMAND" ]]
+
+elif [[ -n "$MODULE" && -z "$COMMAND" ]]
 then
-    module_dir=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
-    echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
-    shopt -s nullglob # enable
-    for cmd in $module_dir/commands/*/default.sh
-	do
-        cmd_name=$(basename $(dirname $cmd))
-        cmd_metadata=$module_dir/commands/${cmd_name}/metadata
-        [[ -f "$cmd_metadata" ]] && cmd_desc=$(rerun_metadataLookup DESCRIPTION $cmd_metadata)
-        bold "${cmd_name}: ${cmd_desc}"
-        if [[ -d "$module_dir/commands/${cmd_name}" ]]
-        then            
-            shopt -s nullglob # enable
-            optfiles=( $module_dir/commands/${cmd_name}/*.option )
-            for opt_metadata in ${optfiles[*]}; do
-                cmd_param=$(basename $(echo ${opt_metadata%%.option}))
-                (    argstring= summary=                  
-                    . $opt_metadata ; # Read the option's metadata.                    
-                    [[ -n "${SHORT}" ]] && {                    
-                       argstring=$(printf ' --%s|-%s'  "$NAME" "$SHORT")
-                    } || {
-                       argstring=$(printf " --%s" "$NAME" )
-                    }	  
-                    [[ "$ARGUMENTS" == "true" ]] && {
-                        argstring=$(printf "%s <${ul}%s${_ul}>" "$argstring" "$DEFAULT")
-                    }
-                    [[ "$REQUIRED" != "true" ]] && {
-                        summary=$(printf "[%s]: \"%s\"" "${argstring}" "$DESCRIPTION") 
-                    } || {
-                        summary=$(printf "%s: \"%s\"" "${argstring}" "$DESCRIPTION")
-                    }
-                    echo -e "$PAD $summary"
-                )
-            done
-        fi
-    done
+
+    rerun_commandListing "$MODULE"
     exit 0
+
 fi
 
 # Command Execution
-# -----------------
-
-# There are two modes of execution: normal and replay. 
-# Normal mode is what you'd expect. The handler script for the
-# command is looked up an executed with user options.
-# Replay mode occurs when a user specifies a replay file and
-# its output is extracted and compared to a new execution.
+# =================
 
 # The module and command must be specified for execution mode.
 [[ -z "$MODULE"  ]]  && rerun_syntax_error "module not specified"
 [[ -z "$COMMAND" ]]  && rerun_syntax_error "command not specified"
 
-RERUN_MODULE_DIR=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
-
-#  Exit, if the command script is not found.
-# User specified a command that did not exist in the RERUN_MODULES directory.
-! rerun_existsCommandScript $RERUN_MODULE_DIR $COMMAND && {
-    rerun_syntax_error command not found: \"$MODULE:$COMMAND\"
-}
-
-# Read answer file and set positional parameters from them.
-if [[ -n "$ANSWERS" && -f "$ANSWERS" ]]
-then
-    set -- $(answerOptions $MODULE $COMMAND $ANSWERS)
-fi
-
-# Ready to run. Export rerun executable environment.
-export RERUN RERUN_MODULES RERUN_MODULE_DIR
-
-# Lookup the path to the command handler script.
-COMMAND_SCRIPT=$(rerun_resolveCommandScript $RERUN_MODULE_DIR $COMMAND)
-
-# If the  `-L` flag is set, record execution.
-if [[ -z "$RERUN_LOGS" || ! -d "$RERUN_LOGS" ]]
-then
-    # __Normal execution mode__
-    # 
-
-    # Execute the command script if it is executable
-    # otherwise run it using the same interpreter as rerun.
-    # Return the command script's exit code as the result.
-    if [[ -x $COMMAND_SCRIPT ]]
-    then
-        $COMMAND_SCRIPT "$@"
-        RETVAL=$?
-    else
-        $SH $VERBOSE $COMMAND_SCRIPT "$@"	
-        RETVAL=$?
-    fi
-else
-    # __Recorded execution mode__
-    # 
-    # When logging is enabled, run the command script in replay mode.
-    #
-    # Save a timestamp for the log.
-
-    TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
-    LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.running
-    # Execute the command script and direct output to the log file.
-    # Get the exit code of the script execution (not the `tee` command).
-    $SH $VERBOSE $COMMAND_SCRIPT "$@" | tee $LOG
-
-    RETVAL=${PIPESTATUS[0]}
-    # Generate execution metadata for the replay file.
-    # This metadata describes the command execution context and is
-    # sufficient to re-execute the command.
-    # Output from the execution is delimited by `__COMMAND_OUT_BELOW__`.
-    rerun_catReplayMetadata $@ > ${LOG%*.running}.metadata || die "Failed generating replay log."
-    REPLAYLOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.replay
-    cat ${LOG%*.running}.metadata $LOG > $REPLAYLOG || die "Failed generating replay log."
-    rm -f $LOG ${LOG%*.running}.metadata; # cleanup working files
-    LOG=$REPLAYLOG
-	
-    # Create a symlink to the "latest" replay log.
-    rm -f $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; #remove old symlink
-    ln -s $LOG $RERUN_LOGS/$MODULE-$COMMAND-latest.replay; # recreate it
-
-    # Replay execution mode
-    # ---------------------
-
-    # If the `--replay` option is set, then extract the output
-    # from the log file and compare it to the results of this execution.
-    # Use the `diff` command to compare the two
-    # and show the diff output if execution output 
-    # doesn't match the replay file content.
-
-    if [[ -n "$REPLAY" ]]
-    then
-        rerun_extractLog $REPLAY > $RERUN_LOGS/rerun-$$.checklog
-        rerun_extractLog $LOG > $RERUN_LOGS/rerun-$$.log
-        
-        $DIFF $RERUN_LOGS/rerun-$$.checklog $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
-        RETVAL=$?
-        [[ $RETVAL -eq 1 ]] && {
-           echo -e ${bold}"[diff]"${_bold}
-            cat $RERUN_LOGS/rerun-$$.diff
-        }
-        rm -f $RERUN_LOGS/rerun-$$.{log,checklog,diff}
-    fi
-fi
-
-
-
-
+rerun_executeCommand "$MODULE" "$COMMAND" "$@"
 
 # Exit with the command exit code.
-exit ${RETVAL}
+exit ${RERUN_EXITSTATUS}
 
 # Done!
