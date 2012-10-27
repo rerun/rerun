@@ -156,7 +156,7 @@ buildrpmarchive() {
        echo "Wrote $(basename $MODULE_DIR) module rpm : rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
 
        # Clean up the temporary directory:
-       # /bin/rm -rf $RPMTOPDIR
+       /bin/rm -rf $RPMTOPDIR
      fi
   done
 }
