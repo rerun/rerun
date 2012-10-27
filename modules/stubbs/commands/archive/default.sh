@@ -114,6 +114,8 @@ buildrpmarchive() {
        # Setup a temporary directory to build the RPM:
        RPMTOPDIR=$(/bin/mktemp -d) || rerun_die "couldn't make a temporary directory to build the rpm"
        mkdir $RPMTOPDIR/SOURCES || rerun_die
+       mkdir $RPMTOPDIR/BUILD || rerun_die
+       mkdir $RPMTOPDIR/RPMS || rerun_die
 
        # Source the module metadata:
        unset NAME DESCRIPTION VERSION REQUIRES
@@ -135,20 +137,26 @@ buildrpmarchive() {
          REQUIRES=rerun,$REQUIRES
        fi
 
-       # Build the RPM source archive:
+       # Prepare the source archive hierarchy:
+       mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
        pushd $MODULE_DIR > /dev/null
-       /bin/tar --transform="s/^\./rerun-${NAME}-${VERSION}/" -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz . || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
+       /usr/bin/find | /bin/cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+       popd > /dev/null
+
+       # Build the source archive:
+       pushd $RPMTOPDIR/SOURCES > /dev/null
+       /bin/tar -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz rerun-${NAME}-${VERSION} || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
+       popd > /dev/null
 
        # Build the RPM:
-       /usr/bin/rpmbuild --quiet --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
-       popd > /dev/null
+       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
 
        # Move the RPM:
        /bin/mv $RPMTOPDIR/RPMS/noarch/rerun-$NAME-$VERSION-$RELEASE.noarch.rpm . || rerun_die "failed to move rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
        echo "Wrote $(basename $MODULE_DIR) module rpm : rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
 
        # Clean up the temporary directory:
-       /bin/rm -rf $RPMTOPDIR
+       # /bin/rm -rf $RPMTOPDIR
      fi
   done
 }

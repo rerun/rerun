@@ -31,6 +31,7 @@ Requires: %{requires}
 %build
  
 %install
+echo "Building in: \"%{buildroot}\""
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}/usr/lib/rerun/modules/%{module}
 mv %{_builddir}/rerun-%{module}-%{version}/* %{buildroot}/usr/lib/rerun/modules/%{module}
