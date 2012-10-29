@@ -52,7 +52,13 @@ it_runs_fully_optioned() {
 }
 
 it_builds_the_stubbs_module_rpm() {
-    TMPDIR=$(/bin/mktemp -d)
+    if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
+    then
+        :; # ok run the test
+    else
+        return 0; # bail out of the test.
+    fi
+    TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
     rerun stubbs:archive --format rpm --modules stubbs
     rpm -qi -p rerun-stubbs-1.0.0-1.noarch.rpm
