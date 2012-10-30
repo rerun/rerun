@@ -1,5 +1,0 @@
-#
-# These are relative to the lib dir
-RERUN_COMMAND_SCRIPT=default.sh
-RERUN_OPTIONS_GENERATOR=generate-options
-RERUN_OPTIONS_SCRIPT=options.sh
