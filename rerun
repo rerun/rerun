@@ -463,7 +463,7 @@ _rerun_commandListing() {
     [[ ! $# = 2 ]] && { 
         rerun_die "wrong # args: should be: _rerun_commandListing modulesdir module" 
     }
-    $RERUN_MODULES=$1
+    RERUN_MODULES=$1
     MODULE=$2
     bold() { echo -e "\033[1m$*\033[0m" ; tput sgr0 ; }
 
