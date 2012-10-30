@@ -101,7 +101,7 @@ fi
 
 
 # Generate option parser script.
-rerun_generateOptionsParser $RERUN_MODULES $MODULE $COMMAND > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
+rerun_generateOptionsParserForBash $RERUN_MODULES $MODULE $COMMAND > $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh || rerun_die
 echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 
 # Update variable summary in command script.

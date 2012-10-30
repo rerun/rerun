@@ -8,7 +8,7 @@
 #
 #   add a new module
 #
-#/ usage: stubbs:add-module  --module|-m <> --description <>
+#/ usage: stubbs:add-module --language|-l <sh> --module|-m <> --description <>
 
 # Source common function library
 . $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed loading function library" ; exit 1 ; }
@@ -21,6 +21,11 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
+	-l|--language)
+	    rerun_option_check "$#" "$1"
+	    LANGUAGE="$2"
+	    shift
+	    ;;
 	-m|--module)
 	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
@@ -54,12 +59,22 @@ done
     read DESC
 }
 
+: ${LANGUAGE:=bash}
+[ ! -f $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata ] && rerun_die "language unsupported: $LANGUAGE"
+
+.  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata || rerun_die "error reading  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata "
+
+[ -z "$RERUN_FUNCTION_LIB" ] && rerun_die "required metadata not found: RERUN_FUNCTION_LIB"
+
+
 # Create module structure
 mkdir -p $RERUN_MODULES/$MODULE || rerun_die
 # Create etc/ subdirectory
 mkdir -p $RERUN_MODULES/$MODULE/etc || rerun_die
 # Create commands/ subdirectory
 mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die
+# Create lib/ subdirectory
+mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die
 
 # Generate a profile for metadata
 (
@@ -68,16 +83,18 @@ cat <<EOF
 # $(date)
 NAME=$MODULE
 DESCRIPTION="$DESC"
+LANGUAGE="$LANGUAGE"
 VERSION=
 REQUIRES=
 
 EOF
 ) > $RERUN_MODULES/$MODULE/metadata || rerun_die
 
-# Copy a basic function library
-mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die
-sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/templates/functions.sh \
-   > $RERUN_MODULES/$MODULE/lib/functions.sh || rerun_die
+# Give it the beginnings of a function library.
+# Replace the word "@MODULE@" with the module's given name.
+sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/lib/$LANGUAGE/templates/$RERUN_FUNCTION_LIB \
+    > $RERUN_MODULES/$MODULE/lib/$RERUN_FUNCTION_LIB || rerun_die
+
 
 # Done
 echo "Created module structure: $RERUN_MODULES/$MODULE"

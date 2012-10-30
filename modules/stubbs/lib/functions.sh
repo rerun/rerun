@@ -239,7 +239,7 @@ add_commandUsage() {
 }
 
 # Generate option parser script.
-rerun_generateOptionsParser() {
+rerun_generateOptionsParserForBash() {
     [ $# = 3 ] || { 
         echo >&2 "usage add_generateOptionsParser <moddir> <module> <command>" 
         return 1 ; 

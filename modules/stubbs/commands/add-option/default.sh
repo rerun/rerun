@@ -161,15 +161,29 @@ EOF
 echo "Wrote option metadata: $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option"
 
 
-# Generate option parser script.
-optionScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh
-rerun_generateOptionsParser \
-    $RERUN_MODULES $MODULE \
-    $COMMAND > $optionScript || rerun_die
-echo "Wrote options script: $optionScript"
+# Read language setting for module. Set it to 'bash' as a default.
+LANGUAGE=$(. $RERUN_MODULES/$MODULE/metadata; echo ${LANGUAGE:-bash});
 
-# Update variable summary in command script.
-commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh
+# Generate option parser script.
+
+[ ! -f $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata ] && rerun_die "language unsupported: $LANGUAGE"
+
+.  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata || rerun_die "error reading  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata "
+
+[ -z "$RERUN_OPTIONS_GENERATOR" ] && rerun_die "required metadata not found: RERUN_OPTIONS_GENERATOR"
+[ -z "$RERUN_OPTIONS_SCRIPT" ] && rerun_die "required metadata not found: RERUN_OPTIONS_SCRIPT"
+
+optionsParserScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
+
+$RERUN_MODULE_DIR/lib/$LANGUAGE/$RERUN_OPTIONS_GENERATOR \
+    $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || rerun_die
+
+[ -z "$RERUN_COMMAND_SCRIPT" ] && rerun_die "required metadata not found: RERUN_COMMAND_SCRIPT"
+
+
+# Update the command script header to give it the updated
+# variable summary and usage info.
+commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 if [ -f "$commandScript" ]
 then
     rerun_rewriteCommandScriptHeader \

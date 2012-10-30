@@ -1,0 +1,8 @@
+NAME=language
+DESCRIPTION="the scripting language (bash)"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=bash
+LONG=language
+SHORT=l
+RANGE={bash}
