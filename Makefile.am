@@ -73,17 +73,19 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/module.option \
 	modules/stubbs/commands/test/plan.option \
+	modules/stubbs/lib/bash/metadata \
+	modules/stubbs/lib/bash/generate-options \
+	modules/stubbs/lib/bash/templates/default.sh \
+	modules/stubbs/lib/bash/templates/functions.sh \
+	modules/stubbs/templates/test.roundup \
 	modules/stubbs/lib/functions.sh \
 	modules/stubbs/lib/roundup \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/stubbs.1 \
-	modules/stubbs/templates/default.sh \
 	modules/stubbs/templates/extract \
-	modules/stubbs/templates/functions.sh \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec \
-	modules/stubbs/templates/test.sh \
 	modules/stubbs/tests/add-command-1-test.sh \
 	modules/stubbs/tests/add-module-1-test.sh \
 	modules/stubbs/tests/add-option-1-test.sh \
