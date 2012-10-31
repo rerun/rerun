@@ -1,0 +1,24 @@
+#!/usr/bin/env groovy
+/*
+*  command: @MODULE@:@NAME@: "@DESCRIPTION@"
+*
+*#/ usage: rerun @MODULE@:@NAME@ [options]
+*
+*#/ variables: @VARIABLES@
+*/
+
+/* # Parse the command options.
+*/
+def options = new GroovyShell(new Binding(args:args)).evaluate(new File(new File(this.class.protectionDomain.codesource.location.path).parentFile,"options.groovy"))
+
+
+/* ------------------------------
+# Your implementation goes here.
+# ------------------------------ */
+
+println "This is the command: @NAME@"
+println "Args: ${args as List}"
+println "Options: ${options}"
+
+
+// Done
