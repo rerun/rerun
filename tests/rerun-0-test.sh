@@ -49,13 +49,77 @@ it_performs_rerun_syntax_error() {
     rerun_syntax_error "messagetext" 2>&1 |grep "^SYNTAX: messagetext$"
 }
 
-it_performs_rerun_syntax_check() {
+it_performs_rerun_option_check() {
     . $RERUN
-    rerun_syntax_check 1 foo 2>&1 |grep "^SYNTAX: option requires argument: foo"
+    rerun_option_check 1 foo 2>&1 |grep "^SYNTAX: option requires argument: foo"
     test ${PIPESTATUS[0]} = 2; # syntax errors exit with 2
 
-    rerun_syntax_check 2 bar 
+    rerun_option_check 2 bar 
 }
+
+it_performs_rerun_modules() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+    modules=( $(rerun_modules $RERUN_MODULES) )
+    test -n "$modules"
+    containsElement "freddy" "${modules[@]}"
+    containsElement "stubbs" "${modules[@]}"
+}
+
+it_performs_rerun_commands() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+    commands=( $(rerun_commands $RERUN_MODULES freddy) )
+    test -n "$commands"
+    test "${#commands[*]}" = 2
+    containsElement "dance" "${commands[@]}"
+}
+
+
+it_performs_rerun_options() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+    options=( $(rerun_options $RERUN_MODULES freddy dance) )
+    test -n "$options"
+    test "${#options[*]}" = 2
+    containsElement "jumps" "${options[@]}"
+    containsElement "subject" "${options[@]}"
+}
+
+
+it_performs_rerun_commandGetMetadataValue() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+
+    name=$(rerun_commandGetMetadataValue $RERUN_MODULES/freddy dance NAME)
+    test -n "$name"
+    test "$name" = "dance"
+
+}
+
+
+it_performs_rerun_optionGetMetadataValue() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+
+    name=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps NAME)
+    test -n "$name"
+    test "$name" = "jumps"
+
+    args=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps ARGUMENTS)
+    test -n "$args"
+    test "$args" = "true"
+
+    required=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps REQUIRED)
+    test -n "$required"
+    test "$required" = "false"
+}
+
 
 it_performs_rerun_resolveCommandScript() {
     make_freddy $RERUN_MODULES

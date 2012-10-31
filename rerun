@@ -57,15 +57,113 @@ rerun_syntax_error() {
     exit 2
 }
 
-# _rerun_syntax_check_
+# _rerun_option_check_
 
 # Check option has an argument. If an argument is required, 
 # then error out. If the check succeeds, return 0. 
-rerun_syntax_check() {
+rerun_option_check() {
     if [[ "$1" -lt 2 ]]
     then rerun_syntax_error "option requires argument: $2"
     else return 0
     fi
+}
+
+
+# _rerun_option_usage_
+
+# print usage summary and exit.
+rerun_option_usage() {
+    if [ -f $0 ]
+    then grep '^#/ usage:' <"$0" | cut -c4- >&2
+    else echo >&2 "usage: check command for usage." 
+    fi
+    return 2
+}
+
+# _rerun_modules_
+
+# List the modules by name.
+rerun_modules() {
+    names=
+    for f in `echo $1/*/metadata`; do
+	[ -f $f ] && {
+		mod_name=$(basename $(dirname $f))
+		names="$names $mod_name"
+	}
+    done
+    echo $names
+}
+
+# _rerun_commands_
+
+# List the commands for the specified module.
+rerun_commands() {
+    commands=
+    for c in `echo $1/$2/commands/*/metadata`; do
+	[ -f $c ] && {
+	    cmd_name=$(basename $(dirname $c))
+	    commands="$commands $cmd_name"
+	}
+    done
+    echo $commands
+}
+
+# _rerun_options_
+
+# List the options for the specified command.
+rerun_options() {
+    options=
+    for o in `echo $1/$2/commands/$3/*.option`; do
+	[ -f $o ] && {
+	    opt_def=$(basename $o)
+	    opt_name=${opt_def%.option}
+	    options="$options $opt_name"
+	}
+    done
+    echo $options
+}
+
+
+rerun_absolutePath() {
+    local infile="${1:-$0}"
+    {
+        if [[ "${infile#/}" = "${infile}" ]]; then
+            echo $(pwd)/${infile}
+        else
+            echo ${infile}
+        fi
+    } | sed '
+    :a
+    s;/\./;/;g
+    s;//;/;g
+    s;/[^/][^/]*/\.\./;/;g
+    ta'
+}
+
+# _rerun_optionGetMetadataValue_
+
+# Print the value for the specified option metadata item.
+
+rerun_optionGetMetadataValue() {
+    [[ ! $# -eq 4 ]] && { 
+        rerun_die 'wrong # args: should be: rerun_optionGetMetadataValue module_dir command option key'
+    }
+	[[ -f $1/commands/$2/$3.option ]] && {
+		awk -F= "/$4/ {print \$2}" $1/commands/$2/$3.option
+	}
+}
+
+# _rerun_commandGetMetadataValue_
+
+# Print the value for the specified option metadata item.
+
+rerun_commandGetMetadataValue() {
+    [[ ! $# -eq 3 ]] && { 
+        rerun_die 'wrong # args: should be: rerun_commandGetMetadataValue module_dir command key'
+    }
+	[[ -f $1/commands/$2/metadata ]] && {
+		awk -F= "/$3/ {print \$2}" $1/commands/$2/metadata
+	}
 }
 
 # _rerun_resolveCommandScript_
@@ -528,27 +626,27 @@ while [ "$#" -gt 0 ]; do
 	    set -vx
 	    ;;
 	--man*)
-	    rerun_syntax_check "$#" "$1"
+	    rerun_option_check "$#" "$1"
 	    _rerun_man $2
 	    exit 0
 	    ;;	
 	-M)
-	    rerun_syntax_check "$#" "$1"
+	    rerun_option_check "$#" "$1"
 	    RERUN_MODULES="$2"
 	    shift
 	    ;;
 	-L)        
-	    rerun_syntax_check "$#" "$1"
+	    rerun_option_check "$#" "$1"
 	    RERUN_LOGS="$2" ; # Record log dir.
 	    shift
 	    ;;	
 	--replay)
-	    rerun_syntax_check "$#" "$1"
+	    rerun_option_check "$#" "$1"
 	    REPLAY="$2"
 	    shift
 	    ;;	
 	--answers)
-	    rerun_syntax_check "$#" "$1"
+	    rerun_option_check "$#" "$1"
 	    ANSWERS="$2"
         [[ ! -f $ANSWERS ]] && rerun_syntax_error "answers file not found: $ANSWERS"
 	    shift

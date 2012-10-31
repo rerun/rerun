@@ -2,55 +2,11 @@
 # common rerun functions
 #
 
+. $RERUN || { echo >&2 "ERROR: Failed sourcing functions from rerun: $RERUN" ; exit 1 ; }
 
-# __Colorizing functions__
-
-# Unset `RERUN_COLOR` to disable.
-txtrst () { tput sgr0 ; }
-bold() { echo -e "\033[1m$*\033[0m" ; txtrst ; }
-dim() { tput dim ; echo " $*" ; txtrst ; }
-[ -n "$RERUN_COLOR" ] && {
-    ul="\033[4m" ; _ul="\033[0m" ; # underline
-    gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
-    red="\033[31m" ; _red="\033[0m" ; # red
-    bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
-}
-
-
-# Print the message and exit.
-# Use text effects if `RERUN_COLOR` environment variable set.
-rerun_die() {
-    if [[ "$RERUN_COLOR" == "true" ]]
-    then echo >&2 -e ${red}"ERROR: $*"${_red} 
-    else echo >&2 "ERROR: $*" 
-    fi
-    exit 1
-}
-
-# print USAGE and exit
-rerun_option_error() {
-    if [[ "$RERUN_COLOR" == "true" ]]
-    then echo >&2 -e ${red}"SYNTAX: $*"${_red} 
-    else echo >&2 "SYNTAX: $*" 
-    fi
-    exit 2
-}
-
-# check option has its argument
-rerun_option_check() {
-    [ "$1" -lt 2 ] && {
-        rerun_option_error "option requires argument: $2"
-    }
-}
-
-# print USAGE and exit
-rerun_option_usage() {
-    if [ -f $0 ]
-    then grep '^#/ usage:' <"$0" | cut -c4- >&2
-    else echo >&2 "usage: check command for usage." 
-    fi
-    return 2
-}
+#
+# Stubbs functions
+#
 
 # Bootstrap a command handler
 rerun_init() {
@@ -60,94 +16,27 @@ rerun_init() {
     [ -n "$RERUN_MODULES" ] || RERUN_MODULES=$homedir/modules    
 }
 
-rerun_modules() {
-    names=
-    for f in `echo $1/*/metadata`; do
-	[ -f $f ] && {
-		mod_name=$(basename $(dirname $f))
-		names="$names $mod_name"
-	}
-    done
-    echo $names
-}
-
-rerun_commands() {
-    commands=
-    for c in `echo $1/$2/commands/*/metadata`; do
-	[ -f $c ] && {
-	    cmd_name=$(basename $(dirname $c))
-	    commands="$commands $cmd_name"
-	}
-    done
-    echo $commands
-}
-
-rerun_options() {
-    options=
-    for o in `echo $1/$2/commands/$3/*.option`; do
-	[ -f $o ] && {
-	    opt_def=$(basename $o)
-	    opt_name=${opt_def%.option}
-	    options="$options $opt_name"
-	}
-    done
-    echo $options
-}
-
 rerun_optionArguments() {
-	[ -f $1/$2/commands/$3/$4.option ] && {
-		awk -F= '/ARGUMENTS/ {print $2}' $1/$2/commands/$3/$4.option
-	}
+    echo $(rerun_optionGetMetadataValue "$1/$2" $3 $4 ARGUMENTS)
 }
 
 rerun_optionDefault() {
-	[ -f $1/$2/commands/$3/$4.option ] && {
-    	awk -F= '/DEFAULT/ {print $2}' $1/$2/commands/$3/$4.option
-	}
+    echo $(rerun_optionGetMetadataValue "$1/$2" $3 $4 DEFAULT)
 }
 
 rerun_optionShort() {
-	[ -f $1/$2/commands/$3/$4.option ] && {
-    	awk -F= '/SHORT/ {print $2}' $1/$2/commands/$3/$4.option
-	}
+    echo $(rerun_optionGetMetadataValue "$1/$2" $3 $4 SHORT)
 }
 
 rerun_optionRequired() {
-	[ -f $1/$2/commands/$3/$4.option ] && {
-    	awk -F= '/REQUIRED/ {print $2}' $1/$2/commands/$3/$4.option
-	}
+    echo $(rerun_optionGetMetadataValue "$1/$2" $3 $4 REQUIRED)
 }
 rerun_optionExported() {
-	[ -f $1/$2/commands/$3/$4.option ] && {
-    	awk -F= '/EXPORT/ {print $2}' $1/$2/commands/$3/$4.option
-	}
+    echo $(rerun_optionGetMetadataValue "$1/$2" $3 $4 EXPORT)
 }
 
-rerun_testDescription() {
-	[ -f $1/$2/tests/commands/$3/metadata ] && {
-		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/tests/commands/$3/metadata
-	}
-}
 rerun_commandDescription() {
-	[ -f $1/$2/commands/$3/metadata ] && {
-		awk -F= '/DESCRIPTION/ {print $2}' $1/$2/commands/$3/metadata
-	}
-}
-
-rerun_absolutePath() {
-    local infile="${1:-$0}"
-    {
-        if [[ "${infile#/}" = "${infile}" ]]; then
-            echo $(pwd)/${infile}
-        else
-            echo ${infile}
-        fi
-    } | sed '
-    :a
-    s;/\./;/;g
-    s;//;/;g
-    s;/[^/][^/]*/\.\./;/;g
-    ta'
+    echo $(rerun_commandGetMetadataValue "$1/$2" $3 DESCRIPTION)
 }
 
 optionsWithDefaults() {
