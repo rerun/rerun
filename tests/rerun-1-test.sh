@@ -86,7 +86,7 @@ it_runs_command_with_option() {
 it_runs_command_with_verbosity() {
     make_freddy $RERUN_MODULES
     rerun -v freddy:dance 2> $OUT
-    grep -q "#!/usr/bin/env bash" $OUT
+    grep -q "+ source" $OUT
     grep -q "+ echo 'jumps (3)'" $OUT
 }
 

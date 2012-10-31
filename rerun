@@ -18,18 +18,9 @@
 
 RERUN_VERSION=1.0
 
-# Execute bash from the PATH to help make it more portable.
+# The default interpreter
 
 : ${RERUN_SH:="/usr/bin/env bash"}
-
-# The `diff` command is used with the --replay option to compare execution output.
-# Export `DIFF` environment variable to specify a specific `diff` command.
-: ${DIFF:=diff}
-
-# Set the RERUN environment variable so subsequent 
-# invocations use the same executable. 
-# This helps chaining command executions across modules.
-export RERUN=$0
 
 # To disable color effects: `unset RERUN_COLOR`.
 
@@ -85,15 +76,22 @@ rerun_syntax_check() {
 # then print that path otherwise print the default one.
 rerun_resolveCommandScript() {
     [[ ! $# -eq 2 ]] && { 
-        rerun_die 'wrong # args: should be: rerun_resolveCommandScript module command'
+        rerun_die 'wrong # args: should be: rerun_resolveCommandScript module_dir command'
     }
     local module_dir=$1 command=$2
     local command_dir=$module_dir/commands/${command}
     local os=$(uname -s)
-    if [[ -f  "$command_dir/${os}.sh" ]]
-    then echo $command_dir/${os}.sh; 
-    else echo $command_dir/default.sh; 
-    fi
+
+    searchlist=( $command_dir/${os}  
+        $command_dir/default  $command_dir/default.sh )
+    for file in ${searchlist[*]}
+    do
+        if [[ -f  "$file" ]]
+        then 
+            echo $file
+            return
+        fi
+    done
 }
 
 # _rerun_existsCommandScript_
@@ -184,6 +182,8 @@ rerun_executeCommand() {
         rerun_syntax_error command not found: \"$MODULE:$COMMAND\"
     }
 
+    INTERPRETER=$( . $RERUN_MODULE_DIR/metadata ; echo ${INTERPRETER})
+    : ${INTERPRETER:=$RERUN_SH}; # default it.
 
     export RERUN RERUN_MODULES RERUN_MODULE_DIR
 
@@ -191,22 +191,27 @@ rerun_executeCommand() {
 
     if [[ -z "$RERUN_LOGS" || ! -d "$RERUN_LOGS" ]]
     then
-
-        if [[ -x $COMMAND_SCRIPT ]]
+ 
+        if [[ -n "$RERUN_VERBOSE" ]]
+        then
+            $INTERPRETER $RERUN_VERBOSE $COMMAND_SCRIPT "$@"
+            RERUN_EXITSTATUS=$?
+        elif [[ -x $COMMAND_SCRIPT ]]
         then
             $COMMAND_SCRIPT "$@"
             RERUN_EXITSTATUS=$?
         else
-            $RERUN_SH $RERUN_VERBOSE $COMMAND_SCRIPT "$@"	
+            $INTERPRETER $COMMAND_SCRIPT "$@"
             RERUN_EXITSTATUS=$?
         fi
+
     else
 
         TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
         LOG=$RERUN_LOGS/$MODULE-$COMMAND-$TSTAMP-$$.running
         # Execute the command script and direct output to the log file.
         # Get the exit code of the script execution (not the `tee` command).
-        $RERUN_SH $RERUN_VERBOSE $COMMAND_SCRIPT "$@" | tee $LOG
+        $INTERPRETER $RERUN_VERBOSE $COMMAND_SCRIPT "$@" | tee $LOG
 
         RERUN_EXITSTATUS=${PIPESTATUS[0]}
         # Generate execution metadata for the replay file.
@@ -264,7 +269,7 @@ rerun_metadataLookup() {
 
 # If this file is being sourced, return now.
 
-if [[ "$BASH_SOURCE" != "$RERUN" ]]
+if [[ "$BASH_SOURCE" != "$0" ]]
 then
     return
 fi
@@ -470,7 +475,7 @@ _rerun_commandListing() {
     module_dir=$(rerun_existsModule "$MODULE") || rerun_syntax_error "module not found: \"$MODULE\""
     echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
     shopt -s nullglob # enable
-    for cmd in $module_dir/commands/*/default.sh
+    for cmd in $module_dir/commands/*/metadata
 	do
         cmd_name=$(basename $(dirname "$cmd"))
         metadata=$module_dir/commands/${cmd_name}/metadata
@@ -584,6 +589,9 @@ fi
 [[ -n "$REPLAY" && -z "$RERUN_LOGS" ]] && {
     rerun_syntax_error "usage error: --replay <file> also requires -L <dir>" 
 }
+# The `diff` command is used with the --replay option to compare execution output.
+# Export `DIFF` environment variable to specify a specific `diff` command.
+: ${DIFF:=diff}
 
 # Ensure the modules directory path is defined and is a directory.
 #
@@ -643,6 +651,12 @@ fi
 
 # Command execution
 # =================
+
+
+# Set the RERUN environment variable so subsequent 
+# invocations use the same executable. 
+# This helps chaining command executions across modules.
+export RERUN=$0
 
 # The module and command must be specified for execution mode.
 

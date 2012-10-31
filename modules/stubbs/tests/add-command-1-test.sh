@@ -25,7 +25,7 @@ validate() {
     .  $RERUN_MODULES/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
-    test -f $RERUN_MODULES/freddy/commands/dance/default.sh
+    test -f $RERUN_MODULES/freddy/commands/dance/default
 }
 
 

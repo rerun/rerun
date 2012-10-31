@@ -23,7 +23,7 @@ while [ "$#" -gt 0 ]; do
 	# options with arguments
 	-l|--language)
 	    rerun_option_check "$#" "$1"
-	    LANGUAGE="$2"
+	    INTERPRETER="$2"
 	    shift
 	    ;;
 	-m|--module)
@@ -59,10 +59,10 @@ done
     read DESC
 }
 
-: ${LANGUAGE:=bash}
-[ ! -f $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata ] && rerun_die "language unsupported: $LANGUAGE"
+: ${INTERPRETER:=bash}
+[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && rerun_die "language unsupported: $INTERPRETER"
 
-.  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata || rerun_die "error reading  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata "
+.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata "
 
 [ -z "$RERUN_FUNCTION_LIB" ] && rerun_die "required metadata not found: RERUN_FUNCTION_LIB"
 
@@ -83,7 +83,7 @@ cat <<EOF
 # $(date)
 NAME=$MODULE
 DESCRIPTION="$DESC"
-LANGUAGE="$LANGUAGE"
+INTERPRETER="$INTERPRETER"
 VERSION=
 REQUIRES=
 
@@ -92,7 +92,7 @@ EOF
 
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
-sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/lib/$LANGUAGE/templates/$RERUN_FUNCTION_LIB \
+sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/lib/$INTERPRETER/templates/$RERUN_FUNCTION_LIB \
     > $RERUN_MODULES/$MODULE/lib/$RERUN_FUNCTION_LIB || rerun_die
 
 

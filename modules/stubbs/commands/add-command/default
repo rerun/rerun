@@ -82,7 +82,7 @@ done
 }
 
 [ -z "$TEMPLATE" ] && {
-    TEMPLATE=$RERUN_MODULE_DIR/lib/bash/templates/default.sh
+    TEMPLATE=$RERUN_MODULE_DIR/lib/bash/templates/default
 }
 
 [ ! -r "$TEMPLATE" ] && {
@@ -95,14 +95,14 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die
 VARIABLES=$(list_optionVariables $RERUN_MODULES $MODULE $COMMAND)
 
 # Read language setting for module. Set it to 'bash' as a default.
-LANGUAGE=$(. $RERUN_MODULES/$MODULE/metadata; echo ${LANGUAGE:-bash});
+INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 
-[ ! -f $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata ] && {
-    rerun_die "language unsupported: $LANGUAGE"
+[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && {
+    rerun_die "language unsupported: $INTERPRETER"
 }
 
-.  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/$LANGUAGE/metadata"
+.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata"
 }
 
 [ -z "$RERUN_COMMAND_SCRIPT" ] && {

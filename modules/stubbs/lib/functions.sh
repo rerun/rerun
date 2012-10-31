@@ -73,7 +73,7 @@ rerun_modules() {
 
 rerun_commands() {
     commands=
-    for c in `echo $1/$2/commands/*/default.sh`; do
+    for c in `echo $1/$2/commands/*/metadata`; do
 	[ -f $c ] && {
 	    cmd_name=$(basename $(dirname $c))
 	    commands="$commands $cmd_name"
@@ -342,7 +342,7 @@ rerun_rewriteCommandScriptHeader() {
     local desc=$(rerun_commandDescription $moddir $module $command)
     local variables=$(list_optionVariables $moddir $module $command) || rerun_die
     local usage=$(add_commandUsage $moddir $module $command) || rerun_die
-    local commandScript=$moddir/$module/commands/$command/default.sh
+    local commandScript=$moddir/$module/commands/$command/default
     [ ! -f "$commandScript" ] && {
         rerun_die "command script not found: $commandScript"
     }
