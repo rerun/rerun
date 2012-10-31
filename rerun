@@ -71,19 +71,14 @@ rerun_syntax_check() {
 # _rerun_resolveCommandScript_
 
 # Resolve the handler script for specified command in module.
-# Uses `uname -s` to get OS name for specific handlers.
-# If the user created a script named after the OS,
-# then print that path otherwise print the default one.
 rerun_resolveCommandScript() {
     [[ ! $# -eq 2 ]] && { 
         rerun_die 'wrong # args: should be: rerun_resolveCommandScript module_dir command'
     }
     local module_dir=$1 command=$2
     local command_dir=$module_dir/commands/${command}
-    local os=$(uname -s)
 
-    searchlist=( $command_dir/${os}  
-        $command_dir/default  $command_dir/default.sh )
+    searchlist=( $command_dir/default  $command_dir/default.sh )
     for file in ${searchlist[*]}
     do
         if [[ -f  "$file" ]]

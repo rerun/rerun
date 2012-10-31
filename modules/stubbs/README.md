@@ -357,48 +357,6 @@ additional options being created. It also helps "stubbs"
 preserve changes you make to `default` or other scripts
 that source `options.sh`.
 
-### OS-specific command scripts
-
-Your command's `default` script may not work in all operating
-system environments due to command and/or syntax differences.
-
-Rerun will look for an operating system specific 
-command implementation and run it instead, if it exists.
-
-Effectively, rerun checks for a command script named: 
-`$MODULE/commands/$COMMAND/$(uname -s)`
-
-For example, run `uname -s` on a centos host to see the name of the
-operating system. It returns "Linux".
-
-    $ uname -s
-    Linux
-
-So, to create a Linux OS specific implementation,
-create a script called `Linux`. Copy default
-as a starting point:
-
-    cp freddy/commands/dance/default freddy/commands/dance/Linux
-
-Running the `tree` command shows the directory structure.
-
-    freddy
-    └── commands
-        └── dance
-            ├── Linux (os-specific implementation)
-            └── default (generic one)
-	    
-Inside the Linux script, replace the implementation with:
-
-     echo "I'm a locker"
-     
-Run the `freddy:dance` command:
-
-    $ rerun freddy:dance
-    I'm a locker
-
-The result comes from rerun's execution of the new `Linux` script.
-
 ### Verbosity?
 
 What happens when your command script fails and
