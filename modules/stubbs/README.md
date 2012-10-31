@@ -46,12 +46,12 @@ Add a command named "dance" to the freddy module:
 The `add-command` module generates a boilerplate command script file you can edit.
 
 	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
-	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default.sh
+	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default
 
 Of course, stubbs doesn't write the implementation for you, merely a stub.
 
 See the "Command implementation" section below to learn about 
-the `default.sh` command script.
+the `default` command script.
 
 See the *Testing* section below to learn about
 the test script.
@@ -77,7 +77,7 @@ You will see output similar to:
 Besides the `jumps.option` file, `add-option` also generates an
 option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
-The `default.sh` script sources the `options.sh` script to take care of
+The `default` script sources the `options.sh` script to take care of
 command line option parsing.
 
 Users will now be able to specify a "--jumps" argument to the `freddy:dance` command:
@@ -203,11 +203,11 @@ how to define tests for your module.
 
 Running `stubbs:add-command` as shown above will generate a stub default
 script implementation for the new command: 
-`$RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh`:
+`$RERUN_MODULES/$MODULE/commands/$COMMAND/default`:
 
-The "dance" command's `default.sh` script is shown below.
+The "dance" command's `default` script is shown below.
 
-File listing: `$RERUN_MODULES/freddy/commands/dance/default.sh`
+File listing: `$RERUN_MODULES/freddy/commands/dance/default`
 
     #!/usr/bin/env bash
     #
@@ -352,21 +352,21 @@ A statement like this is added for options that declare
 `DEFAULT` metadata.
 
 Separating options processing into the `options.sh` script,
-away from the command implementation logic in `default.sh`, facilitates
+away from the command implementation logic in `default`, facilitates
 additional options being created. It also helps "stubbs"
-preserve changes you make to `default.sh` or other scripts
+preserve changes you make to `default` or other scripts
 that source `options.sh`.
 
 ### OS-specific command scripts
 
-Your command's `default.sh` script may not work in all operating
+Your command's `default` script may not work in all operating
 system environments due to command and/or syntax differences.
 
 Rerun will look for an operating system specific 
 command implementation and run it instead, if it exists.
 
 Effectively, rerun checks for a command script named: 
-`$MODULE/commands/$COMMAND/$(uname -s).sh`
+`$MODULE/commands/$COMMAND/$(uname -s)`
 
 For example, run `uname -s` on a centos host to see the name of the
 operating system. It returns "Linux".
@@ -375,20 +375,20 @@ operating system. It returns "Linux".
     Linux
 
 So, to create a Linux OS specific implementation,
-create a script called `Linux.sh`. Copy default.sh
+create a script called `Linux`. Copy default
 as a starting point:
 
-    cp freddy/commands/dance/default.sh freddy/commands/dance/Linux.sh
+    cp freddy/commands/dance/default freddy/commands/dance/Linux
 
 Running the `tree` command shows the directory structure.
 
     freddy
     └── commands
         └── dance
-            ├── Linux.sh (os-specific implementation)
-            └── default.sh (generic one)
+            ├── Linux (os-specific implementation)
+            └── default (generic one)
 	    
-Inside the Linux.sh script, replace the implementation with:
+Inside the Linux script, replace the implementation with:
 
      echo "I'm a locker"
      
@@ -397,7 +397,7 @@ Run the `freddy:dance` command:
     $ rerun freddy:dance
     I'm a locker
 
-The result comes from rerun's execution of the new `Linux.sh` script.
+The result comes from rerun's execution of the new `Linux` script.
 
 ### Verbosity?
 
@@ -442,7 +442,7 @@ Define an option called "--subject":
 	   --description "subject to study" --module freddy --command study \
 	   --default math --required false
 
-Edit the default implementation (`$RERUN_MODULES/freddy/commands/study/default.sh`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/study/default`).
 The implementation should echo what freddy is studying:
 
 	# ------------------------------
@@ -460,7 +460,7 @@ Define an option called "--jumps":
 		   --description "jump #num times" --module freddy --command dance \
 		   --default 1 --required false
 
-Edit the default implementation (`$RERUN_MODULES/freddy/commands/dance/default.sh`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/dance/default`).
 The implementation should echo how many jumps:
 
 	# ------------------------------
@@ -520,7 +520,7 @@ each command and ends with the suffix "-test.sh".
 	modules/freddy
 	├── commands
 	│   └── dance
-	│       ├── default.sh
+	│       ├── default
 	│       ├── jumps.option
 	│       ├── metadata
 	│       └── options.sh
