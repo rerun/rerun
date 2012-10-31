@@ -114,7 +114,7 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 
 
 # Generate a boiler plate implementation
-[ ! -f $CMD_SCRIPT -o -n "$OVEWRITE" ] && {
+[ ! -f $CMD_SCRIPT -o -n "$OVERWRITE" ] && {
     sed -e "s/@NAME@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
@@ -126,7 +126,7 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 
 # Generate a unit test script
 mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests directory"
-[ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "$OVEWRITE" ] && {
+[ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "$OVERWRITE" ] && {
     sed -e "s/@NAME@/script/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
