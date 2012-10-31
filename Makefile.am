@@ -25,21 +25,21 @@ dist_man_MANS = modules/stubbs/stubbs.1
 nobase_dist_pkgdata_DATA = \
 	modules/stubbs/README.md \
 	modules/stubbs/commands/add-command/command.option \
-	modules/stubbs/commands/add-command/default.sh \
+	modules/stubbs/commands/add-command/default \
 	modules/stubbs/commands/add-command/desc.option \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/module.option \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/overwrite.option \
 	modules/stubbs/commands/add-command/template.option \
-	modules/stubbs/commands/add-module/default.sh \
+	modules/stubbs/commands/add-module/default \
 	modules/stubbs/commands/add-module/description.option \
 	modules/stubbs/commands/add-module/metadata \
 	modules/stubbs/commands/add-module/module.option \
 	modules/stubbs/commands/add-option/arg.option \
 	modules/stubbs/commands/add-option/command.option \
 	modules/stubbs/commands/add-option/default.option \
-	modules/stubbs/commands/add-option/default.sh \
+	modules/stubbs/commands/add-option/default \
 	modules/stubbs/commands/add-option/desc.option \
 	modules/stubbs/commands/add-option/long.option \
 	modules/stubbs/commands/add-option/metadata \
@@ -48,34 +48,34 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/add-option/range.option \
 	modules/stubbs/commands/add-option/required.option \
 	modules/stubbs/commands/add-option/short.option \
-	modules/stubbs/commands/archive/default.sh \
+	modules/stubbs/commands/archive/default \
 	modules/stubbs/commands/archive/file.option \
 	modules/stubbs/commands/archive/metadata \
 	modules/stubbs/commands/archive/modules.option \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/archive/version.option \
-	modules/stubbs/commands/docs/default.sh \
+	modules/stubbs/commands/docs/default \
 	modules/stubbs/commands/docs/file.option \
 	modules/stubbs/commands/docs/metadata \
 	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
 	modules/stubbs/commands/edit/command.option \
-	modules/stubbs/commands/edit/default.sh \
+	modules/stubbs/commands/edit/default \
 	modules/stubbs/commands/edit/metadata \
 	modules/stubbs/commands/edit/module.option \
 	modules/stubbs/commands/rm-option/command.option \
-	modules/stubbs/commands/rm-option/default.sh \
+	modules/stubbs/commands/rm-option/default \
 	modules/stubbs/commands/rm-option/metadata \
 	modules/stubbs/commands/rm-option/module.option \
 	modules/stubbs/commands/rm-option/option.option \
-	modules/stubbs/commands/test/default.sh \
+	modules/stubbs/commands/test/default \
 	modules/stubbs/commands/test/logs.option \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/module.option \
 	modules/stubbs/commands/test/plan.option \
 	modules/stubbs/lib/bash/metadata \
 	modules/stubbs/lib/bash/generate-options \
-	modules/stubbs/lib/bash/templates/default.sh \
+	modules/stubbs/lib/bash/templates/default \
 	modules/stubbs/lib/bash/templates/functions.sh \
 	modules/stubbs/templates/test.roundup \
 	modules/stubbs/lib/functions.sh \
