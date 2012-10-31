@@ -155,7 +155,7 @@ rerun_optionGetMetadataValue() {
 
 # _rerun_commandGetMetadataValue_
 
-# Print the value for the specified option metadata item.
+# Print the value for the specified command metadata item.
 
 rerun_commandGetMetadataValue() {
     [[ ! $# -eq 3 ]] && { 
@@ -163,6 +163,20 @@ rerun_commandGetMetadataValue() {
     }
 	[[ -f $1/commands/$2/metadata ]] && {
 		awk -F= "/$3/ {print \$2}" $1/commands/$2/metadata
+	}
+}
+
+
+# _rerun_moduleGetMetadataValue_
+
+# Print the value for the specified module metadata item.
+
+rerun_moduleGetMetadataValue() {
+    [[ ! $# -eq 2 ]] && { 
+        rerun_die 'wrong # args: should be: rerun_commandGetMetadataValue module_dir key'
+    }
+	[[ -f $1/metadata ]] && {
+		awk -F= "/$2/ {print \$2}" $1/metadata
 	}
 }
 
@@ -176,7 +190,7 @@ rerun_resolveCommandScript() {
     local module_dir=$1 command=$2
     local command_dir=$module_dir/commands/${command}
 
-    searchlist=( $command_dir/default  $command_dir/default.sh )
+    searchlist=( $command_dir/script  $command_dir/default.sh )
     for file in ${searchlist[*]}
     do
         if [[ -f  "$file" ]]
@@ -492,7 +506,7 @@ _rerun_man() {
     }
     local module=$1
     if [[ ! -f "$RERUN_MODULES/$module/$module.1" 
-                && -f "$RERUN_MODULES/stubbs/commands/docs/default.sh" ]]
+                && -f "$RERUN_MODULES/stubbs/commands/docs/script" ]]
     then $RERUN stubbs:docs --module $module 
     fi
     if [[ -f "$RERUN_MODULES/$module/$module.1" ]]

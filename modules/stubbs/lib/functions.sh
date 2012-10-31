@@ -231,7 +231,8 @@ rerun_rewriteCommandScriptHeader() {
     local desc=$(rerun_commandDescription $moddir $module $command)
     local variables=$(list_optionVariables $moddir $module $command) || rerun_die
     local usage=$(add_commandUsage $moddir $module $command) || rerun_die
-    local commandScript=$moddir/$module/commands/$command/default
+    local RERUN_COMMAND_SCRIPT=$(rerun_moduleGetMetadataValue $moddir RERUN_COMMAND_SCRIPT)
+    local commandScript=$moddir/$module/commands/$command/${RERUN_COMMAND_SCRIPT:-script}
     [ ! -f "$commandScript" ] && {
         rerun_die "command script not found: $commandScript"
     }

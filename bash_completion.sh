@@ -73,7 +73,7 @@ rerun:modules()
 rerun:module:commands()
 {
     local  module=$1 commands=""
-    for hdlr in $RERUN_MODULES/$module/commands/*/default.sh; do
+    for hdlr in $RERUN_MODULES/$module/commands/*/metadata; do
 	[ -f $hdlr ] && {
 	    cmd_name=$(basename $(dirname $hdlr))
 	    commands="$commands $cmd_name"	

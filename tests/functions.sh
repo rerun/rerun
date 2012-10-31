@@ -34,7 +34,7 @@ EOF
 NAME=dance
 DESCRIPTION="tell freddy to dance"
 EOF
-    cat > $moddir/freddy/commands/dance/default <<EOF
+    cat > $moddir/freddy/commands/dance/script <<EOF
 #!/usr/bin/env bash
 source  $moddir/freddy/commands/dance/options.sh || exit 2
 echo "jumps (\$JUMPS)"
@@ -83,7 +83,7 @@ EOF
 NAME=study
 DESCRIPTION="tell freddy to study"
 EOF
-    cat > $moddir/freddy/commands/study/default <<EOF
+    cat > $moddir/freddy/commands/study/script <<EOF
 #!/usr/bin/env bash
 source  $moddir/freddy/commands/study/options.sh || exit 2
 echo "studying (\$SUBJECT)"

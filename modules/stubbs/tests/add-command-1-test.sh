@@ -13,6 +13,11 @@ rerun() {
 
 before() {
     mkdir -p $RERUN_MODULES/freddy
+    cat > $RERUN_MODULES/freddy/metadata <<EOF
+NAME=freddy
+DESCRIPTION=
+INTERPRETER=bash
+EOF
 }
 
 after() {
@@ -25,7 +30,7 @@ validate() {
     .  $RERUN_MODULES/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
-    test -f $RERUN_MODULES/freddy/commands/dance/default
+    test -f $RERUN_MODULES/freddy/commands/dance/script
 }
 
 

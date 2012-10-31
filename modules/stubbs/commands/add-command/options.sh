@@ -45,4 +45,4 @@ done
 
 # If defaultable options variables are unset, set them to their DEFAULT
 [ -z "$OVERWRITE" ] && OVERWRITE=false
-[ -z "$TEMPLATE" ] && TEMPLATE=$RERUN_MODULE_DIR/templates/default
+[ -z "$TEMPLATE" ] && TEMPLATE=$RERUN_MODULE_DIR/templates/script

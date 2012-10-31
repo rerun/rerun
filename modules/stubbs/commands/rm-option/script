@@ -105,7 +105,7 @@ rerun_generateOptionsParserForBash $RERUN_MODULES $MODULE $COMMAND > $RERUN_MODU
 echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 
 # Update variable summary in command script.
-commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/default
+commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
 if [ -f "$commandScript" ]
 then
     rerun_rewriteCommandScriptHeader \

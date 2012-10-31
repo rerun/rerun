@@ -35,10 +35,10 @@ it_builds_a_functional_module() {
         --option jumps --description "jump #num times" --required true --default 3    
 
     # ... Rewrite the handler to echo option value
-    hdler=$RERUN_MODULES/freddy/commands/dance/default
+    hdler=$RERUN_MODULES/freddy/commands/dance/script
     test -f $hdler
-    cat  $hdler | sed 's/\# Your implementation goes here./echo "jumps ($JUMPS)"/' > /tmp/default.$$
-    mv /tmp/default.$$ $hdler 
+    cat  $hdler | sed 's/\# Your implementation goes here./echo "jumps ($JUMPS)"/' > /tmp/script.$$
+    mv /tmp/script.$$ $hdler 
 
     # Run the tests
     test "$(rerun freddy:dance)" = "jumps (3)"

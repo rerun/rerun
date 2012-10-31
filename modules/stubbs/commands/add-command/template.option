@@ -4,6 +4,6 @@ NAME=template
 DESCRIPTION="default script template"
 ARGUMENTS=true
 REQUIRED=true
-DEFAULT=$RERUN_MODULE_DIR/templates/default
+DEFAULT=$RERUN_MODULE_DIR/templates/script
 SHORT=
 RANGE=

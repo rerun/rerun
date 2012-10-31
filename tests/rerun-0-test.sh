@@ -128,7 +128,7 @@ it_performs_rerun_resolveCommandScript() {
     commandScript=$(rerun_resolveCommandScript $RERUN_MODULES/freddy dance)
     test -n "$commandScript"
     test -f "$commandScript"
-    test "$RERUN_MODULES/freddy/commands/dance/default" = $commandScript
+    test "$RERUN_MODULES/freddy/commands/dance/script" = $commandScript
 }
 
 

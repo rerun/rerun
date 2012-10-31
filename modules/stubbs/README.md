@@ -46,12 +46,12 @@ Add a command named "dance" to the freddy module:
 The `add-command` module generates a boilerplate command script file you can edit.
 
 	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
-	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/default
+	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/script
 
 Of course, stubbs doesn't write the implementation for you, merely a stub.
 
 See the "Command implementation" section below to learn about 
-the `default` command script.
+the `script` command script.
 
 See the *Testing* section below to learn about
 the test script.
@@ -77,7 +77,7 @@ You will see output similar to:
 Besides the `jumps.option` file, `add-option` also generates an
 option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
-The `default` script sources the `options.sh` script to take care of
+The `script` script sources the `options.sh` script to take care of
 command line option parsing.
 
 Users will now be able to specify a "--jumps" argument to the `freddy:dance` command:
@@ -203,11 +203,11 @@ how to define tests for your module.
 
 Running `stubbs:add-command` as shown above will generate a stub default
 script implementation for the new command: 
-`$RERUN_MODULES/$MODULE/commands/$COMMAND/default`:
+`$RERUN_MODULES/$MODULE/commands/$COMMAND/script`:
 
-The "dance" command's `default` script is shown below.
+The "dance" command's `script` script is shown below.
 
-File listing: `$RERUN_MODULES/freddy/commands/dance/default`
+File listing: `$RERUN_MODULES/freddy/commands/dance/script`
 
     #!/usr/bin/env bash
     #
@@ -352,9 +352,9 @@ A statement like this is added for options that declare
 `DEFAULT` metadata.
 
 Separating options processing into the `options.sh` script,
-away from the command implementation logic in `default`, facilitates
+away from the command implementation logic in `script`, facilitates
 additional options being created. It also helps "stubbs"
-preserve changes you make to `default` or other scripts
+preserve changes you make to `script` or other scripts
 that source `options.sh`.
 
 ### Verbosity?
@@ -400,7 +400,7 @@ Define an option called "--subject":
 	   --description "subject to study" --module freddy --command study \
 	   --default math --required false
 
-Edit the default implementation (`$RERUN_MODULES/freddy/commands/study/default`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/study/script`).
 The implementation should echo what freddy is studying:
 
 	# ------------------------------
@@ -418,7 +418,7 @@ Define an option called "--jumps":
 		   --description "jump #num times" --module freddy --command dance \
 		   --default 1 --required false
 
-Edit the default implementation (`$RERUN_MODULES/freddy/commands/dance/default`).
+Edit the default implementation (`$RERUN_MODULES/freddy/commands/dance/script`).
 The implementation should echo how many jumps:
 
 	# ------------------------------
@@ -478,7 +478,7 @@ each command and ends with the suffix "-test.sh".
 	modules/freddy
 	├── commands
 	│   └── dance
-	│       ├── default
+	│       ├── script
 	│       ├── jumps.option
 	│       ├── metadata
 	│       └── options.sh

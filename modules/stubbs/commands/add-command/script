@@ -18,9 +18,6 @@
 rerun_init 
 
 
-# Read language setting for module. Set it to 'bash' as a default.
-INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
-
 # Get the options
 while [ "$#" -gt 0 ]; do
     OPT="$1"
@@ -84,8 +81,12 @@ done
     done
 }
 
+
+# Read language setting for module. Set it to 'bash' as a default.
+INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
+
 [ -z "$TEMPLATE" ] && {
-    TEMPLATE=$RERUN_MODULE_DIR/lib/$INTERPRETER/templates/default
+    TEMPLATE=$RERUN_MODULE_DIR/lib/$INTERPRETER/templates/script
 }
 
 [ ! -r "$TEMPLATE" ] && {
@@ -126,7 +127,7 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 # Generate a unit test script
 mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests directory"
 [ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "$OVEWRITE" ] && {
-    sed -e "s/@NAME@/default/g" \
+    sed -e "s/@NAME@/script/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
 	-e "s;@RERUN@;${RERUN};g" \
