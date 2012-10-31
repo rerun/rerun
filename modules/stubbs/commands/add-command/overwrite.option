@@ -1,5 +1,5 @@
 NAME=overwrite
-DESCRIPTION="overwrite the command default.sh (true|false)"
+DESCRIPTION="overwrite the command default (true|false)"
 ARGUMENTS=true
 REQUIRED=true
 DEFAULT=false

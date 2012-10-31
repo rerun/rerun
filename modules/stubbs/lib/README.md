@@ -12,7 +12,7 @@ For example, bash has:
     ├── generate-options
     ├── metadata
     └── templates
-        ├── default.sh
+        ├── default
         └── functions.sh
     
 ## Templates
@@ -34,7 +34,7 @@ Example: stubbs/lib/bash/metadata
 
     RERUN_SCRIPT_INTERPRETER=bash
     RERUN_FUNCTION_LIB=functions.sh
-    RERUN_COMMAND_SCRIPT=default.sh
+    RERUN_COMMAND_SCRIPT=default
     RERUN_OPTIONS_SCRIPT=options.sh
     RERUN_OPTIONS_GENERATOR=generate-options
 

@@ -77,7 +77,7 @@ done
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
-[ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh ] && {
+[ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/default ] && {
     rerun_die "command script not found for $MODULE:$COMMAND. Create one with stubbs:add-command."
 }
 
@@ -85,7 +85,7 @@ done
 
 : ${EDITOR:=vi}
 
-exec $EDITOR $RERUN_MODULES/$MODULE/commands/$COMMAND/default.sh
+exec $EDITOR $RERUN_MODULES/$MODULE/commands/$COMMAND/default
 
 # Done
 
