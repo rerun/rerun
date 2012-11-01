@@ -86,12 +86,11 @@ rerun:module:commands()
 rerun:command:options() 
 {
     local module=$1 command=$2 prefix=$3 options=""
-    for opt in $RERUN_MODULES/$module/commands/$command/*.option; do
-	[ -f $opt ] && {
-		name=$(basename ${opt})
-		options="$options ${prefix}${name%%.option}"
-	}
+    for opt in $(. $RERUN_MODULES/$module/commands/$command/metadata; echo $OPTIONS)
+    do
+        options="$options ${prefix}${opt}"
     done
+    
     echo $options
 }
 
@@ -99,8 +98,9 @@ rerun:command:options()
 rerun:option:default()
 {
     local module=$1 command=$2 opt=$3 
-    [ -f $RERUN_MODULES/$module/commands/$command/${opt##*-}.option ] && {
-        awk -F= '/^DEFAULT/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option
+    local opt_metadata=$RERUN_MODULES/$module/options/${opt##*-}/metadata
+    [ -f "$opt_metadata" ] && {
+        awk -F= '/^DEFAULT/ {print $2}' "$opt_metadata"
 	}
 }
 
@@ -108,8 +108,9 @@ rerun:option:default()
 rerun:option:has-argument()
 {
     local module=$1 command=$2 opt=$3
-    [ -f $RERUN_MODULES/$module/commands/$command/${opt##*-}.option ] && {
-        args=$(awk -F= '/^ARGUMENTS/ {print $2}' $RERUN_MODULES/$module/commands/$command/${opt##*-}.option)
+    local opt_metadata=$RERUN_MODULES/$module/options/${opt##*-}/metadata
+    [ -f "$opt_metadata" ] && {
+        args=$(awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata )
         [ "$args" = "true" ] && return 0 
     }
     return 1
