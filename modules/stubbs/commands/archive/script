@@ -132,9 +132,9 @@ buildrpmarchive() {
 
        if [[ -z $REQUIRES ]]
        then
-         REQUIRES=rerun
+         REQUIRES="rerun=$RERUN_VERSION"
        else
-         REQUIRES=rerun,$REQUIRES
+         REQUIRES="rerun=$RERUN_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
        fi
 
        # Prepare the source archive hierarchy:
