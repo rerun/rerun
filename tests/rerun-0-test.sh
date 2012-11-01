@@ -57,6 +57,25 @@ it_performs_rerun_option_check() {
     rerun_option_check 2 bar 
 }
 
+it_performs_rerun_containsElement() {
+    . $RERUN
+    arr1=( one two three )
+    rerun_containsElement "one" "${arr1[@]}"
+    rerun_containsElement "two" "${arr1[@]}"
+    rerun_containsElement "three" "${arr1[@]}"
+    ! rerun_containsElement "four" "${arr1[@]}"    
+}
+
+it_performs_rerun_removeElement() {
+    . $RERUN
+    arr1=( one two three )    
+    arr2=( $(rerun_removeElement "one" "${arr1[*]}") )
+    test ${#arr2[*]} = 2
+    ! rerun_containsElement "one" "${arr2[@]}"
+    rerun_containsElement "two" "${arr2[@]}"
+    rerun_containsElement "three" "${arr2[@]}"
+}
+
 it_performs_rerun_modules() {
     make_freddy $RERUN_MODULES
 
