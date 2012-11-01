@@ -89,14 +89,17 @@ done
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
+# Check if this option is assigned to any commands.
+option_to_command_assignments=( $(rerun_listAllOptionAssignments $RERUN_MODULES/$MODULE) )
+
 # Remove the .option file
 
-if [ -f "$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option" ]
+if [ ${#option_to_command_assignments[*]} = 0 ]
 then
-    rm "$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option" || {
-        rerun_die "Error removing $OPTION.option file"
+    rm -r "$RERUN_MODULES/$MODULE/options/$OPTION" || {
+        rerun_die "Error removing option: $OPTION"
     }
-    echo "Removed $RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTION.option"
+    echo "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
 fi
 
 #
