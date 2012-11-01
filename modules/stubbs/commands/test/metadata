@@ -1,2 +1,4 @@
+# command metadata
+NAME=test
 DESCRIPTION="run module test scripts"
 OPTIONS="logs module plan"

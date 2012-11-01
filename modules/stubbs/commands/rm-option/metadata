@@ -1,4 +1,4 @@
+# command metadata
 NAME=rm-option
 DESCRIPTION="remove a command option"
-
 OPTIONS="command module option"

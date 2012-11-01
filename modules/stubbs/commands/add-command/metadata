@@ -1,3 +1,4 @@
+# command metadata
 NAME=add-command
 DESCRIPTION="add command to module"
-OPTIONS="command desc module overwrite template"
+OPTIONS="command description module overwrite template"
