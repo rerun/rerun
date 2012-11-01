@@ -24,55 +24,43 @@ dist_man_MANS = modules/stubbs/stubbs.1
 # The module
 nobase_dist_pkgdata_DATA = \
 	modules/stubbs/README.md \
-	modules/stubbs/commands/add-command/command.option \
+	modules/stubbs/options/command/metadata \
 	modules/stubbs/commands/add-command/script \
-	modules/stubbs/commands/add-command/desc.option \
 	modules/stubbs/commands/add-command/metadata \
-	modules/stubbs/commands/add-command/module.option \
 	modules/stubbs/commands/add-command/options.sh \
-	modules/stubbs/commands/add-command/overwrite.option \
-	modules/stubbs/commands/add-command/template.option \
 	modules/stubbs/commands/add-module/script \
-	modules/stubbs/commands/add-module/description.option \
 	modules/stubbs/commands/add-module/metadata \
-	modules/stubbs/commands/add-module/module.option \
-	modules/stubbs/commands/add-option/arg.option \
-	modules/stubbs/commands/add-option/command.option \
-	modules/stubbs/commands/add-option/default.option \
 	modules/stubbs/commands/add-option/script \
-	modules/stubbs/commands/add-option/desc.option \
-	modules/stubbs/commands/add-option/long.option \
 	modules/stubbs/commands/add-option/metadata \
-	modules/stubbs/commands/add-option/module.option \
-	modules/stubbs/commands/add-option/option.option \
-	modules/stubbs/commands/add-option/range.option \
-	modules/stubbs/commands/add-option/required.option \
-	modules/stubbs/commands/add-option/short.option \
-	modules/stubbs/commands/archive/script \
-	modules/stubbs/commands/archive/file.option \
 	modules/stubbs/commands/archive/metadata \
-	modules/stubbs/commands/archive/modules.option \
 	modules/stubbs/commands/archive/options.sh \
-	modules/stubbs/commands/archive/version.option \
-	modules/stubbs/commands/docs/script \
-	modules/stubbs/commands/docs/file.option \
+	modules/stubbs/commands/archive/script \
 	modules/stubbs/commands/docs/metadata \
-	modules/stubbs/commands/docs/module.option \
 	modules/stubbs/commands/docs/options.sh \
-	modules/stubbs/commands/edit/command.option \
-	modules/stubbs/commands/edit/script \
+	modules/stubbs/commands/docs/script \
 	modules/stubbs/commands/edit/metadata \
-	modules/stubbs/commands/edit/module.option \
-	modules/stubbs/commands/rm-option/command.option \
-	modules/stubbs/commands/rm-option/script \
+	modules/stubbs/commands/edit/script \
 	modules/stubbs/commands/rm-option/metadata \
-	modules/stubbs/commands/rm-option/module.option \
-	modules/stubbs/commands/rm-option/option.option \
-	modules/stubbs/commands/test/script \
-	modules/stubbs/commands/test/logs.option \
+	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/metadata \
-	modules/stubbs/commands/test/module.option \
-	modules/stubbs/commands/test/plan.option \
+	modules/stubbs/commands/test/script \
+	modules/stubbs/options/arg/metadata \
+	modules/stubbs/options/command/metadata \
+	modules/stubbs/options/default/metadata \
+	modules/stubbs/options/description/metadata \
+	modules/stubbs/options/file/metadata \
+	modules/stubbs/options/logs/metadata \
+	modules/stubbs/options/long/metadata \
+	modules/stubbs/options/module/metadata \
+	modules/stubbs/options/modules/metadata \
+	modules/stubbs/options/option/metadata \
+	modules/stubbs/options/overwrite/metadata \
+	modules/stubbs/options/plan/metadata \
+	modules/stubbs/options/template/metadata \
+	modules/stubbs/options/range/metadata \
+	modules/stubbs/options/required/metadata \
+	modules/stubbs/options/short/metadata \
+	modules/stubbs/options/version/metadata \
 	modules/stubbs/lib/bash/metadata \
 	modules/stubbs/lib/bash/generate-options \
 	modules/stubbs/lib/bash/templates/script \
