@@ -89,10 +89,27 @@ done
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
-# Check if this option is assigned to any commands.
-option_to_command_assignments=( $(rerun_listAllOptionAssignments $RERUN_MODULES/$MODULE) )
+# Unassign this command from the option
+#
+#
+# Update the command metadata.
+commandMetadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
+currentAssignments=$(rerun_options $RERUN_MODULES $MODULE $COMMAND)
+# Subtract option from the list
+commandOptions=( $(rerun_removeElement $OPTION $currentAssignments) )
 
-# Remove the .option file
+stubbs_rewriteCommandOptionsMetadata \
+    $RERUN_MODULES $MODULE $COMMAND \
+    "${commandOptions[*]}" \
+    > $commandMetadata.$$ || rerun_die "Failed generating command metadata"
+mv  $commandMetadata.$$  $commandMetadata || rerun_die "Failed updating command metadata"
+echo "Updated command metadata:  $commandMetadata"
+
+
+# Check if this option is assigned to any commands.
+option_to_command_assignments=( $(stubbs_list_CommandOptionAssignments $RERUN_MODULES/$MODULE $OPTION) )
+
+# Remove the option declaration if no commands are assigned to it.
 
 if [ ${#option_to_command_assignments[*]} = 0 ]
 then
@@ -121,14 +138,13 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
     rerun_die "required metadata not found: RERUN_OPTIONS_SCRIPT"
 }
 optionsParserScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
-
+# Generate it
 $RERUN_MODULE_DIR/lib/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
     $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || rerun_die "Failed generating options parser."
 
-
 echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 #
-# Update variable summary in command script.
+# Update option variable summary in command script.
 #
 commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
 if [ -f "$commandScript" ]
