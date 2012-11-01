@@ -1,7 +1,0 @@
-NAME=description
-DESCRIPTION="the command description"
-ARGUMENTS=true
-REQUIRED=true
-DEFAULT=
-SHORT=
-RANGE=
