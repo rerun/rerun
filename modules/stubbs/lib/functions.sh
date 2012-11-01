@@ -173,7 +173,7 @@ stubbs_rewriteCommandScriptHeader() {
     }
     sed "
         s,#/ command: .*,#/ command: $module:$command: \"$desc\",
-        s,#/ variables: .*,#/ variables: $variables,
+        s,#/ option variables: .*,#/ option variables: $variables,
         s,#/ usage: .*,#/ usage: rerun $module:$command $usage,
         " $commandScript 
     # generated to stdout
