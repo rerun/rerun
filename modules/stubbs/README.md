@@ -201,11 +201,11 @@ how to define tests for your module.
 
 ## Command scripts
 
-Running `stubbs:add-command` as shown above will generate a stub default
+Running `stubbs:add-command` as shown above will generate a stub
 script implementation for the new command: 
 `$RERUN_MODULES/$MODULE/commands/$COMMAND/script`:
 
-The "dance" command's `script` script is shown below.
+The "dance" command's `script` file is shown below.
 
 File listing: `$RERUN_MODULES/freddy/commands/dance/script`
 
