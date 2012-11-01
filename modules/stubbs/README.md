@@ -48,7 +48,7 @@ The `add-command` module generates a boilerplate command script file you can edi
 	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/script
 
-Of course, stubbs doesn't write the implementation for you, merely a stub.
+Of course, stubbs doesn't write the implementation for you, merely a _stub_.
 
 See the "Command implementation" section below to learn about 
 the `script` command script.
@@ -72,9 +72,9 @@ Define an option named "--jumps":
 
 You will see output similar to:
 
-    Created option: /Users/alexh/.rerun/modules/freddy/commands/dance/jumps.option
+    Created option: /Users/alexh/.rerun/modules/freddy/options/jumps/metadata
 
-Besides the `jumps.option` file, `add-option` also generates an
+Besides the `options/jumps/metadata` file, `add-option` also generates an
 option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
 The `script` script sources the `options.sh` script to take care of
@@ -294,7 +294,7 @@ Here the "--jumps" option is set to a default value, "1":
       --option jumps -description "jump #num times" --module freddy --command dance \
       --default 1
 
-The `add-option` will update the `jumps.option` metadata file with the
+The `add-option` will update the `jumps` option metadata file with the
 new default value and extend the `options.sh` script.
 
 Run the `freddy:dance` command again but this time without the "--jumps" option:
@@ -475,17 +475,20 @@ Below is a partial view of "freddy" module files. Notice
 how the `tests` directory contains files named after
 each command and ends with the suffix "-test.sh".
 
-	modules/freddy
-	├── commands
-	│   └── dance
-	│       ├── script
-	│       ├── jumps.option
-	│       ├── metadata
-	│       └── options.sh
-	├── etc
-	├── metadata
-	└── tests
-	    │   dance-1-test.sh
+    modules/freddy/
+    ├── commands
+    │   └── dance
+    │       ├── metadata
+    │       ├── options.sh
+    │       └── script
+    ├── lib
+    │   └── functions.sh
+    ├── metadata
+    ├── options
+    │   └── jumps
+    │       └── metadata
+    └── tests
+        └── dance-1-test.sh
 
 To run the test suite for a single command use the `--command <>` option:
 
