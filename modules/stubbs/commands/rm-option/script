@@ -15,7 +15,7 @@
 
 
 # Init the handler
-rerun_init 
+stubbs_init
 
 # Get the options
 while [ "$#" -gt 0 ]; do
@@ -133,7 +133,7 @@ echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
 if [ -f "$commandScript" ]
 then
-    rerun_rewriteCommandScriptHeader \
+    stubbs_rewriteCommandScriptHeader \
         $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
         rerun_die "Error updating command script header"
     }

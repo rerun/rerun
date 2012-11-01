@@ -14,7 +14,7 @@
 . $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
 
 # Init the handler
-rerun_init 
+stubbs_init
 
 # Get the options
 while [ "$#" -gt 0 ]; do
@@ -172,7 +172,7 @@ rerun_containsElement "$OPTION" "${commandOptions[*]}" || {
 
 commandMetadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
 
-rerun_rewriteCommandOptionsMetadata \
+stubbs_rewriteCommandOptionsMetadata \
     $RERUN_MODULES $MODULE $COMMAND \
     "${commandOptions[*]}" \
     > $commandMetadata.$$ || rerun_die "Failed generating command metadata"
@@ -215,7 +215,7 @@ $RERUN_MODULE_DIR/lib/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
 commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 if [ -f "$commandScript" ]
 then
-    rerun_rewriteCommandScriptHeader \
+    stubbs_rewriteCommandScriptHeader \
         $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
         rerun_die "Error updating command script header"
     }

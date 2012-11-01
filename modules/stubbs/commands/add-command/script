@@ -15,7 +15,7 @@
 
 
 # Init the handler
-rerun_init 
+stubbs_init 
 
 
 # Get the options
