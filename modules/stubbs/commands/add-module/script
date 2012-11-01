@@ -69,8 +69,6 @@ done
 
 # Create module structure
 mkdir -p $RERUN_MODULES/$MODULE || rerun_die
-# Create etc/ subdirectory
-mkdir -p $RERUN_MODULES/$MODULE/etc || rerun_die
 # Create commands/ subdirectory
 mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die
 # Create lib/ subdirectory
