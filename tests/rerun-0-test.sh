@@ -84,9 +84,8 @@ it_performs_rerun_options() {
     . $RERUN
     options=( $(rerun_options $RERUN_MODULES freddy dance) )
     test -n "$options"
-    test "${#options[*]}" = 2
+    test "${#options[*]}" = 1
     containsElement "jumps" "${options[@]}"
-    containsElement "subject" "${options[@]}"
 }
 
 
@@ -107,15 +106,15 @@ it_performs_rerun_optionGetMetadataValue() {
 
     . $RERUN
 
-    name=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps NAME)
+    name=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy jumps NAME)
     test -n "$name"
     test "$name" = "jumps"
 
-    args=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps ARGUMENTS)
+    args=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy jumps ARGUMENTS)
     test -n "$args"
     test "$args" = "true"
 
-    required=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy dance jumps REQUIRED)
+    required=$(rerun_optionGetMetadataValue $RERUN_MODULES/freddy jumps REQUIRED)
     test -n "$required"
     test "$required" = "false"
 }

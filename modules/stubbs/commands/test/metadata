@@ -1,1 +1,2 @@
 DESCRIPTION="run module test scripts"
+OPTIONS="logs module plan"

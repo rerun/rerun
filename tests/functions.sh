@@ -33,6 +33,7 @@ EOF
     cat > $moddir/freddy/commands/dance/metadata <<EOF
 NAME=dance
 DESCRIPTION="tell freddy to dance"
+OPTIONS="jumps"
 EOF
     cat > $moddir/freddy/commands/dance/script <<EOF
 #!/usr/bin/env bash
@@ -40,7 +41,8 @@ source  $moddir/freddy/commands/dance/options.sh || exit 2
 echo "jumps (\$JUMPS)"
 EOF
     # freddy:dance [-j|--jumps <>]
-    cat > $moddir/freddy/commands/dance/jumps.option <<EOF
+    mkdir -p  $moddir/freddy/options/jumps
+    cat > $moddir/freddy/options/jumps/metadata <<EOF
 NAME=jumps
 DESCRIPTION="jump #num times"
 REQUIRED=false
@@ -82,6 +84,7 @@ EOF
     cat > $moddir/freddy/commands/study/metadata <<EOF
 NAME=study
 DESCRIPTION="tell freddy to study"
+OPTIONS="subject"
 EOF
     cat > $moddir/freddy/commands/study/script <<EOF
 #!/usr/bin/env bash
@@ -89,7 +92,8 @@ source  $moddir/freddy/commands/study/options.sh || exit 2
 echo "studying (\$SUBJECT)"
 EOF
     # freddy:study [-s|--subject <>]
-    cat > $moddir/freddy/commands/dance/subject.option <<EOF
+    mkdir -p  $moddir/freddy/options/subject
+    cat > $moddir/freddy/options/subject/metadata <<EOF
 NAME=subject
 DESCRIPTION="subject to study"
 REQUIRED=false

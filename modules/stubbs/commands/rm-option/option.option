@@ -1,8 +1,0 @@
-NAME=option
-DESCRIPTION="the option name"
-ARGUMENTS=true
-REQUIRED=true
-DEFAULT=
-SHORT=o
-LONG=option
-RANGE=

@@ -3,3 +3,4 @@
 NAME=docs
 DESCRIPTION="generate the docs"
 
+OPTIONS="file module"

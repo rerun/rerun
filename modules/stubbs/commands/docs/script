@@ -42,7 +42,7 @@ rerun_command_metadata() {
 
 rerun_option_metadata() {
 	local FIELD=$(echo $1|tr "[:lower:]" "[:upper:]")
-	local metadata=$RERUN_MODULES/$2/commands/${3}/$4.option
+	local metadata=$RERUN_MODULES/$2/options/$4/metadata
 	[ -f $metadata ] || return ; # skip weird file expansion	
 	awk -F= "/^$FIELD/ {print \$2}" $metadata
 }
@@ -56,10 +56,9 @@ rerun_command_usage() {
 }
 rerun_command_summary() {
 	declare -a summary=()
-	for opt_metadata in $RERUN_MODULES/$1/commands/${2}/*.option; do
-		[ -f $opt_metadata ] || continue ; # skip weird file expansion
-		option=$(basename $opt_metadata)
-		typeset -a arr=( "$(rerun_option_summary $1 $2 ${option%*.option} )" )
+    options=( $(. $RERUN_MODULES/$1/commands/$2/metadata; echo $OPTIONS) )
+	for option in ${options[*]}; do
+		typeset -a arr=( "$(rerun_option_summary $1 $2 ${option} )" )
 		param="${arr[@]:0:1}"
 		summary=( ${summary[@]} ${param%:*} )
 	done

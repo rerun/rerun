@@ -143,8 +143,8 @@ cat <<EOF
 # $(date)
 NAME=$COMMAND
 DESCRIPTION="$DESC"
-
+OPTIONS=
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$COMMAND/metadata || rerun_die
+) > $RERUN_MODULES/$MODULE/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata"
 
 # Done

@@ -73,7 +73,7 @@ done
 
 # If defaultable options variables are unset, set them to their DEFAULT
 $(for opt in $(echo $optionsWithDefaults|sort); do
-printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(trops $opt) $(trops $opt) $(rerun_optionDefault $moddir $module $command $opt)
+printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(trops $opt) $(trops $opt) $(rerun_optionDefault $moddir $module $opt)
 done)
 # Check required options are set
 $(for opt in $(echo $optionsRequired|sort); do

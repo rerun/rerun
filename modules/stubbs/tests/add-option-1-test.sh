@@ -12,24 +12,33 @@ rerun() {
 }
 
 before() {
-    mkdir -p $RERUN_MODULES/freddy/commands/dance
+    mkdir -p $RERUN_MODULES/freddy
     cat > $RERUN_MODULES/freddy/metadata <<EOF
 NAME=freddy
+EOF
+    mkdir -p $RERUN_MODULES/freddy/commands/dance
+    cat > $RERUN_MODULES/freddy/commands/dance/metadata <<EOF
+NAME=dance
+OPTIONS=
 EOF
 }
 
 after() {
-    rm -r $RERUN_MODULES/freddy
+    #rm -r $RERUN_MODULES/freddy
+    :
 }
 
 validate() {
     #
     # Check the metadata file
-    test -f $RERUN_MODULES/freddy/commands/dance/jumps.option
-    .  $RERUN_MODULES/freddy/commands/dance/jumps.option
+    test -f $RERUN_MODULES/freddy/options/jumps/metadata
+    .  $RERUN_MODULES/freddy/options/jumps/metadata
     test -n "$NAME" -a $NAME = jumps 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
     #
+    # Check the command's option assignment
+    OPTIONS=$(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS)
+    test -n "$OPTIONS"
     # Check the option parser
     test -f $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -q "\-j\|\--jumps)" $RERUN_MODULES/freddy/commands/dance/options.sh
@@ -72,7 +81,7 @@ it_exports_option_variable() {
 
     validate
     # Check the option metadata
-    grep "EXPORT=true"  $RERUN_MODULES/freddy/commands/dance/jumps.option
+    grep "EXPORT=true"  $RERUN_MODULES/freddy/options/jumps/metadata
     # Check the option parser
     grep '^export JUMPS$' $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -v '^export HEIGHT$' $RERUN_MODULES/freddy/commands/dance/options.sh

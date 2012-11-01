@@ -1,8 +1,0 @@
-NAME=module
-DESCRIPTION="the module name"
-ARGUMENTS=true
-REQUIRED=true
-DEFAULT=
-LONG=module
-SHORT=m
-RANGE=

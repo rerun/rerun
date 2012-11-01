@@ -1,3 +1,4 @@
 NAME=add-option
 DESCRIPTION="add a command option"
 
+OPTIONS="arg command default desc export long module option range required short"

@@ -1,1 +1,2 @@
 DESCRIPTION="add a new module"
+OPTIONS="description interpreter module"

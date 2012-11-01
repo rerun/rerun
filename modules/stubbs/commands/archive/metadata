@@ -3,3 +3,4 @@
 NAME=extract
 DESCRIPTION="build a self extracting rerun" 
 
+OPTIONS="file format modules release version"
