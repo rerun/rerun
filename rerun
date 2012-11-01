@@ -124,11 +124,28 @@ rerun_options() {
     fi
 }
 
+# _rerun_containsElement_
 rerun_containsElement () {
-  local e
-  for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
-  return 1
+    [[ ! $# -ge 2 ]] && {
+        rerun_die 'wrong # args: should be: rerun_containsElement element array'
+    }
+    local e
+    for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
+    return 1
 }
+
+# _rerun_removeElement_
+
+# remove element from list
+rerun_removeElement() {
+    local retlist=()
+    for e in ${@:2}
+    do
+	    [[ $1 != $e ]] && retlist=( ${retlist[*]} "$e" )
+    done
+    echo "${retlist[@]}"
+}
+
 
 rerun_absolutePath() {
     local infile="${1:-$0}"
