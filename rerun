@@ -270,7 +270,7 @@ rerun_existsModule() {
 # _rerun_executeCommand_
 # 
 # Command scripts see the following environment variables:
-#   RERUN, RERUN_MODULES, RERUN_MODULE_DIR
+#   RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 # There are two modes of execution: normal and replay. 
 # Normal mode is what you'd expect. The handler script for the
 # command is looked up an executed with user options.
@@ -315,7 +315,7 @@ rerun_executeCommand() {
     INTERPRETER=$( . $RERUN_MODULE_DIR/metadata ; echo ${INTERPRETER})
     : ${INTERPRETER:=$RERUN_SH}; # default it.
 
-    export RERUN RERUN_MODULES RERUN_MODULE_DIR
+    export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR
 
     COMMAND_SCRIPT=$(rerun_resolveCommandScript $RERUN_MODULE_DIR $COMMAND)
 

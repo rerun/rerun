@@ -4,7 +4,8 @@
 #
 #/ usage: rerun @MODULE@:@NAME@ [options]
 #
-#/ variables: @VARIABLES@
+#/ rerun variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option variables: @VARIABLES@
 
 # Read module function library.
 . $RERUN_MODULE_DIR/lib/functions.sh || { 

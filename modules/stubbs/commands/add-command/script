@@ -96,7 +96,7 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 # Create command structure
 mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die
 
-VARIABLES=$(list_optionVariables $RERUN_MODULES $MODULE $COMMAND)
+VARIABLES=$(stubbs_list_optionVariables $RERUN_MODULES $MODULE $COMMAND)
 
 [ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && {
     rerun_die "language unsupported: $INTERPRETER"
