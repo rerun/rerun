@@ -1,4 +1,4 @@
-.TH stubbs 1 "Fri Oct 26 15:54:56 PDT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Thu Nov  1 13:52:06 PDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -8,7 +8,7 @@ stubbs \- "Simple rerun module builder"
 rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | rm-option | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
-.SH stubbs:add-command \f[]--command <> --desc <> --module <> --overwrite <false> --template <$RERUN_MODULE_DIR/templates/default.sh>
+.SH stubbs:add-command \f[]--command <> --description <> --module <> --overwrite <false> --template <$RERUN_MODULE_DIR/templates/script>
 "add command to module"
 .PP
 \f[I]OPTIONS\f[]
@@ -18,36 +18,6 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.TP
-.B \--desc \f[]"the command description"\f[]
-required: \f[I]true\f[] ,
-arguments: \f[I]true\f[]
-.RS
-.RE
-.TP
-.B \--module \f[]"the module name"\f[]
-required: \f[I]true\f[] ,
-arguments: \f[I]true\f[]
-.RS
-.RE
-.TP
-.B \--overwrite \f[]"overwrite the command default.sh (true|false)"\f[]
-required: \f[I]true\f[] ,
-arguments: \f[I]true\f[]
-, default: \f[I]false\f[]
-.RS
-.RE
-.TP
-.B \--template \f[]"default script template"\f[]
-required: \f[I]true\f[] ,
-arguments: \f[I]true\f[]
-, default: \f[I]$RERUN_MODULE_DIR/templates/default.sh\f[]
-.RS
-.RE
-.SH stubbs:add-module \f[]--description <> --module <>
-"add a new module"
-.PP
-\f[I]OPTIONS\f[]
 .TP
 .B \--description \f[]"the module description"\f[]
 required: \f[I]true\f[] ,
@@ -60,7 +30,44 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --desc <> [--export <false>] [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
+.TP
+.B \--overwrite \f[]"overwrite the command default (true|false)"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]false\f[]
+.RS
+.RE
+.TP
+.B \--template \f[]"default script template"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]$RERUN_MODULE_DIR/templates/script\f[]
+.RS
+.RE
+.SH stubbs:add-module \f[]--description <> [--interpreter <bash>] --module <>
+"add a new module"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--description \f[]"the module description"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.TP
+.B \--interpreter \f[]"the scripting interpreter (bash)"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+, default: \f[I]bash\f[]
+.RS
+.RE
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
+.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --description <> [--export <false>] [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
 "add a command option"
 .PP
 \f[I]OPTIONS\f[]
@@ -84,7 +91,7 @@ arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \--desc \f[]"the option description"\f[]
+.B \--description \f[]"the module description"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
@@ -171,19 +178,18 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:docs \f[][--file <"$RERUN_MODULE_DIR/${MODULE}.1">] --module <>
+.SH stubbs:docs \f[][--file <>] --module <>
 "generate the docs"
 .PP
 \f[I]OPTIONS\f[]
 .TP
-.B \--file \f[]"file name"\f[]
+.B \--file \f[]"self extracting archive file"\f[]
 required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
-, default: \f[I]"$RERUN_MODULE_DIR/${MODULE}.1"\f[]
 .RS
 .RE
 .TP
-.B \--module \f[]"module name"\f[]
+.B \--module \f[]"the module name"\f[]
 required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
@@ -252,7 +258,7 @@ arguments: \f[I]true\f[]
 .PP
 Successful completion: 0
 .SH AUTHORS
-anthony
+alexh
 .SH "SEE ALSO"
 rerun
 .SH KEYWORDS
