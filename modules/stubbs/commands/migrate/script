@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+#
+#/ command: stubbs:migrate: ""Migrate 0.9 modules to the 1.0 module format""
+#
+#/ usage: rerun stubbs:migrate  --module|-m <> 
+#
+#/ rerun variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option variables: MODULE
+
+# Read module function library.
+. $RERUN_MODULE_DIR/lib/functions.sh || { 
+  echo >&2 "Failed loading function library" ; exit 1 ; 
+}
+
+# Parse the command options.
+[ -r $RERUN_MODULE_DIR/commands/migrate/options.sh ] && {
+  . $RERUN_MODULE_DIR/commands/migrate/options.sh || exit 2 ;
+}
+
+# Exit immediately upon non-zero exit for simple commands. 
+# See [set](http://ss64.com/bash/set.html)
+# Pipelines return with exit code of left most command failure.
+# See [pipelines](http://www.gnu.org/software/bash/manual/bash.html#Pipelines)
+set -e -o pipefail
+
+
+# ------------------------------
+# Your implementation goes here.
+# ------------------------------
+
+MODULE_DIR=$RERUN_MODULES/$MODULE
+
+[[ ! -d "$MODULE_DIR" ]] && {
+    die "module directory not found: $MODULE_DIR"
+}
+
+[[ ! -f "$MODULE_DIR/metadata" ]] && {
+    die "metadata not found: $MODULE_DIR/metadata"
+}
+
+migrateCommands() {
+    [[ $# = 1 ]] || { 
+        echo >&2 "usage: migrateCommands <moddir>" 
+        return 2
+    }
+    MODULE_DIR=$1
+
+    for cmd in $(find "$MODULE_DIR/commands" -name default.sh  -o -name default)
+    do  
+        cmd_metadata=$(dirname $cmd)/metadata
+        cmd_name=$(. $cmd_metadata ; echo $NAME )
+        #
+        # Move the command script
+        #
+        if [[ -f $MODULE_DIR/commands/$cmd_name/script ]]
+        then
+            echo >&2 "skipping: already migrated command: $cmd_name"
+        else
+            mv $cmd  "$MODULE_DIR/commands/$cmd_name/script" || {
+                die "Failed migrating script handler for command: $cmd_name"
+            }
+            echo "Migrated command: $cmd_name"
+        fi
+    done
+}
+
+migrateOptions() {
+    [[ $# = 1 ]] || { 
+        echo >&2 "usage: migrateOptions <moddir>" 
+        return 2 ; 
+    }
+    MODULE_DIR=$1
+    mkdir -p "$MODULE_DIR/options"
+
+    for opt in $(find "$MODULE_DIR" -name \*.option)
+    do  
+        opt_metadata=$(basename $opt)
+        opt_name=${opt_metadata%.*}
+        #
+        # Move the option declaration 
+        #
+        if [[ -f $MODULE_DIR/options/$opt_name/metadata ]]
+        then
+            echo >&2 "skipping option: already migrated: $opt_name"
+        else
+            mkdir -p "$MODULE_DIR/options/$opt_name"
+            mv $opt "$MODULE_DIR/options/$opt_name/metadata" || {
+                die "Failed migrating option: $opt_name"
+            }
+            echo "Migrated option: $opt_name"
+        fi
+        #
+        # Assign the options to their commands
+        #
+
+    done
+}
+
+assignOptions() {
+    [ $# = 1 ] || { 
+        echo >&2 "usage: assignOptions <moddir>" 
+        return 1 ; 
+    }
+    MODULE_DIR=$1    
+
+    shopt -s nullglob # enable
+    for cmd_metadata in $MODULE_DIR/commands/*/metadata
+    do
+        #
+        # Parse the command name
+        cmd_dir=$(dirname $cmd_metadata)
+        cmd_name=$(basename $cmd_dir)
+
+        #
+        # Collect the command's options
+        cmd_options=( $(find "$cmd_dir" \
+            -name \*.option -exec basename {} \;|sed 's/.option//') )
+        #
+        # Add an OPTIONS metadata key if necessary
+        grep -q "^OPTIONS="  $cmd_metadata || {
+            echo "OPTIONS=" >> $cmd_metadata
+        }
+        # Skip option assignment if there are no options
+        [[ ${#cmd_options[*]} < 1 ]] && continue
+        #
+        # Update the OPTIONS list
+        sed "s/OPTIONS=.*/OPTIONS=\"${cmd_options[*]}\"/" \
+            $cmd_metadata > $cmd_metadata.$$
+        mv $cmd_metadata.$$ $cmd_metadata || {
+            die "Failed updating metadata for option: $cmd_name"
+        }
+        echo "Assigned options for command \"$cmd_name\": [${cmd_options[*]}]"
+    done
+}
+
+migrateCommands $MODULE_DIR
+
+assignOptions $MODULE_DIR
+
+migrateOptions $MODULE_DIR
+
+exit $?
+
+# Done
