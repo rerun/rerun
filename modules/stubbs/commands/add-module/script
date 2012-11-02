@@ -60,15 +60,19 @@ done
 }
 
 : ${INTERPRETER:=bash}
-[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && rerun_die "language unsupported: $INTERPRETER"
+[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && {
+    rerun_die "language unsupported: $INTERPRETER"
+}
+.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata"
+}
 
-.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata "
-
-[ -z "$RERUN_FUNCTION_LIB" ] && rerun_die "required metadata not found: RERUN_FUNCTION_LIB"
-
+[ -z "$RERUN_FUNCTION_LIB" ] && {
+    rerun_die "required metadata not found: RERUN_FUNCTION_LIB"
+}
 
 # Create module structure
-mkdir -p $RERUN_MODULES/$MODULE || rerun_die
+mkdir -p $RERUN_MODULES/$MODULE || rerun_die "Failed creating module structure"
 # Create commands/ subdirectory
 mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die
 # Create lib/ subdirectory
@@ -90,7 +94,8 @@ EOF
 
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
-sed "s/@MODULE@/$MODULE/g" $RERUN_MODULE_DIR/lib/$INTERPRETER/templates/$RERUN_FUNCTION_LIB \
+sed "s/@MODULE@/$MODULE/g" \
+    $RERUN_MODULE_DIR/lib/$INTERPRETER/templates/$RERUN_FUNCTION_LIB \
     > $RERUN_MODULES/$MODULE/lib/$RERUN_FUNCTION_LIB || rerun_die
 
 
