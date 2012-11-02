@@ -19,6 +19,9 @@ rerun() {
 describe "migrate"
 
 it_fails_without_arguments() {
+    # Needed for CentOS 5.4:
+    set +e
+
     if ! rerun stubbs:migrate
     then
       exit 0
