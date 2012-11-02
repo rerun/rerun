@@ -90,7 +90,7 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 }
 
 [ ! -r "$TEMPLATE" ] && {
-    rerun_option_error "TEMPLATE does not exist: $TEMPLATE"
+    rerun_syntax_error "TEMPLATE does not exist: $TEMPLATE"
 }
 
 # Create command structure
