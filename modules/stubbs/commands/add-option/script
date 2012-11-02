@@ -202,8 +202,9 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 optionsParserScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
 
 $RERUN_MODULE_DIR/lib/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
-    $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || rerun_die "Failed generating options parser."
-
+    $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || {
+    rerun_die "Failed generating options parser."
+}
 
 # Update the command script header to give it the updated
 # variable summary and usage info.
