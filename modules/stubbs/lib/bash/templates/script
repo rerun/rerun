@@ -4,7 +4,7 @@
 #
 #/ usage: rerun @MODULE@:@NAME@ [options]
 #
-#/ rerun variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ rerun env variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option variables: @VARIABLES@
 
 # Read module function library.
