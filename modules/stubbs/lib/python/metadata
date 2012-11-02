@@ -1,0 +1,9 @@
+#
+RERUN_SCRIPT_LANGUAGE=python
+
+# These are relative to the lib dir
+
+RERUN_FUNCTION_LIB=functions.py
+RERUN_COMMAND_SCRIPT=script
+RERUN_OPTIONS_GENERATOR=generate-options
+RERUN_OPTIONS_SCRIPT=options.py
