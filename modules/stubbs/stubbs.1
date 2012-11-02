@@ -1,11 +1,11 @@
-.TH stubbs 1 "Thu Nov  1 13:52:06 PDT 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Fri Nov  2 14:57:09 PDT 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
 .SH SYNOPSIS
 .PP
 \f[CR] 
-rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | rm-option | test ] [OPTIONS]
+rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | migrate | rm-option | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
 .SH stubbs:add-command \f[]--command <> --description <> --module <> --overwrite <false> --template <$RERUN_MODULE_DIR/templates/script>
@@ -210,6 +210,16 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
+.SH stubbs:migrate \f[]--module <>
+"Migrate 0.9 modules to the 1.0 module format"
+.PP
+\f[I]OPTIONS\f[]
+.TP
+.B \--module \f[]"the module name"\f[]
+required: \f[I]true\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
 .SH stubbs:rm-option \f[]--command <> --module <> --option <>
 "remove a command option"
 .PP
@@ -258,7 +268,7 @@ arguments: \f[I]true\f[]
 .PP
 Successful completion: 0
 .SH AUTHORS
-alexh
+anthony
 .SH "SEE ALSO"
 rerun
 .SH KEYWORDS
