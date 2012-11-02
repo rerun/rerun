@@ -18,6 +18,9 @@ rerun() {
 
 describe "migrate"
 
-it_runs_without_arguments() {
-    rerun stubbs:migrate
+it_fails_without_arguments() {
+    if ! rerun stubbs:migrate
+    then
+      exit 0
+    fi
 }
