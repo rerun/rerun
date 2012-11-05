@@ -1,33 +1,17 @@
+# 
+# Shell functions for @MODULE@ commands
 #
-# common shell functions for @MODULE@ commands
-#
 
 
-# __Colorizing functions__
-
-
-# Unset `RERUN_COLOR` to disable.
-txtrst () { tput sgr0 ; }
-bold() { echo -e "\033[1m$*\033[0m" ; txtrst ; }
-dim() { tput dim ; echo " $*" ; txtrst ; }
-[ -n "$RERUN_COLOR" ] && {
-    ul="\033[4m" ; _ul="\033[0m" ; # underline
-    gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
-    red="\033[31m" ; _red="\033[0m" ; # red
-    bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
+# Read rerun's public functions
+. $RERUN || {
+    echo >&2 "ERROR: Failed sourcing rerun function library: \"$RERUN\""
+    return 1
 }
 
-#
-# error handling functions -
+
+# ----------------------------
+# Your functions declared here.
 #
 
-# Print the message and exit.
-# Use text effects if `RERUN_COLOR` environment variable set.
-rerun_die() {
-    if [[ "$RERUN_COLOR" == "true" ]]
-    then echo >&2 -e ${red}"ERROR: $*"${_red} 
-    else echo >&2 "ERROR: $*" 
-    fi
-    exit 1
-}
 
