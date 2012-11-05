@@ -100,9 +100,7 @@ commandOptions=( $(rerun_list_remove $OPTION $currentAssignments) )
 
 stubbs_command_options_write \
     $RERUN_MODULES/$MODULE $COMMAND \
-    "${commandOptions[*]}" \
-    > $commandMetadata.$$ || rerun_die "Failed generating command metadata"
-mv  $commandMetadata.$$  $commandMetadata || rerun_die "Failed updating command metadata"
+    "${commandOptions[*]}" || rerun_die "Failed generating command metadata"
 echo "Updated command metadata:  $commandMetadata"
 
 

@@ -276,11 +276,7 @@ stubbs_command_options_write() {
     [[ ! -f "$command_metadata" ]] && {
         rerun_die "command metadata not found: $command_metadata"
     }
-    grep -q "^OPTIONS=" $command_metadata || {
-        echo "OPTIONS=">>$command_metadata
-    }
-    sed "s/OPTIONS=.*/OPTIONS=\"$options\"/" $command_metadata
-    # Generate output to stdout.
+    rerun_property_set $moddir/commands/$command OPTIONS="$options"
 }
 
 #
