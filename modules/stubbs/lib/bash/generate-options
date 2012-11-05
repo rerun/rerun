@@ -55,26 +55,6 @@ optionsExported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 #
 #/ usage: $module:$command $(stubbs_command_usage $moddir/$module $command)
 
-# print USAGE and exit
-rerun_option_usage() {
-    grep '^#/ usage:' <"\$0" | cut -c4- >&2
-    return 2
-}
-
-# print SYNTAX and exit
-rerun_option_error() {
-    if [[ "\$RERUN_COLOR" == "true" ]]
-    then echo >&2 -e "${red}""SYNTAX: \$*""${_red}"
-    else echo >&2 "SYNTAX: \$*" 
-    fi
-    exit 2
-}
-
-# check option has its argument
-rerun_option_check() {
-    [ "\$1" -lt 2 ] && rerun_option_usage
-}
-
 # options: [$(rerun_options $moddir $module $command)]
 while [ "\$#" -gt 0 ]; do
     OPT="\$1"
