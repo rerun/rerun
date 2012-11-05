@@ -179,8 +179,8 @@ stubbs_option_commands() {
 # * command: command name
 #
 stubbs_command_usage() {
-    [[ ! $# = 3 ]] && { 
-        echo >&2 "usage: generate_command_usage module_dir command" ; 
+    [[ ! $# = 2 ]] && { 
+        echo >&2 "usage: stubbs_command_usage module_dir command" ; 
         return 1 ; 
     }
     local moddir=$1 command=$2
