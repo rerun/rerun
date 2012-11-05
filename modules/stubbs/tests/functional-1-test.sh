@@ -29,17 +29,21 @@ it_builds_a_functional_module() {
     rerun stubbs:add-command --module "freddy" \
         --command dance --description "tell freddy to dance"
 
+    commandScript=$RERUN_MODULES/freddy/commands/dance/script
+    # Be sure the command script has execute bit set 
+    test -x$commandScript
+    
     # Create option: freddy:dance --jumps <3>
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --description "jump #num times" --required true --default 3    
 
+    test -x$commandScript 
+ 
     # ... Rewrite the handler to echo option value
-    hdler=$RERUN_MODULES/freddy/commands/dance/script
-    test -f $hdler
-    cat  $hdler | sed 's/\# Your implementation goes here./echo "jumps ($JUMPS)"/' > /tmp/script.$$
-    mv /tmp/script.$$ $hdler 
+    cat  $commandScript | sed 's/\# Your implementation goes here./echo "jumps ($JUMPS)"/' > /tmp/script.$$
+    mv /tmp/script.$$ $commandScript 
 
-    # Run the tests
+    # Test the commands with and w/o options
     test "$(rerun freddy:dance)" = "jumps (3)"
     test "$(rerun freddy:dance --jumps $$)" = "jumps ($$)"
 }

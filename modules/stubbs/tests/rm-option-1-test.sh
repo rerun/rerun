@@ -92,8 +92,8 @@ it_removes_option_after_last_assignment() {
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
     test ${#OPTIONS[*]} = 2
-    rerun_containsElement "jumps" "${OPTIONS[@]}"
-    rerun_containsElement "height" "${OPTIONS[@]}"
+    rerun_list_contains "jumps" "${OPTIONS[@]}"
+    rerun_list_contains "height" "${OPTIONS[@]}"
     #
     # Remove --jumps
     rerun stubbs:rm-option --module freddy --command dance --option jumps
@@ -101,8 +101,8 @@ it_removes_option_after_last_assignment() {
     # Check if the option has been unassigned.
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
     test ${#OPTIONS[*]} = 1
-    ! rerun_containsElement "jumps" "${OPTIONS[@]}"
-    rerun_containsElement "height" "${OPTIONS[@]}"
+    ! rerun_list_contains "jumps" "${OPTIONS[@]}"
+    rerun_list_contains "height" "${OPTIONS[@]}"
     # Ensure that the option declaration was removed from the module
     ! test -d $RERUN_MODULES/freddy/options/jumps
     #

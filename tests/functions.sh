@@ -27,6 +27,7 @@ make_freddy() {
     cat > $moddir/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION="A dancer in a red beret and matching suspenders"
+INTERPRETER=bash
 EOF
     # freddy:dance
     mkdir -p $moddir/freddy/commands/dance
@@ -40,6 +41,8 @@ EOF
 source  $moddir/freddy/commands/dance/options.sh || exit 2
 echo "jumps (\$JUMPS)"
 EOF
+    # Make this script executable.
+    chmod +x  $moddir/freddy/commands/dance/script
     # freddy:dance [-j|--jumps <>]
     mkdir -p  $moddir/freddy/options/jumps
     cat > $moddir/freddy/options/jumps/metadata <<EOF

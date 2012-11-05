@@ -64,7 +64,7 @@ EOF
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
     test -n "$OPTIONS"
-    rerun_containsElement "jumps" "${OPTIONS[*]}"
+    rerun_list_contains "jumps" "${OPTIONS[*]}"
 }
 
 it_runs_fully_optioned() {
@@ -76,7 +76,7 @@ it_runs_fully_optioned() {
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
     test -n "$OPTIONS"
-    rerun_containsElement "jumps" "${OPTIONS[*]}"
+    rerun_list_contains "jumps" "${OPTIONS[*]}"
 }
 
 it_exports_option_variable() {
@@ -94,8 +94,8 @@ it_exports_option_variable() {
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
     test -n "$OPTIONS"
     test ${#OPTIONS[*]} = 2
-    rerun_containsElement "jumps" "${OPTIONS[@]}"
-    rerun_containsElement "height" "${OPTIONS[@]}"
+    rerun_list_contains "jumps" "${OPTIONS[@]}"
+    rerun_list_contains "height" "${OPTIONS[@]}"
 
     # Check the option metadata
     grep "EXPORT=true"  $RERUN_MODULES/freddy/options/jumps/metadata

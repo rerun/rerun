@@ -166,14 +166,14 @@ echo "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
 #
 commandOptions=( $(rerun_options $RERUN_MODULES $MODULE $COMMAND) )
 # Check if this option has already been assigned.
-rerun_containsElement "$OPTION" "${commandOptions[*]}" || {
+rerun_list_contains "$OPTION" "${commandOptions[*]}" || {
     commandOptions=( ${commandOptions[*]} $OPTION )
 }
 
 commandMetadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
 
-stubbs_rewriteCommandOptionsMetadata \
-    $RERUN_MODULES $MODULE $COMMAND \
+stubbs_command_options_write \
+    $RERUN_MODULES/$MODULE $COMMAND \
     "${commandOptions[*]}" \
     > $commandMetadata.$$ || rerun_die "Failed generating command metadata"
 mv  $commandMetadata.$$  $commandMetadata || rerun_die "Failed updating command metadata"
@@ -216,13 +216,14 @@ $RERUN_MODULE_DIR/lib/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
 commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 if [ -f "$commandScript" ]
 then
-    stubbs_rewriteCommandScriptHeader \
-        $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
+    stubbs_script_header \
+        $RERUN_MODULES/$MODULE $COMMAND > ${commandScript}.$$ || {
         rerun_die "Error updating command script header"
     }
     mv $commandScript.$$ $commandScript || {
         rerun_die "Error updating command script header"
     }
+    chmod +x $commandScript || rerun_die "Failed setting execute bit on command script."
     echo "Updated command script header: $commandScript"
 fi
 

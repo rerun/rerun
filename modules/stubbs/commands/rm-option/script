@@ -96,10 +96,10 @@ done
 commandMetadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
 currentAssignments=$(rerun_options $RERUN_MODULES $MODULE $COMMAND)
 # Subtract option from the list
-commandOptions=( $(rerun_removeElement $OPTION $currentAssignments) )
+commandOptions=( $(rerun_list_remove $OPTION $currentAssignments) )
 
-stubbs_rewriteCommandOptionsMetadata \
-    $RERUN_MODULES $MODULE $COMMAND \
+stubbs_command_options_write \
+    $RERUN_MODULES/$MODULE $COMMAND \
     "${commandOptions[*]}" \
     > $commandMetadata.$$ || rerun_die "Failed generating command metadata"
 mv  $commandMetadata.$$  $commandMetadata || rerun_die "Failed updating command metadata"
@@ -107,7 +107,7 @@ echo "Updated command metadata:  $commandMetadata"
 
 
 # Check if this option is assigned to any commands.
-option_to_command_assignments=( $(stubbs_list_CommandOptionAssignments $RERUN_MODULES/$MODULE $OPTION) )
+option_to_command_assignments=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $OPTION) )
 
 # Remove the option declaration if no commands are assigned to it.
 
@@ -149,8 +149,8 @@ echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
 if [ -f "$commandScript" ]
 then
-    stubbs_rewriteCommandScriptHeader \
-        $RERUN_MODULES $MODULE $COMMAND > ${commandScript}.$$ || {
+    stubbs_script_header \
+        $RERUN_MODULES/$MODULE $COMMAND > ${commandScript}.$$ || {
         rerun_die "Error updating command script header"
     }
     mv $commandScript.$$ $commandScript || {
