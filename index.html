@@ -92,14 +92,8 @@ for additional documentation including:</p>
 <p><code>-h</code>
 : Print help and usage then exit.</p>
 
-<p><code>--replay *LOG*</code>
-: Compare the results of a <em>command</em> execution to that in a replay log and show the difference in output if any.</p>
-
 <p><code>-M</code> <em>DIRECTORY</em>
 : Module library directory path.</p>
-
-<p><code>-L</code> <em>DIRECTORY</em>
-: Recorded <em>command</em> execution logs stored in this directory. Also settable via <code>RERUN_LOGS</code>.</p>
 
 <p><code>-v</code> 
 : Execute <em>command</em> in verbose mode. </p>
@@ -120,7 +114,7 @@ for additional documentation including:</p>
 |_|  \___|_|   \__,_|_| |_|
 Version: v0.1. License: Apache 2.0.
 
-Usage: rerun [-h][-v][-V] [-M &lt;dir&gt;] [-L &lt;dir&gt;] [--replay &lt;file&gt;] [module:[command [command_args]]]
+Usage: rerun [-h][-v][-V] [-M &lt;dir&gt;] [module:[command [options]]]
 
 Examples:
 | $ rerun 
@@ -266,124 +260,6 @@ jumps (3)
 <p>See <code>stubbs:archive</code> for further information about creating and 
 understanding rerun archives.</p>
 
-<h3>Replay</h3>
-
-<p>Rerun supports basic command replay logging (See "Logs" section below).
-When rerun logs a command it does so in a form that can be re-executed 
-(i.e., "replayed"). It's possible to have rerun compare the results of a 
-given replay log against a new command execution.
-Replay logs are normally found in the directory specified by the <code>RERUN_LOGS</code>
-environment variable (or the <code>-L &lt;dir&gt;</code> option).</p>
-
-<p>Use the <code>--replay &lt;log&gt;</code> option to compare replay output from a command log.</p>
-
-<p>Below you can see the results of a comparison between this run of
-<code>freddy:dance --jumps 2</code>  against an earlier command execution. 
-After the command completes, rerun uses the <code>diff</code> command 
-to compare the log output.</p>
-
-<pre><code>$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance --jumps 2
-jumps (2)
-[diff]
-2c2
-&lt; jumps ()
----
-&gt; jumps (2)
-</code></pre>
-
-<p>In this case, the replay contained "jumps ()" while the new
-execution printed "jumps (2)".
-When a difference is detected, <code>rerun</code> will print the differences
-below the <code>[diff]</code> label and exit with a non-zero exit status.</p>
-
-<h1>LOGS</h1>
-
-<p>Rerun records command execution as replay logs, if the <code>-L &lt;dir&gt;</code> 
-argument is set or the <code>RERUN_LOGS</code> environment variable is set.
-Be sure to set <code>RERUN_LOGS</code> to a writable directory. </p>
-
-<p>Each command execution is recorded in the form of a "replay" log
-file (ending with <code>.replay</code>).
-This log file contains information about the command
-execution, as well as, the output from the execution.</p>
-
-<p>These .replay files can be edited or executed as scripts.</p>
-
-<p><em>File naming</em></p>
-
-<p>Each replay log is named using the following pattern:</p>
-
-<pre><code>$RERUN_LOGS/$MODULE-$COMMAND-YYYY-MM-DD-THHMMSS-PID.replay
-</code></pre>
-
-<p>To list the replay logs for the <code>freddy:dance</code> command use <code>ls</code>:</p>
-
-<pre><code>$ ls -l $RERUN_LOGS/freddy-dance*.replay
--rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-09-21T195402-2344.replay
-</code></pre>
-
-<p><em>File format</em></p>
-
-<p>Replay logs follow a simple format that combines 
-command execution metadata and log output.</p>
-
-<p>metadata:</p>
-
-<ul>
-<li>RERUN: The rerun executable</li>
-<li>MODULE: The module name</li>
-<li>COMMAND: The command name</li>
-<li>OPTIONS: The command options</li>
-<li>USER: The user executing the command</li>
-<li>DATE: The timestamp for the execution</li>
-</ul><p>Here's the metadata as specified in the file template:</p>
-
-<pre><code>#
-# Rerun replay log
-#
-RERUN="$RERUN"
-MODULE="$MODULE"
-COMMAND="$COMMAND"
-OPTIONS="$*"
-USER="$USER"
-DATE="$(date '+%Y-%m%d-%H%M%S')"
-__COMMAND_OUT_BELOW__
-</code></pre>
-
-<p>Any command output is stored below the line delimiter, <code>__COMMAND_OUT_BELOW__</code>.</p>
-
-<p>Here's an example replay file for the <code>freddy:dance</code> command:</p>
-
-<pre><code>#
-# Rerun replay log
-#
-RERUN="/Users/alexh/rerun-workspace/rerun/rerun"
-MODULE="freddy"
-COMMAND="dance"
-OPTIONS=""
-USER="alexh"
-DATE="2011-0921-195402"
-__COMMAND_OUT_BELOW__
-
-jumps (1)
-</code></pre>
-
-<p>This simple shell function will parse the content for a given 
-replay log:</p>
-
-<pre><code>rerun_extractLog() {
-    [ -f $1 ] || die "file does not exist: $1"
-    SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $1) || die "failed sizing output"
-    tail -n+$SIZE $1 || die "failed extracting output"
-}
-</code></pre>
-
-<p>Running this shell function for a given replay log looks similar to this:</p>
-
-<pre><code>$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.replay
-
-jumps (1)
-</code></pre>
 
 <h1>MODULES</h1>
 
@@ -468,18 +344,18 @@ are illustrated here:</p>
 
 <pre><code>freddy
 ├── commands
-│   ├── dance
-│   │   ├── metadata
-│   │   ├── default.sh
-│   │   ├── jumps.option
-│   │   └── options.sh
-│   └── study
-│       ├── metadata
-│       ├── default.sh
-│       ├── options.sh
-│       └── subject.option
-├── metadata
-└── lib
+│   └── dance (directory for dance command files)
+│       ├── metadata (command metadata)
+│       ├── options.sh (option parsing script)
+│       └── script (command script)
+├── lib
+│   └── functions.sh (module function library)
+├── metadata (module metadata)
+├── options (module options)
+│   └── jumps ("jumps" command option)
+│       └── metadata (declares metadata for "jumps" option)
+└── tests
+    └── dance-1-test.sh (unit tests for dance)
 </code></pre>
 
 <h1>ENVIRONMENT</h1>
@@ -489,18 +365,11 @@ are illustrated here:</p>
 If RERUN_MODULES is not set, it is defaulted
 relative to the location of the rerun executable.</p>
 
-<p><code>RERUN_LOGS</code>
-: Path to directory where rerun will record command
-executions as replay log files.</p>
-
 <p><code>RERUN_COLOR</code>
 : Set 'true' if you want ANSI text effects. Makes
 labels in text to print bold in the console.
 Syntax errors will also print bold.</p>
 
-<p><code>DIFF</code>
-: Set to the particular <code>diff</code> command to use for
-replay log comparisons.</p>
 
 <h1>SEE ALSO</h1>
 
