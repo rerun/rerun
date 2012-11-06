@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [options]]]
+	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [module:[command [options]]]
 
 # DESCRIPTION
 
@@ -16,7 +16,7 @@ Collections of management modules can be archived and delivered as
 a single executable to facilitate team hand offs.
 Using the "stubbs" module, rerun will even facilitate unit tests.
 When users execute rerun module commands, rerun can record 
-execution data into log files that can later be replayed.
+execution data into log files.
 
 Rerun provides two modes of operation:
 
@@ -65,9 +65,6 @@ for additional documentation including:
 `-L` *DIRECTORY*
 : Recorded _command_ execution logs stored in this directory. Also settable via `RERUN_LOGS`.
 
-`--replay *LOG*`
-: Compare the results of a _command_ execution to that in a replay log and show the difference in output if any.
-
 `-v` 
 : Execute _command_ in verbose mode. 
 
@@ -88,7 +85,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	|_|  \___|_|   \__,_|_| |_|
 	Version: v0.1. License: Apache 2.0.
 
-	Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [module:[command [command_args]]]
+	Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [module:[command [options]]]
 
 	Examples:
 	| $ rerun 
@@ -235,8 +232,6 @@ file (ending with `.replay`).
 This log file contains information about the command
 execution, as well as, the output from the execution.
 
-These .replay files can be edited or executed as scripts.
-
 *File naming*
 
 Each replay log is named using the following pattern:
@@ -251,10 +246,10 @@ To list the replay logs for the `freddy:dance` command use `ls`:
 
 *File format*
 
-Replay logs follow a simple format that combines 
+Execution logs follow a simple format that combines 
 command execution metadata and log output.
 
-Replay log metadata:
+Log metadata:
 
 * RERUN: The rerun executable
 * MODULE: The module name
@@ -307,35 +302,6 @@ Running this shell function for a given replay log looks similar to this:
 	$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.replay
 
 	jumps (1)
-
-## Replay
-
-Rerun supports basic command replay logging (See "Logs" section below).
-When rerun logs a command it does so in a form that can be re-executed 
-(i.e., "replayed"). It's possible to have rerun compare the results of a 
-given replay log against a new command execution.
-Replay logs are normally found in the directory specified by the `RERUN_LOGS`
-environment variable (or the `-L <dir>` option).
-
-Use the `--replay <log>` option to compare replay output from a command log.
-
-Below you can see the results of a comparison between this run of
-`freddy:dance --jumps 2`  against an earlier command execution. 
-After the command completes, rerun uses the `diff` command 
-to compare the log output.
-
-	$ ./rerun --replay $RERUN_LOGS/freddy-dance-2011-09-21T140744.replay freddy:dance --jumps 2
-	jumps (2)
-	[diff]
-	2c2
-	< jumps ()
-	---
-	> jumps (2)
-
-In this case, the replay contained "jumps ()" while the new
-execution printed "jumps (2)".
-When a difference is detected, `rerun` will print the differences
-below the `[diff]` label and exit with a non-zero exit status.
 
 # MODULES
 
@@ -448,7 +414,7 @@ relative to the location of the rerun executable.
 
 `RERUN_LOGS`
 : Path to directory where rerun will record command
-executions as replay log files.
+executions.
 
 `RERUN_COLOR`
 : Set 'true' if you want ANSI text effects. Makes
