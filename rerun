@@ -53,12 +53,15 @@ fi
 # * Use text effects if `RERUN_COLOR` environment variable set.
 # * Message format:     `"ERROR : ?message?"`
 # * Exit status returned to invoking command: 0
-rerun_die() {
-    
-    [[ -n "${RERUN_VERBOSE:-}" ]] && {
-        local frame=0
-        while caller $frame ; do ((frame++)) ; done
-    }
+rerun_die() {    
+    local -i frame=0; local info=
+    while info=$(caller $frame)
+    do 
+        local -a f=( $info )
+        [[ $frame -gt 0 ]] && printf >&2 "ERROR in \"%s\" %s:%s\n" "${f[1]}" "${f[2]}" "${f[0]}"
+        (( frame++ )) || :; #ignore increment errors (i.e., errexit is set)
+    done
+
     if [[ -n "${RERUN_COLOR:-}" ]]
     then echo >&2 -e ${red}"ERROR: $*"${_red} 
     else echo >&2 "ERROR: $*"
@@ -447,9 +450,10 @@ rerun_script_lookup() {
         if [[ -f  "$file" ]]
         then 
             echo $file
-            return
+            return 0
         fi
     done
+    return 1
 }
 
 #
@@ -559,7 +563,7 @@ rerun_command_execute() {
 
     RERUN_MODULE_DIR=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
 
-    ! rerun_script_exists "$RERUN_MODULE_DIR" $command && {
+    rerun_script_exists "${RERUN_MODULE_DIR:-}" $command || {
         rerun_syntax_error "command not found: \"$module:$command\""
     }
 
@@ -643,47 +647,7 @@ _rerun_options_populate() {
     echo "$argline"
 }
 
-#
-# __rerun_log_extract_ - Extract the log data from the replay log file.
-#
-#
-_rerun_log_extract() {
-    [[ ! $# -eq 1 ]] && { 
-	    rerun_die 'wrong # args: should be: _rerun_log_extract file'
-    }
-    [[ -f $1 ]] || rerun_die "file does not exist: $1"
-    local -r file=$1
-    local size=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $file) || rerun_die "failed sizing log"
-    tail -n+$size $file || rerun_die "failed extracting log"
-}
 
-# __rerun_replay_metadata_ - Generate execution metadata for a replay log
-#
-# Notes:
-# 
-# * This metadata describes the command execution context and is
-# sufficient to re-execute the command.
-# * Output from the execution is delimited by `__COMMAND_OUT_BELOW__`.
-_rerun_replay_metadata() {
-    (
-       cat <<EOF
-#
-# Command replay log
-#
-RERUN="$0"
-MODULE="$MODULE"
-COMMAND="$COMMAND"
-OPTIONS="$*"
-USER="$USER"
-DATE="$TSTAMP"
-EXIT_STATUS="$RERUN_EXITSTATUS"
-__COMMAND_OUT_BELOW__
-       
-EOF
-    )
-}
-
-#
 
 #
 # __rerun_banner_ - Prints logo and version info with a rainbow of colors!
@@ -922,7 +886,7 @@ fi
 
 # Ensure the modules directory path is defined and is a directory.
 #
-[[ -n "${RERUN_MODULES:-}" && -d "$RERUN_MODULES" ]] || {
+[[ -n "${RERUN_MODULES:-}" && -d "${RERUN_MODULES:-}" ]] || {
     rerun_die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
 }
 
