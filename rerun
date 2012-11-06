@@ -965,7 +965,7 @@ fi
 # Set the `RERUN` environment variable so subsequent 
 # invocations can use the same executable. 
 # 
-RERUN=$0
+RERUN=$(rerun_file_absolute $0)
 export RERUN
 #
 
