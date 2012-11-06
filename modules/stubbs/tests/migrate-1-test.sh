@@ -6,12 +6,10 @@
 #     rerun stubbs:test -m stubbs -p migrate
 #
 
-# Helpers
-# ------------
-
-rerun() {
-    command $RERUN -M $RERUN_MODULES "$@"
-}
+if [[ -n $RERUN ]]
+then
+  alias rerun=$RERUN
+fi
 
 # The Plan
 # --------
@@ -19,11 +17,9 @@ rerun() {
 describe "migrate"
 
 it_fails_without_arguments() {
-    # Needed for CentOS 5.4:
-    set +e
-
     if ! rerun stubbs:migrate
     then
+      echo "execution proceeded as expected!"
       exit 0
     fi
 }
