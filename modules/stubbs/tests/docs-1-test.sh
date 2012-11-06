@@ -38,8 +38,10 @@ EOF
 }
 
 it_runs_fully_optioned() {
-    rerun stubbs:docs --module "stubbs" --file /tmp/stubbs.1
+    FILE=$(mktemp)
+    rerun stubbs:docs --module "stubbs" --file $FILE
     
-    validate /tmp/stubbs.1
+    validate $FILE
+    rm -f $FILE
 }
 
