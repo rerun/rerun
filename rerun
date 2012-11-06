@@ -164,7 +164,7 @@ rerun_modules() {
     local -a modules
     for f in `echo $1/*/metadata`
     do
-	    if [[ -f $f ]]
+       if [[ -f $f ]]
         then 
             local module="$(basename $(dirname $f))" 
             [[ -z "${modules:-}" ]] && modules=( $module ) || modules=( ${modules[*]} $module )
@@ -197,7 +197,7 @@ rerun_commands() {
     local -a commands=()
     for c in `echo $1/$2/commands/*/metadata`
     do
-	    if [[ -f $c ]]
+        if [[ -f $c ]]
         then 
             local command="$(basename $(dirname $c))" 
             [[ -z "${commands:-}" ]] && commands=( $command ) || commands=( ${commands[*]} $command )
@@ -290,7 +290,7 @@ rerun_list_remove() {
     local -a retlist=()
     for e in ${@:2}
     do
-	    if [[ $1 != $e ]]
+        if [[ $1 != $e ]]
         then 
             [[ -z "${retlist:-}" ]] && retlist=( $e ) || retlist=( ${retlist[*]} "$e" )
         fi
@@ -540,33 +540,15 @@ rerun_module_exists() {
 #
 # Command scripts see the following environment variables:
 #   RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-# There are two modes of execution: normal and replay. 
-# Normal mode is what you'd expect. The handler script for the
-# command is looked up an executed with user options.
-# Replay mode occurs when a user specifies a replay file and
-# its output is extracted and compared to a new execution.
-# Exit, if the command script is not found.
-# User specified a command that did not exist in the RERUN_MODULES directory.
-# If the  `-L` flag is set, record execution.
 #
-# __Normal execution mode__
+# User specified a command that did not exist in the RERUN_MODULES directory.
+#
+# __Execution__
 # 
 # Execute the command script if it is executable
 # otherwise run it using the same interpreter as rerun.
 # Return the command script's exit code as the result.
 #
-# __Recorded execution mode__
-# 
-# When logging is enabled, run the command script in replay mode.
-#
-# __Replay execution mode__
-# 
-# If the `--replay` option is set, then extract the output
-# from the log file and compare it to the results of this execution.
-# Use the `diff` command to compare the two
-# and show the diff output if execution output 
-# doesn't match the replay file content.
-
 rerun_command_execute() {
     [[ ! $# -ge 2 ]] && { 
         rerun_die "wrong # args: should be: rerun_command_execute module command options" 
@@ -587,58 +569,20 @@ rerun_command_execute() {
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
 
     export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR
-
-    if [[ -z "${RERUN_LOGS:-}" || ! -d "$RERUN_LOGS" ]]
+    
+    if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
- 
-        if [[ -n "${RERUN_VERBOSE:-}" ]]
-        then
-            $interp $RERUN_VERBOSE "$script" "$@"
-            RERUN_EXITSTATUS=$?
-        elif [[ -x "$script" ]]
-        then
-            "$script" "$@"
-            RERUN_EXITSTATUS=$?
-        else
-            $interp "$script" "$@"
-            RERUN_EXITSTATUS=$?
-        fi
-
+        $interp $RERUN_VERBOSE "$script" "$@"
+        RERUN_EXITSTATUS=$?
+    elif [[ -x "$script" ]]
+    then
+        "$script" "$@"
+        RERUN_EXITSTATUS=$?
     else
-
-        local -r TSTAMP=$(date '+%Y-%m-%dT%H%M%S-%Z')
-        LOG=$RERUN_LOGS/$module-$command-$TSTAMP-$$.running
-        # Execute the command script and direct output to the log file.
-        # Get the exit code of the script execution (not the `tee` command).
-        $interp $RERUN_VERBOSE $script "$@" | tee $LOG
-        RERUN_EXITSTATUS=${PIPESTATUS[0]}
-
-        # Generate execution metadata for the replay file.
-        _rerun_replay_metadata $@ > ${LOG%*.running}.metadata || rerun_die "Failed generating replay log."
-        newlog=$RERUN_LOGS/$module-$command-$TSTAMP-$$.replay
-        cat ${LOG%*.running}.metadata $LOG > $newlog || rerun_die "Failed generating replay log."
-        rm -f $LOG ${LOG%*.running}.metadata; # cleanup working files
-        LOG=$newlog
-	    
-        rm -f $RERUN_LOGS/$module-$command-latest.replay; #remove old symlink
-        ln -s $LOG $RERUN_LOGS/$module-$command-latest.replay; # recreate it to latest
-
-        if [[ -n "${REPLAY:-}" ]]
-        then
-            _rerun_log_extract $REPLAY > $RERUN_LOGS/rerun-$$.checklog
-            _rerun_log_extract $LOG > $RERUN_LOGS/rerun-$$.log
-            set +e
-            $DIFF $RERUN_LOGS/rerun-$$.checklog \
-                $RERUN_LOGS/rerun-$$.log > $RERUN_LOGS/rerun-$$.diff
-            RERUN_EXITSTATUS=$?
-            set -e
-            [[ $RERUN_EXITSTATUS -eq 1 ]] && {
-                echo -e ${bold}"[diff]"${_bold}
-                cat $RERUN_LOGS/rerun-$$.diff
-            }
-            rm -f $RERUN_LOGS/rerun-$$.{log,checklog,diff}
-        fi
+        $interp "$script" "$@"
+        RERUN_EXITSTATUS=$?
     fi
+
     return ${RERUN_EXITSTATUS}
 }
 
@@ -658,9 +602,11 @@ then
     return; # Stop sourcing the file here.
 fi
 
-
-set -u
-set -e
+#
+# Enable a stringent exeuction environment.
+#
+set -u ; # Exit if unassigned variable accessed.
+set -e ; # Exit if command execution fails.
 
 
 # - - -
@@ -761,7 +707,7 @@ _rerun_usage() {
         rerun_die "wrong # args: should be: _rerun_usage prog" 
     }
     local -r prog=$1    
-    local usage="Usage: $prog [-h][-v][-V] [-M <dir>] [-L <dir>] [--replay <file>] [--answer <file>] [module:[command [options]]]"
+    local usage="Usage: $prog [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]"
     echo $usage
 }
 
@@ -941,16 +887,6 @@ while [ "$#" -gt 0 ]; do
 	    RERUN_MODULES="$2"
 	    shift
 	    ;;
-	-L)        
-	    rerun_option_check "$#" "$1"
-	    RERUN_LOGS="$2" ; # Record log dir.
-	    shift
-	    ;;	
-	--replay)
-	    rerun_option_check "$#" "$1"
-	    REPLAY="$2"
-	    shift
-	    ;;	
 	--answers)
 	    rerun_option_check "$#" "$1"
 	    ANSWERS="$2"
@@ -983,14 +919,6 @@ then
     fi
 fi
 
-# Replay requires that a log directory is also set.
-#
-[[ -n "${REPLAY:-}" && -z "${RERUN_LOGS:-}" ]] && {
-    rerun_syntax_error "usage error: --replay <file> also requires -L <dir>" 
-}
-# The `diff` command is used with the --replay option to compare execution output.
-# Export `DIFF` environment variable to specify a specific `diff` command.
-: ${DIFF:=diff}
 
 # Ensure the modules directory path is defined and is a directory.
 #
