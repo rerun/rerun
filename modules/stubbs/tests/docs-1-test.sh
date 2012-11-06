@@ -38,7 +38,7 @@ EOF
 }
 
 it_runs_fully_optioned() {
-    FILE=$(mktemp)
+    FILE=$(mktemp /tmp/stubbs.1.XXXX)
     rerun stubbs:docs --module "stubbs" --file $FILE
     
     validate $FILE
