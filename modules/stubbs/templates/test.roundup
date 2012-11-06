@@ -6,13 +6,6 @@
 #     rerun stubbs:test -m @MODULE@ -p @COMMAND@
 #
 
-# Helpers
-# ------------
-
-rerun() {
-    command $RERUN -M $RERUN_MODULES "$@"
-}
-
 # The Plan
 # --------
 
