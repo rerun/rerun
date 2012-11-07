@@ -9,13 +9,15 @@
 
 # Read module function library.
 . $RERUN_MODULE_DIR/lib/functions.sh || { 
-  echo >&2 "Failed loading function library" ; exit 1 ; 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
 }
 
 # Parse the command options.
-[ -r $RERUN_MODULE_DIR/commands/@NAME@/options.sh ] && {
-  . $RERUN_MODULE_DIR/commands/@NAME@/options.sh || exit 2 ;
+[[ -r $RERUN_MODULE_DIR/commands/@NAME@/options.sh ]] && {
+    . $RERUN_MODULE_DIR/commands/@NAME@/options.sh || rerun_die "Failed loading options parser."
+    rerun_options_parse "$@"
 }
+
 
 # Error handling
 # ---------------

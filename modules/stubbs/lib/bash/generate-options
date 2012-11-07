@@ -55,39 +55,54 @@ optionsExported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 #
 #/ usage: $module:$command $(stubbs_command_usage $moddir/$module $command)
 
-# options: [$(rerun_options $moddir $module $command)]
-while [ "\$#" -gt 0 ]; do
-    OPT="\$1"
-    case "\$OPT" in
-$(for option in $(rerun_options $moddir $module $command); do 
-printf "      %s\n" "$(generate_option_parser $option)"; 
-done)
-        # help option
-        -?)
-            rerun_option_usage
-            exit 2
-            ;;
-        # end of options, just arguments left
-        *)
-          break
-    esac
-    shift
-done
-
-# If defaultable options variables are unset, set them to their DEFAULT
-$(for opt in $(echo $optionsWithDefaults|sort); do
-printf "[ -z \"$%s\" ] && %s=\"%s\"\n" $(stubbs_option_variable $opt) $(stubbs_option_variable $opt) $(stubbs_option_property $moddir/$module $opt DEFAULT)
-done)
-# Check required options are set
-$(for opt in $(echo $optionsRequired|sort); do
-printf "[ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" $(stubbs_option_variable $opt) $opt
-done)
-# If option variables are declared exportable, export them.
-$(for opt in $(echo $optionsExported|sort); do
-printf "export %s\n" $(stubbs_option_variable $opt)
-done)
+# _rerun_options_parse_ - Parse the command arguments and set option variables.
 #
-return 0
+#     rerun_options_parse "\$@"
+#
+# Arguments:
+#
+# * the command options and their arguments
+#
+# Notes:
+# 
+# * Sets shell variables for any parsed options.
+# * The "-?" help argument prints command usage and will exit 2.
+# * Return 0 for successful option parse.
+#
+rerun_options_parse() {
+    while [ "\$#" -gt 0 ]; do
+        OPT="\$1"
+        case "\$OPT" in
+$(for option in $(rerun_options $moddir $module $command); do 
+printf "          %s\n" "$(generate_option_parser $option)"; 
+done)
+            # help option
+            -?)
+                rerun_option_usage
+                exit 2
+                ;;
+            # end of options, just arguments left
+            *)
+              break
+        esac
+        shift
+    done
+
+    # Set defaultable options.
+$(for opt in $(echo $optionsWithDefaults|sort); do
+printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" $(stubbs_option_variable $opt) $(stubbs_option_variable $opt) $(stubbs_option_property $moddir/$module $opt DEFAULT)
+done)
+    # Check required options are set
+$(for opt in $(echo $optionsRequired|sort); do
+printf "    [ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" $(stubbs_option_variable $opt) $opt
+done)
+    # If option variables are declared exportable, export them.
+$(for opt in $(echo $optionsExported|sort); do
+printf "    export %s\n" $(stubbs_option_variable $opt)
+done)
+    #
+    return 0
+}
 EOF
 ) 
     # generated to stdout

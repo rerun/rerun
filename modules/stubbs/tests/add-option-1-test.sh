@@ -100,6 +100,6 @@ it_exports_option_variable() {
     # Check the option metadata
     grep "EXPORT=true"  $RERUN_MODULES/freddy/options/jumps/metadata
     # Check the option parser
-    grep '^export JUMPS$' $RERUN_MODULES/freddy/commands/dance/options.sh
-    grep -v '^export HEIGHT$' $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep 'export JUMPS$' $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep -v 'export HEIGHT$' $RERUN_MODULES/freddy/commands/dance/options.sh
 }
