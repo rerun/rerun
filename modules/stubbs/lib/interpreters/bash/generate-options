@@ -69,6 +69,7 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 # * Return 0 for successful option parse.
 #
 rerun_options_parse() {
+    
     while [ "\$#" -gt 0 ]; do
         OPT="\$1"
         case "\$OPT" in
@@ -106,6 +107,14 @@ done)
     #
     return 0
 }
+
+
+# Initialize the options variables to null.
+$(for option in $(rerun_options $moddir $module $command); do 
+printf "%s=\n" "$(stubbs_option_variable $option)"; 
+done)
+
+
 EOF
 ) 
     # generated to stdout
