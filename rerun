@@ -745,6 +745,7 @@ _rerun_modules_summary() {
     local -r directory=$1
     echo -e $gray"Available modules in \"${RERUN_MODULES:-}\":"$_gray
     shopt -s nullglob # enable
+    set +u
     for module in $directory/*
     do
        	local module_dirname=$(rerun_module_exists $(basename "$module")) && {
@@ -767,6 +768,7 @@ _rerun_modules_summary() {
             }
         done
     fi
+    set -u
 }
 
 #
@@ -784,6 +786,7 @@ _rerun_commands_summary() {
     module_dir=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
     echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
     shopt -s nullglob # enable
+
     for cmd in $module_dir/commands/*/metadata
 	do
         local cmd_name=$(basename $(dirname "$cmd"))
@@ -799,7 +802,8 @@ _rerun_commands_summary() {
             for opt in "${options[@]}"
             do
                 local opt_metadata=$module_dir/options/${opt}/metadata
-                (    argstring= summary=                  
+                (   set +u
+                    argstring= summary=                  
                     . $opt_metadata ; # Read the option's metadata.                    
                     [[ -n "${SHORT}" ]] && {                    
                        argstring=$(printf ' --%s|-%s'  "$NAME" "$SHORT")
@@ -815,10 +819,12 @@ _rerun_commands_summary() {
                         summary=$(printf "%s: \"%s\"" "${argstring}" "$DESCRIPTION")
                     }
                     echo -e "$PAD $summary"
+                    set -u
                 )
             done
         fi
     done
+
 }
 
 
