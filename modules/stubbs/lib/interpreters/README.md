@@ -42,16 +42,16 @@ the necessary components assumed and used by the stubbs commands.
 Metadata properties:
 
 * `RERUN_SCRIPT_INTERPRETER`: Interpeter name (eg, "bash", "python").
-* `RERUN_FUNCTION_LIB`: Relative file name for the function library.
-* `RERUN_COMMAND_SCRIPT`: Relative file name for the command script.
-* `RERUN_OPTIONS_SCRIPT`: Relative file name for the options parser script.
-* `RERUN_OPTIONS_GENERATOR`: Relative file name to the executable that generates the option parser script.
+* `RERUN_FUNCTION_LIB`: The function library template.
+* `RERUN_COMMAND_SCRIPT`: The command script template.
+* `RERUN_OPTIONS_SCRIPT`: The options parser file name.
+* `RERUN_OPTIONS_GENERATOR`: Executable that generates the option parser script.
 
 Example: stubbs/lib/bash/metadata
 
     RERUN_SCRIPT_INTERPRETER=bash
-    RERUN_FUNCTION_LIB=functions.sh
-    RERUN_COMMAND_SCRIPT=script
+    RERUN_FUNCTION_LIB=templates/functions.sh
+    RERUN_COMMAND_SCRIPT=templates/script
     RERUN_OPTIONS_SCRIPT=options.sh
     RERUN_OPTIONS_GENERATOR=generate-options
 

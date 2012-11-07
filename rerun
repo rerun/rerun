@@ -349,21 +349,24 @@ rerun_file_absolute() {
 #
 # Notes: 
 #
-# * Returns property value.
+# * Prints property value.
+# * Die if directory not found.
 # * Conditions: If metadata not found, nothing is returned.
+#
 rerun_property_get() {
     [[ ! $# -eq 2 ]] && { 
         rerun_die 'wrong # args: should be: rerun_property_get directory property'
     }
     local -r directory=$1 property=$2
-    [[ ! -d ${directory} ]] && rerun_die "directory not found: ${directory}"
-    if [[ -f ${directory}/metadata ]]
-    then
+    [[ ! -f ${directory}/metadata ]] && rerun_die "metadata not found: ${directory}/metadata"
+    grep -q "^$property=" ${directory}/metadata && {
         set +u
         ( . ${directory}/metadata ; 
             eval echo \$${property:-} )
         set -u
-    fi
+        return 0
+    }
+    return $?
 }
 
 #

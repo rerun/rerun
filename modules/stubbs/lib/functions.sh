@@ -11,6 +11,36 @@
 }
 
 
+# _rerun_interpreters_ - List the interpreters by name.
+#
+#     rerun_interpreters directory 
+#
+# Arguments:
+#
+# * directory:     Directory containing interpreter libraries.
+#
+# Notes: 
+#
+# * Returns a list of space separated interpreter names.
+# 
+stubbs_interpreters() {
+    [[ ! $# -eq 1 ]] && { 
+	    rerun_die 'wrong # args: should be: stubbs_interpreters directory'
+    }
+    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
+    local -a interps
+    for f in `echo $1/*/metadata`
+    do
+       if [[ -f $f ]]
+        then 
+            local interp="$(basename $(dirname $f))" 
+            [[ -z "${interps:-}" ]] && interps=( $interp ) || interps=( ${interps[*]} $interp )
+        fi 
+    done
+    echo ${interps[*]}
+}
+
+
 #
 # - - -
 #

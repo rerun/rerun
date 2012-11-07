@@ -18,12 +18,13 @@ after() {
 # The Plan
 # --------
 
-describe "functional: integration and functional tests"
+describe "functional: functional tests for a bash module"
 
 it_builds_a_functional_module() {
     # Create module: freddy
     rerun stubbs:add-module --module "freddy" \
-        --description "A dancer in a red beret and matching suspenders"
+        --description "A dancer in a red beret and matching suspenders" \
+        --interpreter bash
     
     # Create command: freddy:dance
     rerun stubbs:add-command --module "freddy" \

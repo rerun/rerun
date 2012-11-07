@@ -16,6 +16,7 @@ validate() {
     .  $RERUN_MODULES/freddy/metadata
     test -n "$NAME" -a $NAME = freddy 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "A dancer in a red beret and matching suspenders"
+    test -n "$INTERPRETER" -a "$INTERPRETER" = "bash"
 }
 
 # The Plan
@@ -28,6 +29,7 @@ it_runs_interactively() {
     rerun stubbs:add-module <<EOF
 freddy
 A dancer in a red beret and matching suspenders
+1
 EOF
 
     validate
@@ -36,8 +38,9 @@ EOF
 
 it_runs_fully_optioned() {
     rerun stubbs:add-module --module "freddy" \
-        --description "A dancer in a red beret and matching suspenders"
-    
+        --description "A dancer in a red beret and matching suspenders" \
+        --interpreter bash
+
     validate
 }
 

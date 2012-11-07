@@ -135,6 +135,11 @@ it_performs_rerun_property_get() {
     required=$(rerun_property_get $RERUN_MODULES/freddy/options/jumps REQUIRED)
     test -n "$required"
     test "$required" = "false"
+
+    # Test negative results
+    ! rerun_property_get  $RERUN_MODULES/freddy BOGUS$$
+
+    ! rerun_property_get GARBAGEDIR 2>&1 |grep "metadata not found: GARBAGEDIR"
 }
 
 

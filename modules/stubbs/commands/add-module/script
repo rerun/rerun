@@ -21,7 +21,7 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	-l|--language)
+	-i|--interpreter)
 	    rerun_option_check "$#" "$1"
 	    INTERPRETER="$2"
 	    shift
@@ -59,27 +59,34 @@ done
     read DESC
 }
 
-: ${INTERPRETER:=bash}
 
-INTERPRETER_DIR=$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER
-
-[[ ! -f $INTERPRETER_DIR/metadata ]] && {
-    rerun_die "language unsupported: $INTERPRETER"
+[ -z "$INTERPRETER" ] && {
+    echo "Interpreter: "
+    select INTERPRETER in $(stubbs_interpreters $RERUN_MODULE_DIR/lib/interpreters);
+    do
+	echo "You picked interpreter $INTERPRETER ($REPLY)"
+	break
+    done
 }
-.  $INTERPRETER_DIR/metadata || {
-    rerun_die "error reading  $INTERPRETER_DIR/metadata"
-}
 
-[[ -z "$RERUN_FUNCTION_LIB" ]] && {
+INTERPRETER_LIB=$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER
+[[ ! -d "$INTERPRETER_LIB" ]] && rerun_die "Library not found: $INTERPRETER_LIB"
+
+RERUN_FUNCTION_LIB=$(rerun_property_get $INTERPRETER_LIB RERUN_FUNCTION_LIB) || {
     rerun_die "required metadata not found: RERUN_FUNCTION_LIB"
 }
 
+[[ ! -f  $INTERPRETER_LIB/$RERUN_FUNCTION_LIB ]] && {
+    rerun_die "function library not found:  $INTERPRETER_LIB/$RERUN_FUNCTION_LIB"
+}
+
 # Create module structure
-mkdir -p $RERUN_MODULES/$MODULE || rerun_die "Failed creating module structure"
+
+mkdir -p $RERUN_MODULES/$MODULE || rerun_die "Failed creating module structure."
 # Create commands/ subdirectory
-mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die
+mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die "Failed creating module structure."
 # Create lib/ subdirectory
-mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die
+mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die "Failed creating module structure."
 
 # Generate a profile for metadata
 (
@@ -93,16 +100,17 @@ VERSION=
 REQUIRES=
 
 EOF
-) > $RERUN_MODULES/$MODULE/metadata || rerun_die
+) > $RERUN_MODULES/$MODULE/metadata || rerun_die "Failed generating metadata."
 
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
 sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
 	-e "s/@INTERPRETER@/$INTERPRETER/g" \
-    $INTERPRETER_DIR/templates/$RERUN_FUNCTION_LIB \
-    > $RERUN_MODULES/$MODULE/lib/$RERUN_FUNCTION_LIB || rerun_die "Failed creating function library."
-
+    "$INTERPRETER_LIB/$RERUN_FUNCTION_LIB" \
+    > "$RERUN_MODULES/$MODULE/lib/$(basename $RERUN_FUNCTION_LIB)" || {
+    rerun_die "Failed creating function library for \"$MODULE\"."
+}
 
 # Done
-echo "Created module structure: $RERUN_MODULES/$MODULE"
+echo "Created module structure: $RERUN_MODULES/$MODULE."
