@@ -9,19 +9,14 @@ STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
    exit 1
 }
 
+# Parse the command line arguments
 [ $# = 3 ] || { 
-    echo >&2 "usage: $0 <moddir> <module> <command>" 
-    exit 1 ; 
+    rerun_syntax_error "usage: $0 <moddir> <module> <command>" 
 }
 moddir=$1 module=$2 command=$3
 
-
-
-
 #
-# _generate_option_parser_ - Used to generate an entry inside options.sh
-#
-#     generate_option_parser option ? ? ? ? ? ? ? ? ?
+# _generate_option_parser_ - Generate an entry inside options.sh
 #
 generate_option_parser() {
 	local optName=$1
@@ -44,13 +39,13 @@ generate_option_parser() {
 }
 
 # list the options that set a default
-optionsWithDefaults=$(stubbs_options_matching $moddir/$module $command DEFAULT='[[:alnum:]]+')
+options_defaulted=$(stubbs_options_matching $moddir/$module $command DEFAULT='[[:alnum:]]+')
 
 # list the options that are required
-optionsRequired=$(stubbs_options_matching $moddir/$module $command REQUIRED=true)
+options_required=$(stubbs_options_matching $moddir/$module $command REQUIRED=true)
 
 # list the options that have variables to export
-optionsExported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
+options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 
 (
     cat <<EOF
@@ -93,15 +88,19 @@ done)
     done
 
     # Set defaultable options.
-$(for opt in $(echo $optionsWithDefaults|sort); do
-printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" $(stubbs_option_variable $opt) $(stubbs_option_variable $opt) $(stubbs_option_property $moddir/$module $opt DEFAULT)
+$(for opt in $(echo $options_defaulted|sort); do
+optvar=$(stubbs_option_variable $opt)
+printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" \
+    $optvar $optvar \
+    $(stubbs_option_property $moddir/$module $opt DEFAULT)
 done)
     # Check required options are set
-$(for opt in $(echo $optionsRequired|sort); do
-printf "    [ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" $(stubbs_option_variable $opt) $opt
+$(for opt in $(echo $options_required|sort); do
+printf "    [ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" \
+      $(stubbs_option_variable $opt) $opt
 done)
     # If option variables are declared exportable, export them.
-$(for opt in $(echo $optionsExported|sort); do
+$(for opt in $(echo $options_exported|sort); do
 printf "    export %s\n" $(stubbs_option_variable $opt)
 done)
     #
