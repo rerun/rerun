@@ -185,11 +185,11 @@ echo "Updated command metadata:  $commandMetadata"
 # Read language setting for module. Set it to 'bash' as a default.
 INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 
-[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && {
+[ ! -f $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata ] && {
     rerun_die "language unsupported: $INTERPRETER"
 }
-.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata "
+.  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata "
 }
 [ -z "$RERUN_OPTIONS_GENERATOR" ] && {
     rerun_die "required metadata not found: RERUN_OPTIONS_GENERATOR"
@@ -199,7 +199,7 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 }
 optionsParserScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
 
-$RERUN_MODULE_DIR/lib/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
+$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
     $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || {
     rerun_die "Failed generating options parser."
 }

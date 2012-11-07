@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-#/ command: @MODULE@:@NAME@: "@DESCRIPTION@"
+#/ command: @MODULE@:@COMMAND@: "@DESCRIPTION@"
 #
-#/ usage: rerun @MODULE@:@NAME@ [options]
+#/ usage: rerun @MODULE@:@COMMAND@ [options]
 #
 #/ rerun env variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option variables: @VARIABLES@
@@ -13,8 +13,8 @@
 }
 
 # Parse the command options.
-[[ -r $RERUN_MODULE_DIR/commands/@NAME@/options.sh ]] && {
-    . $RERUN_MODULE_DIR/commands/@NAME@/options.sh || rerun_die "Failed loading options parser."
+[[ -r $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh ]] && {
+    . $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh || rerun_die "Failed loading options parser."
     rerun_options_parse "$@"
 }
 
@@ -24,7 +24,7 @@
 # * Trap calls `rerun_die` with standard message.
 # * Exit upon command errors or accessing unset variables.
 #   * See [set](http://ss64.com/bash/set.html)
-trap 'rerun_die "*** command failed: @MODULE@:@NAME@. ***"' ERR
+trap 'rerun_die "*** command failed: @MODULE@:@COMMAND@. ***"' ERR
 set -o nounset -o pipefail
 
 

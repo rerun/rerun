@@ -2,8 +2,12 @@
 
 set -e
 
-LIBDIR=$(dirname $(dirname $0))
-. $LIBDIR/functions.sh || exit 1
+# Read the stubbs function library.
+STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
+. $STUBBS_LIB_DIR/functions.sh || {
+   echo >&2 "Failed reading stubbs function library"
+   exit 1
+}
 
 [ $# = 3 ] || { 
     echo >&2 "usage: $0 <moddir> <module> <command>" 

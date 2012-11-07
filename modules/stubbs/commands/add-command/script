@@ -86,7 +86,7 @@ done
 INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 
 [ -z "$TEMPLATE" ] && {
-    TEMPLATE=$RERUN_MODULE_DIR/lib/$INTERPRETER/templates/script
+    TEMPLATE=$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/templates/script
 }
 
 [ ! -r "$TEMPLATE" ] && {
@@ -98,12 +98,12 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die
 
 VARIABLES=$(stubbs_option_variables $RERUN_MODULES/$MODULE $COMMAND)
 
-[ ! -f $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata ] && {
+[ ! -f $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata ] && {
     rerun_die "language unsupported: $INTERPRETER"
 }
 
-.  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/$INTERPRETER/metadata"
+.  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata"
 }
 
 [ -z "$RERUN_COMMAND_SCRIPT" ] && {
@@ -115,9 +115,10 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 
 # Generate a boiler plate implementation
 [ ! -f $CMD_SCRIPT -o -n "$OVERWRITE" ] && {
-    sed -e "s/@NAME@/$COMMAND/g" \
+    sed -e "s/@COMMAND@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@DESCRIPTION@/$DESC/g" \
+	-e "s/@INTERPRETER@/$INTERPRETER/g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script"
     chmod +x $CMD_SCRIPT || rerun_die "Failed settng execute bit on command script"
@@ -127,9 +128,10 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
 # Generate a unit test script
 mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests directory"
 [ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "$OVERWRITE" ] && {
-    sed -e "s/@NAME@/script/g" \
+    sed -e "s/@COMMAND@/script/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
+	-e "s/@INTERPRETER@/$INTERPRETER/g" \
 	-e "s;@RERUN@;${RERUN};g" \
 	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
 	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
