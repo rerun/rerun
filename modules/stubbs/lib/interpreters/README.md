@@ -24,7 +24,7 @@ Rerun relies on an _interpreter_ to execute the command script.
 An _interpreter_ is the executable runtime for a scripting 
 language which reads the script file and processes it. 
 
-Stubbs provides a structure to add an support multiple
+Stubbs provides a structure to add and support multiple
 scripting languages.
 
 Each interpreter has a directory position under stubbs/lib. Eg:
@@ -37,7 +37,7 @@ templates and metadata needed by stubbs commands.
 ## Metadata
 
 Each language support library contains metadata that describes
-the necessary components assumed anb used by the stubbs commands.
+the necessary components assumed and used by the stubbs commands.
 
 Metadata properties:
 
@@ -94,7 +94,7 @@ redirect the output where it needs it.
 
 ## Templates
 
-Stubbs commands require template files during the module module
+Stubbs commands require template files during the module
 and command creation process.
 
 * `RERUN_FUNCTION_LIB`: Base function library used by stubbs:add-module.
@@ -125,7 +125,7 @@ code, parses these lines and will substitute values contained in them.
 The stubbs commands will filter and substitute values
 for the following tokens:
 
-* @INTERPRETER@: Replaced with interpreter name.
-* @MODULE@: Replaced with module name.
-* @COMMAND@: Replaced with command name.
-* @DESCRIPTION@: Replaced with the description.
+* `@INTERPRETER@`: Replaced with interpreter name.
+* `@MODULE@`: Replaced with module name.
+* `@COMMAND@`: Replaced with command name.
+* `@DESCRIPTION@`: Replaced with the description.
