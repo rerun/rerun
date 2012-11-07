@@ -46,16 +46,20 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/script \
-	modules/stubbs/lib/README.md \
-	modules/stubbs/lib/bash/generate-options \
-	modules/stubbs/lib/bash/metadata \
-	modules/stubbs/lib/bash/templates/functions.sh \
-	modules/stubbs/lib/bash/templates/script \
+	modules/stubbs/lib/interpreters/README.md \
+	modules/stubbs/lib/interpreters/bash/generate-options \
+	modules/stubbs/lib/interpreters/bash/metadata \
+	modules/stubbs/lib/interpreters/bash/templates/functions.sh \
+	modules/stubbs/lib/interpreters/bash/templates/script \
 	modules/stubbs/lib/functions.sh \
-	modules/stubbs/lib/groovy/generate-options \
-	modules/stubbs/lib/groovy/metadata \
-	modules/stubbs/lib/groovy/templates/functions \
-	modules/stubbs/lib/groovy/templates/script \
+	modules/stubbs/lib/interpreters/groovy/generate-options \
+	modules/stubbs/lib/interpreters/groovy/metadata \
+	modules/stubbs/lib/interpreters/groovy/templates/functions \
+	modules/stubbs/lib/interpreters/groovy/templates/script \
+	modules/stubbs/lib/interpreters/python/generate-options \
+	modules/stubbs/lib/interpreters/python/metadata \
+	modules/stubbs/lib/interpreters/python/templates/functions.py \
+	modules/stubbs/lib/interpreters/python/templates/script \
 	modules/stubbs/lib/roundup \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
@@ -90,7 +94,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/tests/add-option-1-test.sh \
 	modules/stubbs/tests/archive-1-test.sh \
 	modules/stubbs/tests/docs-1-test.sh \
-	modules/stubbs/tests/functional-1-test.sh \
+	modules/stubbs/tests/functional-bash-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh
 
