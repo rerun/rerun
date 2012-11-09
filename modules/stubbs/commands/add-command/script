@@ -119,7 +119,7 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $RERUN_COMMAND_SC
 [ ! -f $CMD_SCRIPT -o -n "$OVERWRITE" ] && {
     sed -e "s/@COMMAND@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
-	-e "s/@DESCRIPTION@/$DESC/g" \
+	-e "s,@DESCRIPTION@,$DESC,g" \
 	-e "s/@INTERPRETER@/$INTERPRETER/g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script"

@@ -105,7 +105,7 @@ EOF
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
 sed -e "s/@MODULE@/$MODULE/g" \
-	-e "s/@DESCRIPTION@/$DESC/g" \
+	-e "s,@DESCRIPTION@,$DESC,g" \
 	-e "s/@INTERPRETER@/$INTERPRETER/g" \
     "$INTERPRETER_LIB/$RERUN_FUNCTION_LIB" \
     > "$RERUN_MODULES/$MODULE/lib/$(basename $RERUN_FUNCTION_LIB)" || {
