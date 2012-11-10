@@ -5,7 +5,7 @@ standard operating procedure.
 
 # SYNOPSYS
 
-	rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [module:[command [options]]]
+	rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
 
 # DESCRIPTION
 
@@ -62,9 +62,6 @@ for additional documentation including:
 `-M` *DIRECTORY*
 : Module library directory path.
 
-`-L` *DIRECTORY*
-: Recorded _command_ execution logs stored in this directory. Also settable via `RERUN_LOGS`.
-
 `-v` 
 : Execute _command_ in verbose mode. 
 
@@ -85,7 +82,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	|_|  \___|_|   \__,_|_| |_|
 	Version: v0.1. License: Apache 2.0.
 
-	Usage: rerun [-h][-v][-V] [-M <dir>] [-L <dir>] [module:[command [options]]]
+	Usage: rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
 
 	Examples:
 	| $ rerun 
@@ -221,88 +218,6 @@ See `stubbs:archive` for further information about creating and
 understanding rerun archives.
 
 
-# LOGS
-
-Rerun records command execution as replay logs, if the `-L <dir>` 
-argument is set or the `RERUN_LOGS` environment variable is set.
-Be sure to set `RERUN_LOGS` to a writable directory. 
-
-Each command execution is recorded in the form of a "replay" log
-file (ending with `.replay`).
-This log file contains information about the command
-execution, as well as, the output from the execution.
-
-*File naming*
-
-Each replay log is named using the following pattern:
-
-    $RERUN_LOGS/$MODULE-$COMMAND-YYYY-MM-DD-THHMMSS-PID.replay
-
-To list the replay logs for the `freddy:dance` command use `ls`:
-
-	$ ls -l $RERUN_LOGS/freddy-dance*.replay
-	-rw-rw----  1 alexh  wheel  188 Sep 21 19:54 freddy-dance-2011-09-21T195402-2344.replay
-	
-
-*File format*
-
-Execution logs follow a simple format that combines 
-command execution metadata and log output.
-
-Log metadata:
-
-* RERUN: The rerun executable
-* MODULE: The module name
-* COMMAND: The command name
-* OPTIONS: The command options
-* USER: The user executing the command
-* DATE: The timestamp for the execution
-
-Here's the metadata as specified in the file template:
-
-	#
-	# Rerun replay log
-	#
-	RERUN="$RERUN"
-	MODULE="$MODULE"
-	COMMAND="$COMMAND"
-	OPTIONS="$*"
-	USER="$USER"
-	DATE="$(date '+%Y-%m%d-%H%M%S')"
-	__COMMAND_OUT_BELOW__
-	
-Any command output is stored below the line delimiter, `__COMMAND_OUT_BELOW__`.
-
-Here's an example replay file for the `freddy:dance` command:
-
-	#
-	# Rerun replay log
-	#
-	RERUN="/Users/alexh/rerun-workspace/rerun/rerun"
-	MODULE="freddy"
-	COMMAND="dance"
-	OPTIONS=""
-	USER="alexh"
-	DATE="2011-0921-195402"
-	__COMMAND_OUT_BELOW__
-
-	jumps (1)
-
-This simple shell function will parse the content for a given 
-replay log:
-
-	rerun_extractLog() {
-		[ -f $1 ] || die "file does not exist: $1"
-		SIZE=$(awk '/^__COMMAND_OUT_BELOW__/ {print NR + 1; exit 0; }' $1) || die "failed sizing output"
-		tail -n+$SIZE $1 || die "failed extracting output"
-	}
-
-Running this shell function for a given replay log looks similar to this:
-
-	$ rerun_extractLog $RERUN_LOGS/freddy-dance-2011-0921-194512.replay
-
-	jumps (1)
-
 # MODULES
 
 ## Layout
@@ -412,18 +327,11 @@ are illustrated here:
 If RERUN_MODULES is not set, it is defaulted
 relative to the location of the rerun executable.
 
-`RERUN_LOGS`
-: Path to directory where rerun will record command
-executions.
-
 `RERUN_COLOR`
 : Set 'true' if you want ANSI text effects. Makes
 labels in text to print bold in the console.
 Syntax errors will also print bold.
 
-`DIFF`
-: Set to the particular `diff` command to use for
-replay log comparisons.
 
 # SEE ALSO
 

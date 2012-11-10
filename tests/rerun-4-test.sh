@@ -6,6 +6,7 @@
 unset RERUN_COLORS
 unset RERUN_MODULES
 
+
 # Helpers
 # ------------
 . ./functions.sh || { echo "Failed loading test functions" ; exit 2 ; }

@@ -7,6 +7,8 @@ unset RERUN_COLORS
 
 # Helpers
 # ------------
+
+
 . ./functions.sh || { echo "Failed loading test functions" ; exit 2 ; }
 
 rerun() {

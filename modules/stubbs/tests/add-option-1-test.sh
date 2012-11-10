@@ -27,7 +27,7 @@ EOF
 
 after() {
     # clean up the mock module
-    rm -r $RERUN_MODULES/freddy
+    echo rm -r $RERUN_MODULES/freddy
 }
 
 validate() {
@@ -58,8 +58,10 @@ it_runs_interactively() {
 jumps
 jump #num times
 1
+1
 3
 EOF
+
     validate
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
@@ -70,7 +72,8 @@ EOF
 it_runs_fully_optioned() {
     # --jumps|-j <3>
     rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --description "jump #num times" --required true --default 3
+        --option jumps --description "jump #num times" \
+        --required true --export true --default 3
 
     validate
     # Check the command's option assignment

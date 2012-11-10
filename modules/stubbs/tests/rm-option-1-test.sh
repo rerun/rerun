@@ -56,7 +56,7 @@ it_runs_interactively() {
     # Add option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --desc "number of times to jump" \
-        --default 1 --required false
+        --default 1 --required false --export false
 
     rerun stubbs:rm-option --module freddy --command dance<<EOF
 jumps
@@ -70,7 +70,7 @@ it_runs_fully_optioned() {
     # Add option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --desc "number of times to jump" \
-        --default 1 --required false
+        --default 1 --required false --export false
 
     rerun stubbs:rm-option --module freddy --command dance --option jumps
 
@@ -82,12 +82,12 @@ it_removes_option_after_last_assignment() {
     # Add option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --desc "number of times to jump" \
-        --default 1 --required false
+        --default 1 --required false --export false
     #
     # Add a second option: "--height|-h <5>"
     rerun stubbs:add-option --module freddy --command dance \
         --option height --desc "height to jump" \
-        --default 5 --required false
+        --default 5 --required false --export false
     #
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
