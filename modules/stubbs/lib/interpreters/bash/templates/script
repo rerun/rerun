@@ -12,13 +12,6 @@
   echo >&2 "Failed loading function library." ; exit 1 ; 
 }
 
-# Parse the command options.
-[[ -r $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh ]] && {
-    . $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh || rerun_die "Failed loading options parser."
-    rerun_options_parse "$@"
-}
-
-
 # Error handling
 # ---------------
 # * Trap calls `rerun_die` with standard message.
@@ -26,6 +19,12 @@
 #   * See [set](http://ss64.com/bash/set.html)
 trap 'rerun_die "*** command failed: @MODULE@:@COMMAND@. ***"' ERR
 set -o nounset -o pipefail
+
+# Parse the command options.
+[[ -r $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh ]] && {
+    . $RERUN_MODULE_DIR/commands/@COMMAND@/options.sh || rerun_die "Failed loading options parser."
+    rerun_options_parse "$@"
+}
 
 
 # ------------------------------
