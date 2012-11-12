@@ -276,7 +276,7 @@ stubbs_script_header() {
         s,#/ command: .*,#/ command: $module:$command: \"$description\",
         s,#/ option variables: .*,#/ option variables: $variables,
         s,#/ usage: .*,#/ usage: rerun $module:$command $usage,
-        " $commandScript 
+        " $command_script 
     # Generate output to stdout.
 }
 

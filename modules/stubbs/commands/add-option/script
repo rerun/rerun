@@ -239,7 +239,7 @@ $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
     rerun_die "required metadata not found: RERUN_COMMAND_SCRIPT"
 }
 
-command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_COMMAND_SCRIPT
+command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $RERUN_COMMAND_SCRIPT)
 if [ -f "$command_script" ]
 then
     stubbs_script_header \

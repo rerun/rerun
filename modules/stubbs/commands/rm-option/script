@@ -93,15 +93,15 @@ done
 #
 #
 # Update the command metadata.
-commandMetadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
-currentAssignments=$(rerun_options $RERUN_MODULES $MODULE $COMMAND)
+command_metadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
+command_options_assignments=$(rerun_options $RERUN_MODULES $MODULE $COMMAND)
 # Subtract option from the list
-commandOptions=( $(rerun_list_remove $OPTION $currentAssignments) )
+command_options=( $(rerun_list_remove $OPTION $command_options_assignments) )
 
 stubbs_command_options_write \
     $RERUN_MODULES/$MODULE $COMMAND \
-    "${commandOptions[*]}" || rerun_die "Failed generating command metadata"
-echo "Updated command metadata:  $commandMetadata"
+    "${command_options[*]}" || rerun_die "Failed generating command metadata"
+echo "Updated command metadata:  $command_metadata"
 
 
 # Check if this option is assigned to any commands.
@@ -135,26 +135,26 @@ INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
 [ -z "$RERUN_OPTIONS_SCRIPT" ] && {
     rerun_die "required metadata not found: RERUN_OPTIONS_SCRIPT"
 }
-optionsParserScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
+options_parser=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
 # Generate it
 $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
-    $RERUN_MODULES $MODULE $COMMAND > $optionsParserScript || rerun_die "Failed generating options parser."
+    $RERUN_MODULES $MODULE $COMMAND > $options_parser || rerun_die "Failed generating options parser."
 
 echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh"
 #
 # Update option variable summary in command script.
 #
-commandScript=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
-if [ -f "$commandScript" ]
+command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/script
+if [ -f "$command_script" ]
 then
     stubbs_script_header \
-        $RERUN_MODULES/$MODULE $COMMAND > ${commandScript}.$$ || {
+        $RERUN_MODULES/$MODULE $COMMAND > ${command_script}.$$ || {
         rerun_die "Error updating command script header"
     }
-    mv $commandScript.$$ $commandScript || {
+    mv $command_script.$$ $command_script || {
         rerun_die "Error updating command script header"
     }
-    echo "Updated command script header: $commandScript"
+    echo "Updated command script header: $command_script"
 fi
 # Done
 
