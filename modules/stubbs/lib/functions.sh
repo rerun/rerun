@@ -166,6 +166,33 @@ stubbs_option_variables() {
 # - - -
 #
 
+# _stubbs_options_with_short_ - List all options that have short.
+#
+#     stubbs_options_with_short directory module command
+#
+# Arguments:
+# 
+# * directory: Module directory
+#
+stubbs_options_with_short() {
+    [[ ! $# = 2 ]] && { 
+        echo >&2 "usage: stubbs_options_with_short <moddir> <short>" 
+        return 1 ; 
+    }
+    local -r moddir=$1
+    local -a shorts=()
+    for option in $(rerun_module_options $(dirname $moddir) $(basename $moddir))
+    do
+        short=$(stubbs_option_property $moddir $option SHORT)
+        [[ -n "$short" ]] && shorts=( ${shorts[*]} $option )
+    done
+    echo ${shorts[*]}
+}
+
+#
+# - - -
+#
+
 # _stubbs_option_commands_ - Lists the commands assigned to option
 #
 #     stubbs_option_commands directory option

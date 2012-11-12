@@ -93,6 +93,16 @@ it_performs_rerun_modules() {
     containsElement "stubbs" "${modules[@]}"
 }
 
+it_performs_rerun_module_options() {
+    make_freddy $RERUN_MODULES
+
+    . $RERUN
+    options=( $(rerun_module_options $RERUN_MODULES freddy) )
+    test -n "$options"
+    test "${#options[*]}" = 2
+    rerun_list_contains "jumps" "${options[@]}"
+}
+
 it_performs_rerun_commands() {
     make_freddy $RERUN_MODULES
 

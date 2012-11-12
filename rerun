@@ -152,7 +152,7 @@ rerun_option_usage() {
 
 # _rerun_options_parse_ - Parse the command arguments and set option variables.
 #
-#     rerun_options_parse "\$@"
+#     rerun_options_parse "$@"
 #
 # Arguments:
 #
@@ -160,8 +160,8 @@ rerun_option_usage() {
 #
 # Notes:
 # 
-# # Sets shell variables for any parsed options.
-# * The "-?" help argument prints command usage and will exit 2.
+# * Sets shell variables for any parsed options.
+# * The "-?" help argument prints command usage and exits 2.
 # * This function can be overriden by command scripts.
 # * Set defaultable options.
 # * Check required options are set
@@ -172,14 +172,11 @@ rerun_options_parse() {
     while [ "$#" -gt 0 ]; do
         OPT="$1"
         case "$OPT" in
-            # help option
-            -?)
-                rerun_option_usage
+            -?) rerun_option_usage
                 exit 2
-                ;;
-            # end of options, just arguments left
+                ;;           
             *)
-              break
+              break ; # end of options, just arguments left
         esac
         shift
     done
@@ -285,6 +282,39 @@ rerun_options() {
     else
         echo ""
     fi
+}
+
+#
+# - - -
+#
+
+# _rerun_module_options_ - List the options for the specified module.
+#
+#     rerun_module_options directory module
+#
+# Arguments:
+#
+# * directory:     Directory containing modules.
+# * module:        Module name.
+# Notes: 
+#
+# * Returns a list of space separated option names.
+# 
+rerun_module_options() {
+   [[ ! $# -eq 2 ]] && { 
+	    rerun_die 'wrong # args: should be: rerun_module_options directory module'
+    }
+    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
+    local -a options=()
+    for o in `echo $1/$2/options/*/metadata`
+    do
+        if [[ -f $o ]]
+        then 
+            local option="$(basename $(dirname $o))" 
+            [[ -z "${options:-}" ]] && options=( $option ) || options=( ${options[*]} $option )
+        fi 
+    done
+    echo ${options[*]:-}
 }
 
 #

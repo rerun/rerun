@@ -78,6 +78,11 @@ while [ "$#" -gt 0 ]; do
 	    LONG="$2"
 	    shift
 	    ;;	
+	--short)
+	    rerun_option_check "$#" "$1"
+	    SHORT="$2"
+	    shift
+	    ;;	
 	-d|--default)
 	    rerun_option_check "$#" "$1"
 	    DEFAULT="$2"
@@ -169,6 +174,14 @@ fi
     [[ -n "${CURR_DEFAULT}" && -z "$DEFAULT" ]] && DEFAULT=${CURR_DEFAULT}
 }
 
+# If short is specified, check it's not already used.
+[ -n "$SHORT" ] && {
+    options=$(stubbs_options_with_short "$RERUN_MODULES/$MODULE" $SHORT)
+    [ -n "$options" ] && {
+        rerun_die "-${SHORT} already used by option: $options"
+    }
+}
+
 # Generate metadata for new option
 mkdir -p  $RERUN_MODULES/$MODULE/options/$OPTION
 (
@@ -180,13 +193,15 @@ NAME=$OPTION
 DESCRIPTION="$DESC"
 ARGUMENTS=${ARGS:-true}
 REQUIRED=${REQ:-true}
-SHORT=${OPTION:0:1}
+SHORT=${SHORT}
 LONG=${LONG:-$OPTION}
 DEFAULT=$DEFAULT
 EXPORT=$EXPORT
 
 EOF
-) > $RERUN_MODULES/$MODULE/options/$OPTION/metadata || rerun_die
+) > $RERUN_MODULES/$MODULE/options/$OPTION/metadata || {
+    rerun_die "Failed generating $OPTION option metadata"
+}
 echo "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
 
 #
