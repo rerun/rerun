@@ -32,13 +32,13 @@ describe "rerun(1) Basic sanity tests"
 
 
 it_displays_help() {
-    help=$(rerun -help)
+    ! help=$(rerun -help 2>&1)
     test -n "$help"
 }
 
 it_displays_usage() {
-    usage=$(rerun -help|grep ^Usage)
-    test "$usage" = "Usage: rerun [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]"
+    usage=$(rerun -help 2>&1 |grep '^usage:')
+    test "$usage" = 'usage: rerun [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]'
 }
 
 it_displays_version_and_license() {

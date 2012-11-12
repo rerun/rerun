@@ -7,6 +7,8 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
+#/ usage: rerun [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]
+#
 # __Install__
 # 
 # See [wiki](http://github.com/rerun/rerun/wiki) for install and
@@ -141,6 +143,47 @@ rerun_option_usage() {
     else echo >&2 "usage: check command for usage." 
     fi
     return 2
+}
+
+#
+# - - -
+#
+
+
+# _rerun_options_parse_ - Parse the command arguments and set option variables.
+#
+#     rerun_options_parse "\$@"
+#
+# Arguments:
+#
+# * the command options and their arguments.
+#
+# Notes:
+# 
+# # Sets shell variables for any parsed options.
+# * The "-?" help argument prints command usage and will exit 2.
+# * This function can be overriden by command scripts.
+# * Set defaultable options.
+# * Check required options are set
+# * If option variables are declared exportable, export them.
+# * Return 0 for successful option parse.
+#
+rerun_options_parse() {
+    while [ "$#" -gt 0 ]; do
+        OPT="$1"
+        case "$OPT" in
+            # help option
+            -?)
+                rerun_option_usage
+                exit 2
+                ;;
+            # end of options, just arguments left
+            *)
+              break
+        esac
+        shift
+    done
+    return 0
 }
 
 #
@@ -666,17 +709,6 @@ _rerun_banner() {
     echo $(tput setaf 5) "Version: ${RERUN_VERSION:-}. License: Apache 2.0."$(tput sgr0)
 }
 
-# __rerun_usage_ - Print usage summary
-#
-# 
-_rerun_usage() {
-    [[ ! $# = 1 ]] && { 
-        rerun_die "wrong # args: should be: _rerun_usage prog" 
-    }
-    local -r prog=$1    
-    local usage="Usage: $prog [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]"
-    echo $usage
-}
 
 #
 # __rerun_examples_ - Print usage examples
@@ -839,7 +871,7 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
 	-h*|--h*)
         _rerun_banner
-        _rerun_usage $(basename "$0")
+        rerun_option_usage
         _rerun_examples $(basename "$0")
         exit 0
 	    ;;

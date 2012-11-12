@@ -56,6 +56,14 @@ it_performs_rerun_option_check() {
     rerun_option_check 2 bar 
 }
 
+it_performs_rerun_options_parse() {
+    . $RERUN
+    rerun_options_parse -h 2>&1 |grep "^usage: "
+    test ${PIPESTATUS[0]} = 2; # syntax errors exit with 2
+
+    rerun_options_parse 2 bar 
+}
+
 it_performs_rerun_list_contains() {
     . $RERUN
     arr1=( one two three )
