@@ -62,15 +62,6 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Post processes the options
-[ -z "$COMMAND" ] && {
-    echo "Command: "
-    read COMMAND
-}
-
-[ -z "$DESC" ] && {
-    echo "Description: "
-    read DESC
-}
 
 [ -z "$MODULE" ] && {
     echo "Module: "
@@ -79,6 +70,16 @@ done
 	echo "You picked module $MODULE ($REPLY)"
 	break
     done
+}
+
+[ -z "$COMMAND" ] && {
+    echo "Command: "
+    read COMMAND
+}
+
+[ -z "$DESC" ] && {
+    echo "Description: "
+    read DESC
 }
 
 
