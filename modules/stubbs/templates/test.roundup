@@ -11,6 +11,11 @@
 
 describe "@COMMAND@"
 
-it_runs_without_arguments() {
-    rerun @MODULE@:@COMMAND@
+
+# ------------------------------
+# Replace this test. 
+it_fails_without_a_real_test() {
+    exit 1
 }
+# ------------------------------
+
