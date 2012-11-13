@@ -750,15 +750,15 @@ _rerun_examples() {
     }
     local -r prog=$1
     if [[ "${RERUN_COLOR:-}" = "true" ]]
-    then echo $(tput sgr 0 1)"Examples:"$(tput sgr0)
-    else echo "Examples:"
+    then echo >&2 $(tput sgr 0 1)"Examples:"$(tput sgr0)
+    else echo >&2 "Examples:"
     fi
 echo "| \$ $prog
-| => List all modules.
+| => List installed modules.
 | \$ $prog freddy
-| => List all freddy commands.
+| => List  commands.
 | \$ $prog freddy:dance --jumps 3
-| => Execute the freddy dance command."
+| => Execute a command."
 }
 
 #
@@ -864,6 +864,8 @@ _rerun_commands_summary() {
             for opt in "${options[@]}"
             do
                 local opt_metadata=$module_dir/options/${opt}/metadata
+                if [[ -r "$opt_metadata" ]] 
+                then
                 (   set +u
                     argstring= summary=                  
                     . $opt_metadata ; # Read the option's metadata.                    
@@ -883,6 +885,10 @@ _rerun_commands_summary() {
                     echo -e "$PAD $summary"
                     set -u
                 )
+                else                    
+                    # limited usage summary.
+                    echo -e "$PAD --$opt <>: \"no description\""; 
+                fi
             done
         fi
     done
