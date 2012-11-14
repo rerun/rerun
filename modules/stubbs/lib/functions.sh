@@ -5,6 +5,11 @@
 #
 # Stubbs functions build on the rerun functions.
 #
+[ ! -f "$RERUN" ] && {
+    echo >&2 "ERROR: \$RERUN environment variable not set to rerun"
+    exit 1
+}
+
 . $RERUN || { 
     echo >&2 "ERROR: Failed sourcing functions from rerun: $RERUN" 
     exit 1 
@@ -56,7 +61,7 @@ stubbs_interpreters() {
 # * property: the metadata property
 #
 stubbs_option_property() {
-    echo $(rerun_property_get "$1/options/$2" $3)
+    echo "$(rerun_property_get "$1/options/$2" $3)"
 }
 
 #
