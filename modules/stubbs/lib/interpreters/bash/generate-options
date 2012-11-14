@@ -98,7 +98,7 @@ done)
     # Set defaultable options.
 $(for opt in $(echo $options_defaulted|sort); do
 optvar=$(stubbs_option_variable $opt)
-printf "    [ -z \"$%s\" ] && %s=%s\n" \
+printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" \
     $optvar $optvar \
     "$(stubbs_option_property $moddir/$module $opt DEFAULT)"
 done)
