@@ -2,18 +2,25 @@
 
 set -e
 
+# Parse the command line arguments
+[ $# = 3 ] || { 
+   echo >&2 "usage: $0 <moddir> <module> <command>" 
+   exit 2
+}
+moddir=$1 module=$2 command=$3
+
+
 # Read the stubbs function library.
 STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
-. $STUBBS_LIB_DIR/functions.sh || {
+[ ! -f "$STUBBS_LIB_DIR/functions.sh" ] && {
+    echo >&2 "Could load stubbs function library: \"$STUBBS_LIB_DIR/functions.sh\""
+    exit 1
+}
+
+. "$STUBBS_LIB_DIR/functions.sh" || {
    echo >&2 "Failed reading stubbs function library"
    exit 1
 }
-
-# Parse the command line arguments
-[ $# = 3 ] || { 
-    rerun_syntax_error "usage: $0 <moddir> <module> <command>" 
-}
-moddir=$1 module=$2 command=$3
 
 #
 # _generate_option_parser_ - Generate an entry inside options.sh
@@ -91,9 +98,9 @@ done)
     # Set defaultable options.
 $(for opt in $(echo $options_defaulted|sort); do
 optvar=$(stubbs_option_variable $opt)
-printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" \
+printf "    [ -z \"$%s\" ] && %s=%s\n" \
     $optvar $optvar \
-    $(stubbs_option_property $moddir/$module $opt DEFAULT)
+    "$(stubbs_option_property $moddir/$module $opt DEFAULT)"
 done)
     # Check required options are set
 $(for opt in $(echo $options_required|sort); do
