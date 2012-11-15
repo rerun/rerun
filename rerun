@@ -787,6 +787,23 @@ _rerun_man_page() {
 
 PAD="  "
 
+# __rerun_module_summary_ - Print a module summary.
+#
+# Arguments
+# 
+# * directory: Module directory
+#
+_rerun_module_summary() {
+    [[ ! $# = 1 ]] && { 
+        rerun_die "wrong # args: should be: _rerun_module_summary module_dir" 
+    }
+    local -r module_dir=$1
+    local -r module_dirname=$(rerun_module_exists $(basename "$module_dir")) && {
+        local -r module_name=$(basename "$module_dir")
+        local -r module_desc=$(rerun_property_get $module_dir DESCRIPTION)
+        echo "${PAD:-}${module_name}: \"${module_desc}\"" 
+    }
+}
 
 # __rerun_modules_summary_ - List the modules.
 #
@@ -810,24 +827,16 @@ _rerun_modules_summary() {
     set +u
     for module in $directory/*
     do
-       	local module_dirname=$(rerun_module_exists $(basename "$module")) && {
-            local module_name=$(basename "$module")
-            local module_desc=$(rerun_property_get $module DESCRIPTION)
-            echo "${PAD:-}${module_name}: \"${module_desc}\"" 
-        }
+        [[ -f $module/metadata ]] && _rerun_module_summary $module
     done
-
-
-    if [[ ${RERUN_LOCATION:-} = "/usr/bin" && ${RERUN_MODULES:-} != "/usr/lib/rerun/modules" ]]
+    if [[ ${RERUN_LOCATION:-} = "/usr/bin" 
+                && ${RERUN_MODULES:-} != "/usr/lib/rerun/modules" ]]
     then
         echo
         echo -e $gray"Available modules in \"/usr/lib/rerun/modules\":"$_gray
-        for module in /usr/lib/rerun/modules/*; do
-            local module_dirname=$(rerun_module_exists $(basename "$module")) && {
-                local module_name=$(basename "$module")
-                local module_desc=$(rerun_property_get $module DESCRIPTION)
-                echo "${PAD}${module_name}: \"${module_desc}\"" 
-            }
+        for module in /usr/lib/rerun/modules/*
+        do
+           [[ -f $module/metadata ]] && _rerun_module_summary $module
         done
     fi
     set -u
