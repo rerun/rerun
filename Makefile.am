@@ -24,6 +24,7 @@ dist_man_MANS = modules/stubbs/stubbs.1
 # The module
 nobase_dist_pkgdata_DATA = \
 	modules/stubbs/README.md \
+	modules/stubbs/bin/roundup \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
@@ -46,12 +47,12 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/script \
+	modules/stubbs/lib/functions.sh \
 	modules/stubbs/lib/interpreters/README.md \
 	modules/stubbs/lib/interpreters/bash/generate-options \
 	modules/stubbs/lib/interpreters/bash/metadata \
 	modules/stubbs/lib/interpreters/bash/templates/functions.sh \
 	modules/stubbs/lib/interpreters/bash/templates/script \
-	modules/stubbs/lib/functions.sh \
 	modules/stubbs/lib/interpreters/groovy/generate-options \
 	modules/stubbs/lib/interpreters/groovy/metadata \
 	modules/stubbs/lib/interpreters/groovy/templates/functions \
@@ -60,7 +61,6 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/lib/interpreters/python/metadata \
 	modules/stubbs/lib/interpreters/python/templates/functions.py \
 	modules/stubbs/lib/interpreters/python/templates/script \
-	modules/stubbs/bin/roundup \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/options/arg/metadata \
@@ -88,6 +88,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec \
+	modules/stubbs/templates/test.functions.sh \
 	modules/stubbs/templates/test.roundup \
 	modules/stubbs/tests/add-command-1-test.sh \
 	modules/stubbs/tests/add-module-1-test.sh \
