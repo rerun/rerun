@@ -27,7 +27,7 @@ EOF
 
 after() {
     # clean up the mock module
-    echo rm -r $RERUN_MODULES/freddy
+    rm -r $RERUN_MODULES/freddy
 }
 
 validate() {
