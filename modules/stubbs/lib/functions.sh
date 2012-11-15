@@ -185,13 +185,13 @@ stubbs_options_with_short() {
         return 1 ; 
     }
     local -r moddir=$1 short=$2
-    local -a shorts=()
+    local -a with_short=()
     for option in $(rerun_module_options $(dirname $moddir) $(basename $moddir))
     do
         local opt_short=$(stubbs_option_property $moddir $option SHORT)
-        [[ "$short" = "$opt_short" ]] && shorts=( ${shorts[*]} $option )
+        [[ "$short" = "$opt_short" ]] && with_short=( ${with_short[*]} $option )
     done
-    echo ${shorts[*]}
+    echo ${with_short[*]}
 }
 
 #
