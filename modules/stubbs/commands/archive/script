@@ -138,7 +138,7 @@ buildrpmarchive() {
        fi
 
        # Remove any existing builds:
-       rm -f $MODULE_DIR/${NAME}-*-*.noarch.rpm
+       rm -f $MODULE_DIR/rerun-${NAME}-*-*.noarch.rpm
 
        # Prepare the source archive hierarchy:
        mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
