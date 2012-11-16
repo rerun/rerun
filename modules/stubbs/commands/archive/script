@@ -137,6 +137,9 @@ buildrpmarchive() {
          REQUIRES="rerun = $RERUN_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
        fi
 
+       # Remove any existing builds:
+       rm -f $MODULE_DIR/${NAME}-*-*.noarch.rpm
+
        # Prepare the source archive hierarchy:
        mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
        pushd $MODULE_DIR > /dev/null
