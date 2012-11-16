@@ -59,15 +59,8 @@ done
     read DESC
 }
 
-
-[ -z "$INTERPRETER" ] && {
-    echo "Interpreter: "
-    select INTERPRETER in $(stubbs_interpreters $RERUN_MODULE_DIR/lib/interpreters);
-    do
-	echo "You picked interpreter $INTERPRETER ($REPLY)"
-	break
-    done
-}
+# Set bash as the default interpreter.
+: ${INTERPRETER:=bash}
 
 INTERPRETER_LIB=$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER
 [[ ! -d "$INTERPRETER_LIB" ]] && rerun_die "Library not found: $INTERPRETER_LIB"
