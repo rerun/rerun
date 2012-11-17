@@ -31,6 +31,10 @@ validate() {
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
     test -f $RERUN_MODULES/freddy/commands/dance/script
+    test -f $RERUN_MODULES/freddy/tests/functions.sh
+    test -f $RERUN_MODULES/freddy/tests/dance-1-test.sh
+    grep -q '[[ -f ./functions.sh ]] && . ./functions.sh' \
+        $RERUN_MODULES/freddy/tests/dance-1-test.sh
 }
 
 
