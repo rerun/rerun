@@ -64,6 +64,11 @@ it_performs_rerun_options_parse() {
     rerun_options_parse 2 bar 
 }
 
+it_performs_rerun_path_absolute() {
+    . $RERUN
+    expr "$(rerun_path_absolute $RERUN)" : "/.*"
+}
+
 it_performs_rerun_list_contains() {
     . $RERUN
     arr1=( one two three )

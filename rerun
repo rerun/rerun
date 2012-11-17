@@ -379,7 +379,7 @@ rerun_list_remove() {
 #
 
 #
-# _rerun_file_absolute_ - Returns the file name's absolute path.
+# _rerun_path_absolute_ - Returns the file name's absolute path.
 #
 #     rerun_absoluatePath file
 #
@@ -391,7 +391,7 @@ rerun_list_remove() {
 #
 # * File name can be relative.
 
-rerun_file_absolute() {
+rerun_path_absolute() {
     local -r infile="${1:-$0}"
     {
         if [[ "${infile#/}" = "${infile}" ]]; then
@@ -934,7 +934,7 @@ while [ "$#" -gt 0 ]; do
 	    ;;	
 	-M)
 	    rerun_option_check "$#" "$1"
-	    RERUN_MODULES="$2"
+	    RERUN_MODULES="$(rerun_path_absolute $2)"
 	    shift
 	    ;;
 	--answers)
@@ -1051,7 +1051,7 @@ fi
 # Set the `RERUN` environment variable so subsequent 
 # invocations can use the same executable. 
 # 
-RERUN=$(rerun_file_absolute $0)
+RERUN=$(rerun_path_absolute $0)
 export RERUN
 #
 

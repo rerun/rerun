@@ -59,8 +59,8 @@ echo " TESTING MODULE: $MODULE "
 echo "========================================================="
 (
     # Resolve relative path to rerun
-    export RERUN=$(rerun_file_absolute $RERUN)
-    export ROUNDUP=$(rerun_file_absolute $RERUN_MODULE_DIR/bin/roundup)
+    export RERUN=$(rerun_path_absolute $RERUN)
+    export ROUNDUP=$(rerun_path_absolute $RERUN_MODULE_DIR/bin/roundup)
 
     # Set modules path
     export RERUN_MODULES=$RERUN_MODULES
