@@ -60,7 +60,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/lib/interpreters/python/metadata \
 	modules/stubbs/lib/interpreters/python/templates/functions.py \
 	modules/stubbs/lib/interpreters/python/templates/script \
-	modules/stubbs/lib/roundup \
+	modules/stubbs/bin/roundup \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/options/arg/metadata \
@@ -116,7 +116,7 @@ install-data-hook:
 test: test-rerun test-stubbs
 test-rerun:
 	@echo "Testing rerun ..."
-	cd ./tests && ../modules/stubbs/lib/roundup
+	cd ./tests && ../modules/stubbs/bin/roundup
 test-stubbs:
 	@echo "Testing stubbs module..."
 	./rerun stubbs:test --module stubbs
