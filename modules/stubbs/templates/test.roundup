@@ -6,6 +6,10 @@
 #     rerun stubbs:test -m @MODULE@ -p @COMMAND@
 #
 
+# Helpers
+#
+[[ -f ./functions.sh ]] && . ./functions.sh
+
 # The Plan
 # --------
 

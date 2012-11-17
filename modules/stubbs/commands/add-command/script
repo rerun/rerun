@@ -139,6 +139,10 @@ mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests direct
 	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
     echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh"
 }
+[ ! -f $RERUN_MODULES/$MODULE/tests/functions.sh -o -n "$OVERWRITE" ] && {
+    sed -e "s/@MODULE@/$MODULE/g" \
+	$RERUN_MODULE_DIR/templates/test.functions.sh > $RERUN_MODULES/$MODULE/tests/functions.sh || rerun_die "Failed generating test functions library."
+}
 
 # Generate command metadata
 (
