@@ -41,12 +41,13 @@ fi
 #
 
 #
-# _rerun_die_ - Print an error message and exit 1.
+# _rerun_die_ - Print an error message and exit with exit code status.
 #
-#     rerun_die ?message?
+#     rerun_die ?exit_code? ?message?
 #
 # Arguments:
 #
+# * exit_code:   Exit code status. Defaults to 1.
 # * message:     Text to print in message
 #
 # Notes: 
@@ -55,12 +56,18 @@ fi
 # * Use text effects if `RERUN_COLOR` environment variable set.
 # * Message format:     `"ERROR : ?message?"`
 # * Exit status returned to invoking command: 0
-rerun_die() {    
-    local -i frame=0; local info=
+rerun_die() {   
+   [[ $# -gt 1 ]] && { 
+	    exit_status=$1
+        shift        
+    } 
+    local -i frame=0; local info= 
     while info=$(caller $frame)
     do 
         local -a f=( $info )
-        [[ $frame -gt 0 ]] && printf >&2 "ERROR in \"%s\" %s:%s\n" "${f[1]}" "${f[2]}" "${f[0]}"
+        [[ $frame -gt 0 ]] && {
+            printf >&2 "ERROR in \"%s\" %s:%s\n" "${f[1]}" "${f[2]}" "${f[0]}"
+        }
         (( frame++ )) || :; #ignore increment errors (i.e., errexit is set)
     done
 
@@ -68,7 +75,7 @@ rerun_die() {
     then echo >&2 -e ${red}"ERROR: $*"${_red} 
     else echo >&2 "ERROR: $*"
     fi
-    exit 1
+    exit ${exit_status:-1}
 }
 
 #

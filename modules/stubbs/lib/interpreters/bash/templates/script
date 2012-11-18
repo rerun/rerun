@@ -17,7 +17,7 @@
 # * Trap calls `rerun_die` with standard message.
 # * Exit upon command errors or accessing unset variables.
 #   * See [set](http://ss64.com/bash/set.html)
-trap 'rerun_die "*** command failed: @MODULE@:@COMMAND@. ***"' ERR
+trap 'rerun_die $? "*** command failed: @MODULE@:@COMMAND@. ***"' ERR
 set -o nounset -o pipefail
 
 # Parse the command options.

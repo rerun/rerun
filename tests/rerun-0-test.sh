@@ -39,6 +39,8 @@ it_performs_rerun_die() {
     rerun_die 2>&1 |grep "^ERROR:"
     test ${PIPESTATUS[0]} = 1; # errors exit with 1
     rerun_die "messagetext" 2>&1 |grep "^ERROR: messagetext$"
+    rerun_die 22 "exit code 22" 2>&1 | grep "^ERROR:"
+    test ${PIPESTATUS[0]} = 22
 }
 
 it_performs_rerun_syntax_error() {
