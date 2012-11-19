@@ -213,13 +213,14 @@ stubbs_option_commands() {
         return 1 ; 
     }
     moddir=$1 option=$2
-
     commands=()
     for cmd_dir in $moddir/commands/*
     do
-        OPTIONS=( $(. $cmd_dir/metadata ; echo $OPTIONS ) )
-        rerun_list_contains "$option" "${OPTIONS[*]}" && {
-            commands=( ${commands[*]} $(basename $cmd_dir) )
+        local -a command_options=( $(rerun_property_get $cmd_dir OPTIONS) )
+        [[ -z "${command_options}" ]] && continue; # no option assignments.
+
+        rerun_list_contains "$option" "${command_options[@]}" && {
+            commands=( ${commands[@]} $(basename $cmd_dir) )
         }
     done
     echo "${commands[*]}"

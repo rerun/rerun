@@ -79,12 +79,12 @@ it_runs_fully_optioned() {
 
 # Run the command with all options.
 it_removes_option_after_last_assignment() {
-    # Add option "--jumps|-j <1>"
+    # Add freddy:dance option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --desc "number of times to jump" \
         --default 1 --required false --export false
     #
-    # Add a second option: "--height|-h <5>"
+    # Add a second freddy:dance option: "--height|-h <5>"
     rerun stubbs:add-option --module freddy --command dance \
         --option height --desc "height to jump" \
         --default 5 --required false --export false
@@ -100,6 +100,7 @@ it_removes_option_after_last_assignment() {
     #
     # Check if the option has been unassigned.
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
+
     test ${#OPTIONS[*]} = 1
     ! rerun_list_contains "jumps" "${OPTIONS[@]}"
     rerun_list_contains "height" "${OPTIONS[@]}"
@@ -116,5 +117,39 @@ it_removes_option_after_last_assignment() {
     #
     # Ensure that the option declaration was removed from the module
     ! test -d $RERUN_MODULES/freddy/options/height
+}
+
+
+it_retains_option_if_assigned_to_command() {
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --desc "number of times to jump" \
+        --default 1 --required false --export false
+
+    mkdir -p $RERUN_MODULES/freddy/commands/pop
+    cat > $RERUN_MODULES/freddy/commands/pop/metadata <<EOF
+NAME=pop
+DESCRIPTION="pop those moves"
+OPTIONS=
+EOF
+    cat > $RERUN_MODULES/freddy/commands/pop/script <<EOF
+#!/usr/bin/env bash
+#/ command: freddy:pop: "pop those moves"
+echo "jumps ($JUMPS)"
+EOF
+    rerun stubbs:add-option --module freddy --command pop \
+        --option jumps --desc "number of times to jump" \
+        --default 1 --required false --export false
+    rerun stubbs:add-option --module freddy --command pop \
+        --option music --desc "music to play" \
+        --default lockit --required false --export false
+    # Remove freddy:pop --jumps
+    rerun stubbs:rm-option --module freddy --command pop --option jumps
+    # Jumps option declaration should still exist and tied to dance.
+    test -f $RERUN_MODULES/freddy/options/jumps/metadata
+    # Ensure the dance command has the jumps assignment
+    OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
+    test -n "$OPTIONS"
+    test ${#OPTIONS[*]} = 1
+    test ${OPTIONS[0]} = "jumps"
 }
 

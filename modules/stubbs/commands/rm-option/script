@@ -89,11 +89,7 @@ done
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
-# Verify this option exists
-#
-[ ! -d $RERUN_MODULES/$MODULE/option/$OPTION ] && {
-    exit 0
-}
+
 # Unassign this command from the option
 #
 #
@@ -112,14 +108,17 @@ echo "Updated command metadata:  $command_metadata"
 # Check if this option is assigned to any commands.
 option_to_command_assignments=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $OPTION) )
 
-# Remove the option declaration if no commands are assigned to it.
+# Remove the option directory, if no commands are assigned to it.
 
 if [ ${#option_to_command_assignments[*]} = 0 ]
 then
-    rm -r "$RERUN_MODULES/$MODULE/options/$OPTION" || {
-        rerun_die "Error removing option: $OPTION"
-    }
-    echo "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
+    if [[ -d  "$RERUN_MODULES/$MODULE/options/$OPTION" ]]
+    then
+        rm -r "$RERUN_MODULES/$MODULE/options/$OPTION" || {
+            rerun_die "Error removing option: $OPTION"
+        }
+        echo "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
+    fi
 fi
 
 #

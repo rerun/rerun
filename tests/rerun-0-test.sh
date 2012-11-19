@@ -78,6 +78,13 @@ it_performs_rerun_list_contains() {
     rerun_list_contains "two" "${arr1[@]}"
     rerun_list_contains "three" "${arr1[@]}"
     ! rerun_list_contains "four" "${arr1[@]}"    
+
+    options=( content-type description file owner repository url )
+    rerun_list_contains "url" "${options[@]}"
+
+    #rerun_list_contains title 'url owner repository title key-file'
+    options=(url owner repository title key-file)
+    rerun_list_contains title "${options[@]}"
 }
 
 it_performs_rerun_list_remove() {
