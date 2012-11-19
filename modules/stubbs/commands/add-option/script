@@ -139,16 +139,19 @@ done
 # Confirm the option declaration settings.
 if [[ -f $RERUN_MODULES/$MODULE/options/$OPTION/metadata ]]
 then
-    CURR_DESC=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION DESCRIPTION)
     CURR_REQ=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION REQUIRED)
-    CURR_DEFAULT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION DEFAULT)
     CURR_EXPORT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION EXPORT)
+    # Crap hack to avoid quote stripping. Use awk to parse the property values.
+    CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
+        $RERUN_MODULES/$MODULE/options/$OPTION/metadata)
+    CURR_DESC=$(awk -F= '/DESCRIPTION/ {print $2}' \
+        $RERUN_MODULES/$MODULE/options/$OPTION/metadata)
 fi
 # Confirm the description.
 [ -z "$DESC" ] && {
     printf "Description%s\n" "$(display_default CURR_DESC)"
     read DESC
-    [[ -n "${CURR_DESC}" && -z "$DESC" ]] && DESC=${CURR_DESC}
+    [[ -n "${CURR_DESC}" && -z "$DESC" ]] && DESC="${CURR_DESC}"
 }
 # Confirm the option requirement.
 [ -z "$REQ" ] && {
@@ -171,7 +174,7 @@ fi
 [ -z "$DEFAULT" ] && {
     printf "Default%s\n" "$(display_default CURR_DEFAULT)"
     read DEFAULT
-    [[ -n "${CURR_DEFAULT}" && -z "$DEFAULT" ]] && DEFAULT=${CURR_DEFAULT}
+    [[ -n "${CURR_DEFAULT}" && -z "$DEFAULT" ]] && DEFAULT="${CURR_DEFAULT}"
 }
 
 # If short is specified, check it's not already used.
