@@ -89,6 +89,11 @@ done
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
+# Verify this option exists
+#
+[ ! -d $RERUN_MODULES/$MODULE/option/$OPTION ] && {
+    exit 0
+}
 # Unassign this command from the option
 #
 #
