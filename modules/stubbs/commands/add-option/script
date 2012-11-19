@@ -208,8 +208,8 @@ echo "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
 # Update the command metadata.
 #
 command_options=( $(rerun_options $RERUN_MODULES $MODULE $COMMAND) )
-# Check if this option has already been assigned.
-rerun_list_contains "$OPTION" "${command_options[*]}" || {
+# Add this OPTION to the list if it is not yet assigned.
+rerun_list_contains "$OPTION" "${command_options[@]:-}" || {
     command_options=( ${command_options[*]} $OPTION )
 }
 

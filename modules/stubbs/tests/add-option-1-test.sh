@@ -106,3 +106,23 @@ it_exports_option_variable() {
     grep 'export JUMPS$' $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -v 'export HEIGHT$' $RERUN_MODULES/freddy/commands/dance/options.sh
 }
+
+it_does_not_add_duplicate_assignments() {
+    # --jumps|-j <3>
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" \
+        --required true --export true --default 3
+    # Check the command's option assignment
+    OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
+    test "${#OPTIONS[*]}" = 1
+    rerun_list_contains "jumps" "${OPTIONS[*]}"
+
+    # Add the option again and be sure the assignment doesn't get duplicated.
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" \
+        --required true --export true --default 3
+    OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
+    test "${#OPTIONS[*]}" = 1
+    rerun_list_contains "jumps" "${OPTIONS[*]}"
+
+}
