@@ -201,6 +201,9 @@ it_performs_rerun_property_set() {
     three=$(rerun_property_get $RERUN_MODULES/freddy THREE)
     test "$three" = "3"
 
+    rerun_property_set $RERUN_MODULES/freddy DEFAULT="'${USER}'"
+    def=$(rerun_property_get $RERUN_MODULES/freddy DEFAULT)
+    test "$def" = "'${USER}'"
 }
 
 it_performs_rerun_script_lookup() {
