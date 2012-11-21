@@ -126,8 +126,9 @@ done
 
 # Verify this command exists
 #
-[ ! -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] && rerun_option_error "command not found: \"$MODULE:$COMMAND\""
-
+[ ! -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] && {
+    rerun_option_error "command not found: \"$MODULE:$COMMAND\""
+}
 
 # Was option argument specified?
 [ -z "$OPTION" ] && {
@@ -139,12 +140,12 @@ done
 # Confirm the option declaration settings.
 if [[ -f $RERUN_MODULES/$MODULE/options/$OPTION/metadata ]]
 then
+    CURR_DESC=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION DESCRIPTION)
     CURR_REQ=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION REQUIRED)
     CURR_EXPORT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION EXPORT)
-    # Crap hack to avoid quote stripping. Use awk to parse the property values.
+    # Crap hack to avoid quote stripping or eval expansions. 
+    # Use awk to parse the property values.
     CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
-        $RERUN_MODULES/$MODULE/options/$OPTION/metadata)
-    CURR_DESC=$(awk -F= '/DESCRIPTION/ {print $2}' \
         $RERUN_MODULES/$MODULE/options/$OPTION/metadata)
 fi
 # Confirm the description.

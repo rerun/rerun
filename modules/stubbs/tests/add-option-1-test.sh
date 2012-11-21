@@ -137,3 +137,19 @@ it_does_not_add_duplicate_assignments() {
     rerun_list_contains "jumps" "${OPTIONS[*]}"
 
 }
+
+it_should_not_overquote_descriptions() {
+   # --jumps|-j <3>
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" \
+        --required true --export true --default 3
+    # repeat the declaration
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" \
+        --required true --export true --default 3
+    # Check the description
+    
+    DESC=$(awk -F= '/DESCRIPTION=.*/ {print $2}' \
+        $RERUN_MODULES/freddy/options/jumps/metadata)
+    test "$DESC" = '"jump #num times"'
+}
