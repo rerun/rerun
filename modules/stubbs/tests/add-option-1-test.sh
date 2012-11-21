@@ -23,6 +23,13 @@ EOF
 NAME=dance
 OPTIONS=
 EOF
+    cat > $RERUN_MODULES/freddy/commands/dance/script <<EOF
+#!/usr/bin/env bash
+#/ usage:
+#/ rerun-variables:
+#/ option-variables:
+
+EOF
 }
 
 after() {
@@ -44,6 +51,10 @@ validate() {
     grep -q "\-j\|\--jumps)" $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -q '[ -z "$JUMPS" ] && JUMPS="3"' $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -q '"missing required option: --jumps"' $RERUN_MODULES/freddy/commands/dance/options.sh
+
+    grep '^#/ usage: '  $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep '^#/ option-variables:' $RERUN_MODULES/freddy/commands/dance/script
+
     return $?
 }
 

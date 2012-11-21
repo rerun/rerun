@@ -307,7 +307,7 @@ stubbs_script_header() {
 
     sed "
         s,#/ command: .*,#/ command: $module:$command: \"$description\",
-        s,#/ option variables: .*,#/ option variables: $variables,
+        s,#/ option-variables: .*,#/ option-variables: $variables,
         s,#/ usage: .*,#/ usage: rerun $module:$command $usage,
         " $command_script 
     # Generate output to stdout.

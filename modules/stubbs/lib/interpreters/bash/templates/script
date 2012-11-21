@@ -47,8 +47,8 @@ set -o nounset -o pipefail
 # This command script can access the following variables
 # declared by `rerun` or by the option parser function.
 
-#/ rerun env variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option variables: @VARIABLES@
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: @VARIABLES@
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting 
