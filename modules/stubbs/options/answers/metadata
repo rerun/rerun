@@ -1,0 +1,8 @@
+NAME=answers
+DESCRIPTION="option answer file"
+ARGUMENTS=true
+REQUIRED=false
+DEFAULT=
+SHORT=
+EXPORT=true
+RANGE=

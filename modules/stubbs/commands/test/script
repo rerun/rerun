@@ -32,6 +32,11 @@ while [ "$#" -gt 0 ]; do
 	        PLAN="${2}"
 	        shift
 	        ;;
+	    -a|--answers)
+	        rerun_option_check "$#" "$1"
+	        ANSWERS="${2}"
+	        shift
+	        ;;
 
     # unknown option
 	    -?)
@@ -64,6 +69,9 @@ echo "========================================================="
 
     # Set modules path
     export RERUN_MODULES=$RERUN_MODULES
+
+    # Export the answers file
+    export ANSWERS=$ANSWERS
 
     # Roundup likes to run relative
     cd $RERUN_MODULES/$MODULE/tests
