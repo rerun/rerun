@@ -16,19 +16,19 @@
 }
 
 
-# _rerun_interpreters_ - List the interpreters by name.
+# _stubbs_metamodules_ - List the stubs by name.
 #
-#     rerun_interpreters directory 
+#     stubbs_metamodules directory 
 #
 # Arguments:
 #
-# * directory:     Directory containing interpreter libraries.
+# * directory:     Directory containing stub libraries.
 #
 # Notes: 
 #
-# * Returns a list of space separated interpreter names.
+# * Returns a list of space separated stub names.
 # 
-stubbs_interpreters() {
+stubbs_metamodules() {
     [[ ! $# -eq 1 ]] && { 
 	    rerun_die 'usage: ${FUNCNAME} directory'
     }

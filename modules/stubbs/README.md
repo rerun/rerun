@@ -23,7 +23,7 @@ Create a new rerun module.
 
 Make a new module named "freddy":
 
-    rerun stubbs:add-module --module freddy --description "A dancer in a red beret and matching suspenders"
+    rerun stubbs:add-module --module freddy --description "A dancer in a red beret and matching suspenders" 
 
 The `add-module` command will print:
 
@@ -45,16 +45,16 @@ Add a command named "dance" to the freddy module:
 
 The `add-command` module generates a boilerplate command script file you can edit.
 
-	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
 	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/script
+	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
 
-Of course, stubbs doesn't write the implementation for you, merely a _stub_.
+Of course, stubbs doesn't write the implementation for you, merely a stub.
 
 See the "Command implementation" section below to learn about 
-the `script` command script.
+the generated `script` command script.
 
 See the *Testing* section below to learn about
-the test script.
+the `dance-1-test.sh` test script.
 
 ### add-option
 
@@ -68,16 +68,18 @@ Define a command option for the specified module and generate options parser scr
 
 Define an option named "--jumps":
 
-    rerun stubbs:add-option --option jumps --description "jump #num times" --module freddy --command dance
+    rerun stubbs:add-option --option jumps --description "jump #num times" --module freddy --command dance --required true --export false --default 3
 
 You will see output similar to:
 
     Created option: /Users/alexh/.rerun/modules/freddy/options/jumps/metadata
+    Updated command metadata:  /Users/alexh/.rerun/modules/freddy/commands/dance/metadata
 
-Besides the `options/jumps/metadata` file, `add-option` also generates an
-option parsing script: `$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
+Besides the `options/jumps/metadata` file, the `add-option` 
+command also generates an option parsing script: 
+`$RERUN_MODULES/$MODULE/commands/$COMMAND/options.sh`.
 
-The `script` script sources the `options.sh` script to take care of
+The dance command's `script` sources the `options.sh` script to take care of
 command line option parsing.
 
 Users will now be able to specify a "--jumps" argument to the `freddy:dance` command:
@@ -85,7 +87,12 @@ Users will now be able to specify a "--jumps" argument to the `freddy:dance` com
     $ rerun freddy
     freddy:
      dance: tell freddy to dance
-        --jumps <>: "jump #num times"
+        --jumps|-j <3>: "jump #num times"
+
+Use the [stubbs:edit](#edit) command to open the generated `script` file
+in the text editor referenced via the `$EDITOR` environment variable. Eg,
+
+    rerun stubbs: edit --module freddy --command dance 
 
 ### archive
 
@@ -170,6 +177,24 @@ Run `rerun --manual <module>` to display it:
 	
 	rerun --manual freddy
 	
+### edit
+
+Open the command script in $EDITOR.
+
+*Usage*
+
+    rerun stubbs:edit --module <> --command <>
+    
+*Example*
+
+    rerun stubbs:edit --module freddy --command dance
+
+The `edit` command will open $RERUN_MODULES/$MODULE/commands/$COMMAND/script.
+
+The stubbs:edit command defaults to `vi` if EDITOR is not defined.
+Echo the `$EDITOR` environment variable to see the current text
+editor defined for your shell.
+
 ### test
 
 Run module test suite. 
@@ -205,33 +230,38 @@ Running `stubbs:add-command` as shown above will generate a stub
 script implementation for the new command: 
 `$RERUN_MODULES/$MODULE/commands/$COMMAND/script`:
 
-The "dance" command's `script` file is shown below.
+The initial "dance" command `script` file is shown below.
 
 File listing: `$RERUN_MODULES/freddy/commands/dance/script`
 
     #!/usr/bin/env bash
     #
-    # NAME
+    #/ command: freddy:dance: "tell freddy to dance"
     #
-    #   dance 
+    #/ usage: rerun freddy:dance [options]
     #
-    # DESCRIPTION
-    #
-    #   tell freddy to dance
+    #/ rerun env variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+    #/ option variables: 
      
-    # Function to print error message and exit
-    rerun_die() {
-        echo "ERROR: $* " ; exit 1;
+    # Read module function library.
+    . $RERUN_MODULE_DIR/lib/functions.sh || {
+      echo >&2 "Failed loading function library." ; exit 1 ;
     }
      
-    # Parse the command options     
-    [ -r $RERUN_MODULES/freddy/commands/dance/options.sh ] && {
-       . $RERUN_MODULES/freddy/commands/dance/options.sh
-    } 
+    # Error handling
+    # ---------------
+    # * Trap calls `rerun_die` with standard message.
+    # * Exit upon command errors or accessing unset variables.
+    #   * See [set](http://ss64.com/bash/set.html)
+    trap 'rerun_die "*** command failed: freddy:dance. ***"' ERR
+    set -o nounset -o pipefail
      
-    # Exit immediately upon non-zero exit. See [set](http://ss64.com/bash/set.html)
-    set -e
-     
+    # Parse the command options.
+    [[ -r $RERUN_MODULE_DIR/commands/dance/options.sh ]] && {
+        . $RERUN_MODULE_DIR/commands/dance/options.sh || rerun_die "Failed loading options parser."
+        rerun_options_parse "$@"
+    }
+         
     # ------------------------------
     # Your implementation goes here.
     # ------------------------------

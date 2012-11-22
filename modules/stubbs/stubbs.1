@@ -1,4 +1,4 @@
-.TH stubbs 1 "Fri Nov 16 10:35:32 PST 2012" "Version 1" "Rerun User Manual" 
+.TH stubbs 1 "Thu Nov 22 11:28:34 PST 2012" "Version 1" "Rerun User Manual" 
 .SH NAME
 stubbs \- "Simple rerun module builder"
 .PP
@@ -8,7 +8,7 @@ stubbs \- "Simple rerun module builder"
 rerun [ARGS] stubbs: [ add-command | add-module | add-option | archive | docs | edit | migrate | rm-option | test ] [OPTIONS]
 \f[]
 .SH COMMANDS
-.SH stubbs:add-command \f[]--command <> --description <> --module <> --overwrite <false> --template <$RERUN_MODULE_DIR/templates/script>
+.SH stubbs:add-command \f[]
 "add command to module"
 .PP
 \f[I]OPTIONS\f[]
@@ -37,14 +37,7 @@ arguments: \f[I]true\f[]
 , default: \f[I]false\f[]
 .RS
 .RE
-.TP
-.B \--template \f[]"default script template"\f[]
-required: \f[I]true\f[] ,
-arguments: \f[I]true\f[]
-, default: \f[I]$RERUN_MODULE_DIR/templates/script\f[]
-.RS
-.RE
-.SH stubbs:add-module \f[]--description <> [--interpreter <bash>] --module <>
+.SH stubbs:add-module \f[]
 "add a new module"
 .PP
 \f[I]OPTIONS\f[]
@@ -55,10 +48,9 @@ arguments: \f[I]true\f[]
 .RS
 .RE
 .TP
-.B \--interpreter \f[]"the scripting interpreter (bash)"\f[]
-required: \f[I]false\f[] ,
-arguments: \f[I]true\f[]
-, default: \f[I]bash\f[]
+.B \--interpreter \f[]\f[]
+required: \f[I]\f[] ,
+arguments: \f[I]\f[]
 .RS
 .RE
 .TP
@@ -67,7 +59,7 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:add-option \f[][--arg <false>] --command <> [--default <>] --description <> [--export <false>] [--long <>] --module <> --option <> [--range <"*">] [--required <false>] [--short <>]
+.SH stubbs:add-option \f[]
 "add a command option"
 .PP
 \f[I]OPTIONS\f[]
@@ -141,7 +133,7 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:archive \f[][--file <>] [--format <bin>] --modules <"*"> [--release <1>] [--version <>]
+.SH stubbs:archive \f[]
 "build a self extracting rerun" 
 .PP
 \f[I]OPTIONS\f[]
@@ -178,7 +170,7 @@ required: \f[I]false\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:docs \f[][--file <>] --module <>
+.SH stubbs:docs \f[]
 "generate the docs"
 .PP
 \f[I]OPTIONS\f[]
@@ -194,7 +186,7 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:edit \f[]--command <> --module <>
+.SH stubbs:edit \f[]
 "edit a command script"
 .PP
 \f[I]OPTIONS\f[]
@@ -210,7 +202,7 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:migrate \f[]--module <>
+.SH stubbs:migrate \f[]
 "Migrate 0.9 modules to the 1.0 module format"
 .PP
 \f[I]OPTIONS\f[]
@@ -220,7 +212,7 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:rm-option \f[]--command <> --module <> --option <>
+.SH stubbs:rm-option \f[]
 "remove a command option"
 .PP
 \f[I]OPTIONS\f[]
@@ -242,10 +234,16 @@ required: \f[I]true\f[] ,
 arguments: \f[I]true\f[]
 .RS
 .RE
-.SH stubbs:test \f[][--logs <>] --module <> [--plan <>]
+.SH stubbs:test \f[]
 "run module test scripts"
 .PP
 \f[I]OPTIONS\f[]
+.TP
+.B \--answers \f[]"option answer file"\f[]
+required: \f[I]false\f[] ,
+arguments: \f[I]true\f[]
+.RS
+.RE
 .TP
 .B \--logs \f[]"logs directory"\f[]
 required: \f[I]false\f[] ,
@@ -268,7 +266,7 @@ arguments: \f[I]true\f[]
 .PP
 Successful completion: 0
 .SH AUTHORS
-anthony
+alexh
 .SH "SEE ALSO"
 rerun
 .SH KEYWORDS

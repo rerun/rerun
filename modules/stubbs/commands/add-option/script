@@ -258,23 +258,23 @@ echo "Updated command metadata:  $command_metadata"
 #
 
 # Read language setting for module. Set it to 'bash' as a default.
-INTERPRETER=$(. $RERUN_MODULES/$MODULE/metadata; echo ${INTERPRETER:-bash});
+META_MODULE=$(. $RERUN_MODULES/$MODULE/metadata; echo ${META_MODULE:-bash});
 
-[ ! -f $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata ] && {
-    rerun_die "language unsupported: $INTERPRETER"
+[ ! -f $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata ] && {
+    rerun_die "meta-module not found: $META_MODULE"
 }
-.  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/metadata "
+.  $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata "
 }
-[ -z "$RERUN_OPTIONS_GENERATOR" ] && {
-    rerun_die "required metadata not found: RERUN_OPTIONS_GENERATOR"
+[ -z "$OPTIONS_GENERATOR" ] && {
+    rerun_die "required metadata not found: OPTIONS_GENERATOR"
 }
-[ -z "$RERUN_OPTIONS_SCRIPT" ] && {
-    rerun_die "required metadata not found: RERUN_OPTIONS_SCRIPT"
+[ -z "$OPTIONS_SCRIPT" ] && {
+    rerun_die "required metadata not found: OPTIONS_SCRIPT"
 }
-options_parser=$RERUN_MODULES/$MODULE/commands/$COMMAND/$RERUN_OPTIONS_SCRIPT
+options_parser=$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTIONS_SCRIPT
 
-$RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
+$RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/$OPTIONS_GENERATOR \
     $RERUN_MODULES $MODULE $COMMAND > $options_parser || {
     rerun_die "Failed generating options parser."
 }
@@ -282,11 +282,11 @@ $RERUN_MODULE_DIR/lib/interpreters/$INTERPRETER/$RERUN_OPTIONS_GENERATOR \
 # Update the command script header to give it the updated
 # variable summary and usage info.
 
-[ -z "$RERUN_COMMAND_SCRIPT" ] && {
-    rerun_die "required metadata not found: RERUN_COMMAND_SCRIPT"
+[ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
+    rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
 }
 
-command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $RERUN_COMMAND_SCRIPT)
+command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND_SCRIPT)
 if [ -f "$command_script" ]
 then
     stubbs_script_header \

@@ -1,8 +1,0 @@
-NAME=interpreter
-DESCRIPTION="the scripting interpreter (bash)"
-ARGUMENTS=true
-REQUIRED=false
-DEFAULT=bash
-LONG=interpreter
-SHORT=l
-RANGE={bash}

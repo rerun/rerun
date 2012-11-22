@@ -16,7 +16,7 @@ before() {
     cat > $RERUN_MODULES/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION=
-INTERPRETER=bash
+META_MODULE=bash
 EOF
 }
 

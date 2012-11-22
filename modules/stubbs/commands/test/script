@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #/ command: stubbs:test: "run module test scripts"
-#/ usage: stubbs:test --module|-m <> [--plan|-p <*>] [--logs <>] 
+#/ usage: stubbs:test --module|-m <> [--plan|-p <*>] [--answers|-a]
 
 
 # Load common functions

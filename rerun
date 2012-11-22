@@ -633,7 +633,7 @@ rerun_module_exists() {
 # __Execution__
 # 
 # Execute the command script if it is executable
-# otherwise run it using the same interpreter as rerun.
+# otherwise run it using the same shell as rerun.
 # Return the command script's exit code as the result.
 #
 rerun_command_execute() {
@@ -649,9 +649,9 @@ rerun_command_execute() {
     rerun_script_exists "${RERUN_MODULE_DIR:-}" $command || {
         rerun_syntax_error "command not found: \"$module:$command\""
     }
-
-    local interp=$(rerun_property_get "$RERUN_MODULE_DIR" "INTERPRETER")
-    [[ -z "$interp" || "$interp" = "" ]] && interp=bash; # default it.
+    local -r RERUN_SHELL=$SHELL
+    local COMMAND_SHELL=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
+    : ${COMMAND_SHELL:=$RERUN_SHELL}; # default it.
 
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
 
@@ -659,14 +659,14 @@ rerun_command_execute() {
     
     if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
-        $interp $RERUN_VERBOSE "$script" "$@"
+        $COMMAND_SHELL $RERUN_VERBOSE "$script" "$@"
         RERUN_EXITSTATUS=$?
     elif [[ -x "$script" ]]
     then
         "$script" "$@"
         RERUN_EXITSTATUS=$?
     else
-        $interp "$script" "$@"
+        $COMMAND_SHELL "$script" "$@"
         RERUN_EXITSTATUS=$?
     fi
 
