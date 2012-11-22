@@ -30,7 +30,7 @@
 # 
 stubbs_interpreters() {
     [[ ! $# -eq 1 ]] && { 
-	    rerun_die 'wrong # args: should be: stubbs_interpreters directory'
+	    rerun_die 'usage: ${FUNCNAME} directory'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
     local -a interps
@@ -100,7 +100,7 @@ stubbs_command_property() {
 #
 stubbs_options_matching() {
     [[ ! $# > 2 ]] && { 
-        echo >&2 "usage: stubbs_option_matching directory command" ; 
+        echo >&2 "usage: ${FUNCNAME} directory command" ; 
         return 1 ; 
     }
     local moddir=$1 command=$2
@@ -120,7 +120,7 @@ stubbs_options_matching() {
             fi
         done
     done
-    echo "${options[*]}"
+    echo "${options[*]:-}"
 }
 
 #
@@ -154,17 +154,21 @@ stubbs_option_variable() {
 #
 stubbs_option_variables() {
     [[ ! $# = 2 ]] && { 
-        echo >&2 "usage: stubbs_option_variables <moddir> <command>" 
+        echo >&2 "usage: ${FUNCNAME} <moddir> <command>" 
         return 1 ; 
     }
     local moddir=$1 command=$2
 
-    local variables=()
+    local -a variables=()
     for option in $(rerun_options $(dirname $moddir) $(basename $moddir) $command)
     do
-        variables=( ${variables[*]} $(stubbs_option_variable $option) )
+        local variable=$(stubbs_option_variable $option)
+        if [[ -z "${variables:-}" ]]
+        then variables=( $variable )
+        else variables=( ${variables[*]} ${variable} )
+        fi
     done
-    echo ${variables[*]}
+    echo ${variables[*]:-}
 }
 
 #
@@ -181,7 +185,7 @@ stubbs_option_variables() {
 #
 stubbs_options_with_short() {
     [[ ! $# = 2 ]] && { 
-        echo >&2 "usage: stubbs_options_with_short <moddir> <short>" 
+        echo >&2 "usage: ${FUNCNAME} <moddir> <short>" 
         return 1 ; 
     }
     local -r moddir=$1 short=$2
@@ -209,7 +213,7 @@ stubbs_options_with_short() {
 #
 stubbs_option_commands() {
     [[ ! $# = 2 ]] && { 
-        echo >&2 "usage: stubbs_option_commands <moddir> <option>" 
+        echo >&2 "usage: ${FUNCNAME} <moddir> <option>" 
         return 1 ; 
     }
     moddir=$1 option=$2
@@ -217,13 +221,13 @@ stubbs_option_commands() {
     for cmd_dir in $moddir/commands/*
     do
         local -a command_options=( $(rerun_property_get $cmd_dir OPTIONS) )
-        [[ -z "${command_options}" ]] && continue; # no option assignments.
+        [[ -z "${command_options:-}" ]] && continue; # no option assignments.
 
         rerun_list_contains "$option" "${command_options[@]}" && {
-            commands=( ${commands[@]} $(basename $cmd_dir) )
+            commands=( ${commands[@]:-} $(basename $cmd_dir) )
         }
     done
-    echo "${commands[*]}"
+    echo "${commands[*]:-}"
 }
 
 #
@@ -243,7 +247,7 @@ stubbs_option_commands() {
 #
 stubbs_command_usage() {
     [[ ! $# = 2 ]] && { 
-        echo >&2 "usage: stubbs_command_usage module_dir command" ; 
+        echo >&2 "usage: ${FUNCNAME} module_dir command" ; 
         return 1 ; 
     }
     local moddir=$1 command=$2
@@ -289,7 +293,7 @@ stubbs_command_usage() {
 #
 stubbs_script_header() {
     [[ ! $# = 2 ]] && { 
-        echo >&2 "usage: stubbs_script_header <moddir> <command>" 
+        echo >&2 "usage: ${FUNCNAME} <moddir> <command>" 
         return 1 ; 
     }
     local moddir=$1 command=$2     
@@ -329,7 +333,7 @@ stubbs_script_header() {
 #
 stubbs_command_options_write() {
     [[ ! $# = 3 ]] && { 
-        echo >&2 "usage: rerun_command_options_write <moddir> <command> <options>" 
+        echo >&2 "usage: ${FUNCNAME} <moddir> <command> <options>" 
         return 1 ; 
     }
     local moddir=$1 command=$2 options=$3

@@ -1,28 +1,51 @@
 #!/usr/bin/env bash
 #
-# NAME
-#
-#   archive
-#
-# DESCRIPTION
-#
-#   Build a self extracting archive
-#
+# command: stubbs:archive: "Build a self extracting archive"
 #/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <*> [ --release|-r <1>] [ --version|-v <>] 
 
-# Source common function library
-. $RERUN_MODULE_DIR/lib/functions.sh || { echo >&2 "failed laoding function library" ; exit 1 ; }
+
+# Load common functions
+# ---------------------
+
+# Load the function library for this module.
+# This loads rerun functions and those defined for stubbs.
+. $RERUN_MODULE_DIR/lib/functions.sh || { 
+    echo >&2 "failed laoding function library" ; exit 1 ; 
+}
 
 # Parse the command options
 [ -r $RERUN_MODULE_DIR/commands/archive/options.sh ] && {
   . $RERUN_MODULE_DIR/commands/archive/options.sh
 }
 
+# Error handling
+# ---------------
+
+# This script is designed to _fail-fast_.
+
+# Trap errors and exit. The call to `rerun_die` will print the
+# the error message and exit with the error command exit status. 
+
+trap 'rerun_die $? "*** command failed: stubbs:archive. ***"' ERR
+
+# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
+# so a pipeline return status is the value of the last 
+# (rightmost) command to exit with non-zero status.
+#
+# [set]: http://ss64.com/bash/set.html
+# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
+
+set -o nounset -o pipefail
+
+
+# Command implementation
+# ----------------------
+
 buildbinarchive() {
   CWD=$(pwd); #remember current working directory.
 
   # Check if file option was specified and if not set it to rerun.bin.
-  [ -z "${FILE}"  ] && FILE=rerun.bin 
+  [ -z "${FILE:-}"  ] && FILE=rerun.bin 
 
   # Prepend curren working directory if relative file path.
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
@@ -30,7 +53,7 @@ buildbinarchive() {
   [ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
 
   # Default version to blank if unspecified.
-  [ -z "${VERSION}" ] && VERSION=
+  [ -z "${VERSION:-}" ] && VERSION=
 
   # create a work directory the archive content
   export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die

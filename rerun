@@ -378,7 +378,7 @@ rerun_list_remove() {
             [[ -z "${retlist:-}" ]] && retlist=( $e ) || retlist=( ${retlist[*]} "$e" )
         fi
     done
-    echo "${retlist[@]}"
+    echo "${retlist[@]:-}"
 }
 
 #

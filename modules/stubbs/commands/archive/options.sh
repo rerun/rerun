@@ -45,9 +45,9 @@ while [ "$#" -gt 0 ]; do
 done
 
 # If defaultable options variables are unset, set them to their DEFAULT
-[ -z "$FORMAT" ] && FORMAT="bin"
-[ -z "$MODULES" ] && MODULES=""*""
-[ -z "$RELEASE" ] && RELEASE="1"
+[ -z "${FORMAT:-}" ] && FORMAT="bin"
+[ -z "${MODULES:-}" ] && MODULES=""*""
+[ -z "${RELEASE:-}" ] && RELEASE="1"
 # Check required options are set
 [ -z "$MODULES" ] && { echo >&2 "missing required option: --modules" ; return 2 ; }
 # If option variables are declared exportable, export them.
