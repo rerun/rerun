@@ -33,15 +33,15 @@ it_runs_interactively() {
     rerun stubbs:docs <<EOF
 stubbs
 EOF
-    validate $RERUN_MODULE_DIR/stubbs.1
+    validate $RERUN_MODULE_DIR/docs/stubbs.1
 
 }
 
 it_runs_fully_optioned() {
-    FILE=$(mktemp /tmp/stubbs.1.XXXX)
-    rerun stubbs:docs --module "stubbs" --file $FILE
+    DIR=$(mktemp -d /tmp/stubbs.docs.XXXX)
+    rerun stubbs:docs --module "stubbs" --dir $DIR
     
-    validate $FILE
-    rm -f $FILE
+    validate $DIR/stubbs.1
+    rm -r $DIR
 }
 

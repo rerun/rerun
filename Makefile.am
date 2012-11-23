@@ -19,7 +19,7 @@ dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
 dist_bin_SCRIPTS = rerun
 
 # man pages here
-dist_man_MANS = modules/stubbs/stubbs.1
+dist_man_MANS = modules/stubbs/docs/stubbs.1
 
 # The module
 nobase_dist_pkgdata_DATA = \
@@ -84,7 +84,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/short/metadata \
 	modules/stubbs/options/template/metadata \
 	modules/stubbs/options/version/metadata \
-	modules/stubbs/stubbs.1 \
+	modules/stubbs/docs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec \

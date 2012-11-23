@@ -75,9 +75,9 @@ rerun_command_summary() {
 	for option in ${options[*]}; do
 		typeset -a arr=( "$(rerun_option_summary $1 $2 ${option} )" )
 		param="${arr[@]:0:1}"
-		summary=( ${summary[@]} ${param%:*} )
+		summary=( ${summary[@]:-} ${param%:*} )
 	done
-	echo ${summary[*]}
+	echo ${summary[*]:-}
 }
 
 rerun_option_summary() {
@@ -96,6 +96,11 @@ rerun_option_summary() {
 
 [ -f "$RERUN_MODULES/$MODULE/metadata" ] || rerun_die "module not found: $MODULE"
 
+: ${DIR:=$RERUN_MODULES/$MODULE/docs}
+mkdir -p $DIR 
+MANPAGE=$DIR/$MODULE.1
+
+: ${PAD:="  "}
 
 #
 # Document head
@@ -111,11 +116,11 @@ $MODULE \- $(rerun_module_metadata "description" $MODULE)
 $(basename ${RERUN}) [ARGS] $(rerun_module_synopsys $MODULE) [OPTIONS]
 \f[]
 EOF
-) > $FILE || rerun_die
+) > $MANPAGE || rerun_die
 #
 # COMMANDS section
 #
-echo ".SH COMMANDS" >> $FILE
+echo ".SH COMMANDS" >> $MANPAGE
 for command in $(rerun_commands $RERUN_MODULES $MODULE)
 do
 (
@@ -139,7 +144,7 @@ echo .RS
 echo .RE
 done)
 EOF
-) >> $FILE || rerun_die
+) >> $MANPAGE || rerun_die
 done || rerun_die
 #
 # AUTHORS section
@@ -151,7 +156,7 @@ Successful completion: 0
 .SH AUTHORS
 $USER
 EOF
-) >> $FILE || rerun_die
+) >> $MANPAGE || rerun_die
 #
 # SEE ALSO section
 (
@@ -161,9 +166,9 @@ rerun
 .SH KEYWORDS
 $MODULE
 EOF
-) >> $FILE || rerun_die
+) >> $MANPAGE || rerun_die
 
-echo "Generated unix manual: $FILE"
+echo "Generated unix manual: $MANPAGE"
 exit $?
 
 # Done
