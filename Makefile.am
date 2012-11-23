@@ -48,19 +48,19 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/script \
 	modules/stubbs/lib/functions.sh \
-	modules/stubbs/lib/interpreters/README.md \
-	modules/stubbs/lib/interpreters/bash/generate-options \
-	modules/stubbs/lib/interpreters/bash/metadata \
-	modules/stubbs/lib/interpreters/bash/templates/functions.sh \
-	modules/stubbs/lib/interpreters/bash/templates/script \
-	modules/stubbs/lib/interpreters/groovy/generate-options \
-	modules/stubbs/lib/interpreters/groovy/metadata \
-	modules/stubbs/lib/interpreters/groovy/templates/functions \
-	modules/stubbs/lib/interpreters/groovy/templates/script \
-	modules/stubbs/lib/interpreters/python/generate-options \
-	modules/stubbs/lib/interpreters/python/metadata \
-	modules/stubbs/lib/interpreters/python/templates/functions.py \
-	modules/stubbs/lib/interpreters/python/templates/script \
+	modules/stubbs/lib/meta-modules/README.md \
+	modules/stubbs/lib/meta-modules/bash/generate-options \
+	modules/stubbs/lib/meta-modules/bash/metadata \
+	modules/stubbs/lib/meta-modules/bash/templates/functions.sh \
+	modules/stubbs/lib/meta-modules/bash/templates/script \
+	modules/stubbs/lib/meta-modules/groovy/generate-options \
+	modules/stubbs/lib/meta-modules/groovy/metadata \
+	modules/stubbs/lib/meta-modules/groovy/templates/functions \
+	modules/stubbs/lib/meta-modules/groovy/templates/script \
+	modules/stubbs/lib/meta-modules/python/generate-options \
+	modules/stubbs/lib/meta-modules/python/metadata \
+	modules/stubbs/lib/meta-modules/python/templates/functions.py \
+	modules/stubbs/lib/meta-modules/python/templates/script \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/options/arg/metadata \
@@ -70,7 +70,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/export/metadata \
 	modules/stubbs/options/file/metadata \
 	modules/stubbs/options/format/metadata \
-	modules/stubbs/options/interpreter/metadata \
+	modules/stubbs/options/meta-module/metadata \
 	modules/stubbs/options/logs/metadata \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/module/metadata \
@@ -96,7 +96,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/tests/add-option-1-test.sh \
 	modules/stubbs/tests/archive-1-test.sh \
 	modules/stubbs/tests/docs-1-test.sh \
-	modules/stubbs/tests/functional-bash-test.sh \
+	modules/stubbs/tests/functional-bash-1-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh
 

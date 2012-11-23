@@ -360,3 +360,80 @@ stubbs_init() {
     homedir=$(dirname .)
     [[ -n "$RERUN_MODULES" ]] || RERUN_MODULES=$homedir/modules    
 }
+
+#
+# - - -
+#
+
+# _stubbs_file_replace_str_ - Replace a string of text in file.
+#
+#     stubbs_file_replace_str string replacewith file
+#
+# Arguments:
+#
+# * string: string to be matched.
+# * replacewith: new string that replaces matched string.
+# * file: file to operate on.
+#
+stubbs_file_replace_str() {
+    [[ ! $# = 3 ]] && {
+        echo >&2 "usage: ${FUNCNAME} string replacewith file"
+        return 1 ;
+    }
+    local -r string=$1 replacewith=$2 file=$3
+    [[ ! -f "$file" ]] && rerun_die "File not found: $file"
+    printf ",s/$string/$replacewith/g\nw\nQ" | ed -s "$file" > /dev/null 2>&1
+    return $?
+}
+
+#
+# - - -
+#
+
+# _stubbs_module_clone_ - Clone a module from a template.
+#
+#     stubbs_module_clone moduledir templatedir
+#
+# Arguments:
+#
+# * moduledir: module directory for clone
+# * templatedir: template directory
+#
+stubbs_module_clone() {
+    [[ ! $# = 2 ]] && {
+        echo >&2 "usage: ${FUNCNAME} moduledir templatedir"
+        return 1 ;
+    }
+    local -r moduledir=$1 templatedir=$2
+    [[ ! -d "$moduledir" ]] && rerun_die "Directory not found: $moduledir"
+    [[ ! -d "$templatedir" ]] && rerun_die "Directory not found: $templatedir"
+
+    local -r module_name=$(rerun_property_get $moduledir NAME)
+    local -r module_desc=$(rerun_property_get $moduledir DESCRIPTION)
+    local -r template_name=$(rerun_property_get $templatedir NAME)
+
+    # Copy the template directory content to the new module directory
+    cp -r $templatedir/* $moduledir/
+
+    # Update the metadata in the clone.
+    rerun_property_set $moduledir NAME=$module_name
+    rerun_property_set $moduledir DESCRIPTION="$module_desc"
+
+    # Find all the command scripts.
+    local -a scripts=( $(find $moduledir/commands -type f -name script -o -name options.sh) )
+    # Find all the test scripts.
+    local -a tests=( $(find $moduledir/tests -type f -name \*.sh) )
+    # List of matching files to be processed.
+    local -a files=( ${scripts[*]:-} ${tests[*]:-} )
+
+    # Process all the matching files, replacing template module
+    # name using the clone's instead.
+    #
+    for file in ${files[*]:-}
+    do
+        grep -q "$template_name" $file && {
+            stubbs_file_replace_str "$template_name" "$module_name" "$file"
+        }
+    done
+    return 0
+}

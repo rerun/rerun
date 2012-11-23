@@ -62,6 +62,11 @@ while [ "$#" -gt 0 ]; do
 	    DESCRIPTION="$2"
 	    shift
 	    ;;
+	--template)
+	    rerun_option_check "$#" "$1"
+	    TEMPLATE="$2"
+	    shift
+	    ;;
         # unknown option
 	-?)
 	    rerun_option_usage
@@ -135,6 +140,18 @@ sed -e "s/@MODULE@/$MODULE/g" \
     > "$RERUN_MODULES/$MODULE/lib/$(basename $TEMPLATE_FUNCTION_LIB)" || {
     rerun_die "Failed creating function library for \"$MODULE\"."
 }
+
+# If --template was specified, reslove its directory path
+# and clone its contents into the new module.
+if [[ -n "${TEMPLATE:-}" ]]
+then
+    if [[ "$TEMPLATE" =~ [/]+ ]]
+    then TEMPLATE_DIR=$(rerun_path_absolute $TEMPLATE)
+    else TEMPLATE_DIR=$RERUN_MODULES/$TEMPLATE
+    fi
+    echo "Copying files from template: $TEMPLATE..."
+    stubbs_module_clone $RERUN_MODULES/$MODULE $TEMPLATE_DIR
+fi
 
 # Done
 echo "Created module structure: $RERUN_MODULES/$MODULE."

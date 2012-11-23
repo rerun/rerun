@@ -1,4 +1,4 @@
-# Shell functions for @MODULE@ commands
+# Shell functions for the @MODULE@ module.
 #/ usage: source RERUN_MODULE_DIR/lib/functions.sh command
 #
 

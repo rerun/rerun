@@ -2,10 +2,9 @@
 
 # To implement this command, edit the "Command implementation" section below. 
 
-# Command usage
-# -------------
+# Usage
+# -----
 
-# This script is the implementation for the @MODULE@:@COMMAND@ command.
 # Comments prefixed with `#/` are managed by stubbs.
 # The `command` and `usage` comments describe the command
 # and show its options.
@@ -17,7 +16,7 @@
 # ---------------------
 
 # Load the function library for this module.
-# This loads rerun functions and those defined for @MODULE@.
+# This loads rerun functions, too.
 . $RERUN_MODULE_DIR/lib/functions.sh @COMMAND@ || { 
   echo >&2 "Failed loading function library." ; exit 1 ; 
 }

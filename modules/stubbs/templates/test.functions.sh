@@ -1,9 +1,9 @@
 # 
-# Test functions for @MODULE@ command tests
+# Test functions for command tests.
 #
 
-# ----------------------------
+# - - -
 # Your functions declared here.
-#
+# - - -
 
 

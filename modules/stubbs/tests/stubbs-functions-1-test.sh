@@ -24,11 +24,22 @@ NAME=dance
 OPTIONS=
 EOF
 
-
+    cat > $RERUN_MODULES/freddy/commands/dance/script <<EOF
+#!/bin/bash
+#/ command: freddy:dance "watch freddy dance"
+#/ usage: rerun freddy:dance 
+trap 'rerun_die $? "*** command failed: freddy:dance. ***"' ERR
+EOF
     mkdir -p $RERUN_MODULES/freddy/commands/study
     cat > $RERUN_MODULES/freddy/commands/study/metadata <<EOF
 NAME=study
 OPTIONS=
+EOF
+    cat > $RERUN_MODULES/freddy/commands/study/script <<EOF
+#!/bin/bash
+#/ command: freddy:study "watch freddy study"
+#/ usage: rerun freddy:study 
+trap 'rerun_die $? "*** command failed: freddy:study. ***"' ERR
 EOF
 }
 
@@ -84,4 +95,42 @@ it_performs_stubbs_option_commands() {
     test ${#commands[*]} = 1
     ! rerun_list_contains dance "${commands[@]}" 
     rerun_list_contains study "${commands[@]}" 
+}
+
+it_should_replace_string_in_file() {
+    FILE=$(mktemp /tmp/stubbs.tests.${FUNCNAME}.XXX)
+    cat >$FILE <<EOF
+NAME=roger
+DESCRIPTION="whats happening?"
+VERSION=1
+EOF
+    stubbs_file_replace_str roger wiseguy $FILE
+    NAME=$(awk -F= '/NAME=/ {print $2}' $FILE)
+    test "$NAME" = "wiseguy"
+
+    stubbs_file_replace_str "whats happening?" "this is happening" $FILE
+    DESC=$(awk -F= '/DESCRIPTION=/ {print $2}' $FILE)
+    test "$DESC" = '"this is happening"'
+
+    stubbs_file_replace_str "VERSION=1" "VERSION=2" $FILE
+    VERS=$(awk -F= '/VERSION=/ {print $2}' $FILE)
+    test "$VERS" = 2
+
+    rm $FILE
+}
+
+it_should_clone_a_module() {
+    moduledir=$(mktemp -d /tmp/stubbs.tests.clone.XXX)
+    cat > $moduledir/metadata <<EOF
+NAME=cloney
+DESCRIPTION="i am a clone"
+EOF
+    templatedir=$RERUN_MODULES/freddy
+    stubbs_module_clone $moduledir $templatedir
+
+    test "$(rerun_property_get $moduledir NAME)" = "cloney"
+    test "$(rerun_property_get $moduledir DESCRIPTION)" = "i am a clone"
+    
+    ! grep freddy $moduledir/commands/*/script
+    grep cloney $moduledir/commands/*/script
 }
