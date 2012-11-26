@@ -2,3 +2,5 @@
 #/ rerun-metadata: module
 NAME=stubbs
 DESCRIPTION="Simple rerun module builder"
+VERSION=
+REQUIRES=
