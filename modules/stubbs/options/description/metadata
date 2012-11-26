@@ -1,5 +1,5 @@
 NAME=description
-DESCRIPTION="the module description"
+DESCRIPTION="the brief description"
 ARGUMENTS=true
 REQUIRED=true
 DEFAULT=

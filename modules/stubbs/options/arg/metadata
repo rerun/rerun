@@ -1,5 +1,5 @@
 NAME=arg
-DESCRIPTION="option takes argument (true|false)"
+DESCRIPTION="option takes argument?"
 ARGUMENTS=true
 REQUIRED=false
 DEFAULT=false

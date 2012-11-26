@@ -1,7 +1,7 @@
 NAME=overwrite
-DESCRIPTION="overwrite the command default (true|false)"
+DESCRIPTION="should overwrite?"
 ARGUMENTS=true
-REQUIRED=true
+REQUIRED=false
 DEFAULT=false
 SHORT=
 RANGE="(true|false)"

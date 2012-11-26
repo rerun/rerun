@@ -2,6 +2,6 @@ NAME=range
 DESCRIPTION="argument value range"
 ARGUMENTS=true
 REQUIRED=false
-DEFAULT="*"
+DEFAULT=
 SHORT=
 RANGE=

@@ -1,5 +1,5 @@
 NAME=export
-DESCRIPTION="export option variable (true|false)"
+DESCRIPTION="export variable?"
 ARGUMENTS=true
 REQUIRED=false
 DEFAULT=false
