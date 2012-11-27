@@ -1,0 +1,76 @@
+body
+{
+    font-family:'Palatino Linotype','Book Antiqua',Palatino,FreeSerif,serif;
+    font-size:15px;
+    line-height:22px;
+    color:#252519;
+    margin:0;
+    padding:0
+}
+
+a
+{
+    color:#444;
+    font-weight:700;
+    text-decoration:none
+}
+
+a:hover
+{
+    color:blue;
+    text-decoration:underline
+}
+
+p
+{
+    margin:0 0 15px
+}
+
+h1,h2,h3,h4,h5,h6
+{
+    margin:0 0 15px
+}
+
+h1
+{
+    margin-top:40px
+}
+
+hr
+{
+    border-color: #e5e5ee;
+    border-width: 1px 0 0 0;
+    height:1px;
+    margin:20px 0
+}
+
+pre,tt,code
+{
+    font-family:Menlo,Monaco,Consolas,"Lucida Console",monospace;
+    font-size:12px
+}
+
+p code
+{
+    border:1px solid #dedede;
+    background-color:#f5f5ff;
+    border-radius:1px;
+    padding:0 .2em
+}
+
+pre > code
+{
+    display:block;
+    margin:1em 0;
+    padding-left:1em;
+    border:1px solid #dedede;
+    background-color:#f5f5ff;
+    border-radius:3px;
+    overflow-x:auto;
+    padding:.5em
+}
+
+body
+{
+    padding:50px
+}
