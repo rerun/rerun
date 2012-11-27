@@ -39,11 +39,13 @@ set -o nounset -o pipefail
 
 
 display_default() {
+    set +u
     eval local var=\$$1
     if [[ -n "$var" ]]
     then  printf " (%s):" "$var" 
     else  printf ":" 
     fi
+    set -u
 }
 
 # Init the handler
@@ -126,7 +128,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 
-[ -z "$MODULE" ] && {
+[ -z "${MODULE:-}" ] && {
     printf "Module: \n"
     select MODULE in $(rerun_modules $RERUN_MODULES);
     do
@@ -138,7 +140,7 @@ done
 # check the chosen module exists
 [ ! -f $RERUN_MODULES/$MODULE/metadata ] && rerun_option_error "module not found: $MODULE"
 
-[ -z "$COMMAND" ] && {
+[ -z "${COMMAND:-}" ] && {
     commands=( $(rerun_commands $RERUN_MODULES $MODULE) )
     [[ -z ${commands:-} ]] && rerun_die "No commands exist for module: $MODULE"
     printf "Command: \n"
