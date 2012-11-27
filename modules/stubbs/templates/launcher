@@ -27,6 +27,6 @@ export RERUN_MODULES=$PAYLOAD/rerun/modules
 cd $CWD || die "couldn't change to current working directory: $CWD"
 
 # launch it!
-exec $PAYLOAD/rerun/rerun $*
+exec $PAYLOAD/rerun/rerun "$@"
 
 # Done

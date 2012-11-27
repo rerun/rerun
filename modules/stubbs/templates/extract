@@ -31,7 +31,7 @@ export PAYLOAD
 cd $PAYLOAD || die
 
 # Run the launcher !
-bash ./launcher $*
+bash ./launcher "$@"
 RETVAL=$?
 
 # Go back to original working directory

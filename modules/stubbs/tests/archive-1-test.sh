@@ -51,6 +51,22 @@ it_runs_fully_optioned() {
     rm /tmp/rerun.bin.$$
 }
 
+it_handles_comands_using_quoted_arguments() {
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command says --description "none"
+    rerun stubbs:add-option --module freddy --command says --option msg --description none --required true --export false --default nothing
+    cat $RERUN_MODULES/freddy/commands/says/script |
+    sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
+    mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/says/script
+
+    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+
+    output=$(/tmp/rerun.bin.$$ freddy:says --msg "whats happening")
+    test "$output" = "msg (whats happening)"
+    
+    #rm /tmp/rerun.bin.$$
+}
+
 it_builds_the_stubbs_module_rpm() {
     if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
     then
