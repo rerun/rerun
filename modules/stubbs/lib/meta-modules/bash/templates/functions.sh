@@ -2,14 +2,14 @@
 #/ usage: source RERUN_MODULE_DIR/lib/functions.sh command
 #
 
-# Check usage. Argument should be command name.
-[[ $# = 1 ]] || rerun_option_usage
-
 # Read rerun's public functions
 . $RERUN || {
     echo >&2 "ERROR: Failed sourcing rerun function library: \"$RERUN\""
     return 1
 }
+
+# Check usage. Argument should be command name.
+[[ $# = 1 ]] || rerun_option_usage
 
 # Source the option parser script.
 #
