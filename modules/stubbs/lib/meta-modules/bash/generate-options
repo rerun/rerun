@@ -46,7 +46,8 @@ generate_option_parser() {
 }
 
 # list the options that set a default
-options_defaulted=$(stubbs_options_matching $moddir/$module $command DEFAULT='[[:alnum:]]+')
+options_defaulted=$(stubbs_options_matching $moddir/$module $command DEFAULT='.+')
+
 
 # list the options that are required
 options_required=$(stubbs_options_matching $moddir/$module $command REQUIRED=true)
