@@ -108,8 +108,10 @@ done
 
 
 # Read language setting for module. Set it to 'bash' as a default.
-META_MODULE=$(rerun_property_get $RERUN_MODULES/$MODULE META_MODULE)
-: ${META_MODULE:=bash}; #default it
+META_MODULE=$(rerun_property_get $RERUN_MODULES/$MODULE META_MODULE) || { 
+    META_MODULE=bash 
+}
+
 
 META_MODULE_LIB=$RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE
 
