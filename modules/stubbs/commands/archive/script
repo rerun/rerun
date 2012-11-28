@@ -18,6 +18,9 @@
   . $RERUN_MODULE_DIR/commands/archive/options.sh
 }
 
+# Default version to blank if unspecified.
+[ -z "${VERSION:-}" ] && VERSION=
+
 # Error handling
 # ---------------
 
@@ -51,9 +54,6 @@ buildbinarchive() {
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
   [ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
-
-  # Default version to blank if unspecified.
-  [ -z "${VERSION:-}" ] && VERSION=
 
   # create a work directory the archive content
   export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die
@@ -130,6 +130,7 @@ buildbinarchive() {
 }
 
 buildrpmarchive() {
+
   for MODULE_DIR in $RERUN_MODULES/$MODULES
   do
      if [[ -r $MODULE_DIR/metadata ]]
