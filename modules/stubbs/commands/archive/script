@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <*> [ --release|-r <1>] [ --version|-v <>] 
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release|-r <1>] [ --version|-v <>] 
 
 
 # Load common functions
@@ -18,8 +18,6 @@
   . $RERUN_MODULE_DIR/commands/archive/options.sh
 }
 
-# Default version to blank if unspecified.
-[ -z "${VERSION:-}" ] && VERSION=
 
 # Error handling
 # ---------------
@@ -40,6 +38,21 @@ trap 'rerun_die $? "*** command failed: stubbs:archive. ***"' ERR
 
 set -o nounset -o pipefail
 
+
+# Command variables
+# -----------------
+
+# This command script can access the following variables
+# declared by `rerun` or by the option parser function.
+
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: FILE FORMAT MODULES RELEASE VERSION
+
+# The `rerun_options_parse` function processes the command line
+# arguments. Each accepted command line flag results in setting 
+# one the corresponding option variables.
+
+rerun_options_parse "$@"
 
 # Command implementation
 # ----------------------
