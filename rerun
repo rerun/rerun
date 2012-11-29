@@ -808,7 +808,8 @@ _rerun_module_summary() {
     local -r module_dirname=$(rerun_module_exists $(basename "$module_dir")) && {
         local -r module_name=$(basename "$module_dir")
         local -r module_desc=$(rerun_property_get $module_dir DESCRIPTION)
-        echo "${PAD:-}${module_name}: \"${module_desc}\"" 
+        local -r module_vers=$(rerun_property_get $module_dir VERSION) || module_vers=""
+        echo "${PAD:-}${module_name}: \"${module_desc}\" - $module_vers" 
     }
 }
 
@@ -1076,3 +1077,9 @@ rerun_command_execute "$MODULE" "$COMMAND" "$@"
 exit $?
 # - - -
 # Done!
+
+
+# More
+# ----
+
+# _(c) 2012 Alex Honor - Apache 2 License_
