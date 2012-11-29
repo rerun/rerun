@@ -51,6 +51,10 @@ describe "docs"
 
 
 it_runs_interactively() {
+    
+    # Bail out if pygmentize is not available.
+    command pygmentize 2>/dev/null || exit 0;
+
     rerun stubbs:docs <<EOF
 stubbs
 EOF
@@ -59,6 +63,9 @@ EOF
 }
 
 it_runs_fully_optioned() {
+    # Bail out if pygmentize is not available.
+    command pygmentize 2>/dev/null || exit 0;
+
     DIR=$(mktemp -d /tmp/stubbs.docs.XXXX)
     rerun stubbs:docs --module "stubbs" --dir "$DIR"
     
