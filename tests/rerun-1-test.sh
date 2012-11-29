@@ -38,13 +38,13 @@ it_displays_help() {
 
 it_displays_usage() {
     usage=$(rerun -help 2>&1 |grep '^usage:')
-    test "$usage" = 'usage: rerun [-h][-v][-V] [-M <dir>] [--answer <file>] [module:[command [options]]]'
+    test "$usage" = 'usage: rerun [-h][-v][-V][--version] [-M <dir>] [--answer <file>] [module:[command [options]]]'
 }
 
 it_displays_version_and_license() {
     rinfo=( $(rerun -help|grep Version:) )
     test "${rinfo[1]}" = "Version:"
-    test "${rinfo[2]}" = "1.0."
+    test "${rinfo[2]}" = "1.0.0."
     test "${rinfo[3]}" = "License:"
     test "${rinfo[4]}" = "Apache"
 }
