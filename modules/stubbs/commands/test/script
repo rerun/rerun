@@ -75,7 +75,7 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-[ -z "${MODULE:-}" ] &&  { rerun_option_error "missing required option: --module"; }
+[ -z "${MODULE:-}" ] &&  { rerun_syntax_error "missing required option: --module"; }
 [ -z "${PLAN:-}" ] && PLAN="*"
 
 if [ ! -d "$RERUN_MODULES/$MODULE/tests" ]
