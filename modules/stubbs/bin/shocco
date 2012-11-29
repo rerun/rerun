@@ -31,6 +31,7 @@
 
 # The most important line in any shell program.
 set -e
+set -o pipefail
 
 # There's a lot of different ways to do usage messages in shell scripts.
 # This is my favorite: you write the usage message in a comment --
@@ -84,6 +85,8 @@ PYGMENTIZE=pygmentize
 command -v "$MARKDOWN" >/dev/null || {
     if command -v Markdown.pl >/dev/null
     then alias markdown='Markdown.pl'
+    elif test -x "$(dirname $0)/Markdown.pl"
+    then MARKDOWN="$(dirname $0)/Markdown.pl"
     elif test -f "$(dirname $0)/Markdown.pl"
     then alias markdown="perl $(dirname $0)/Markdown.pl"
     else echo "$(basename $0): markdown command not found." 1>&2
@@ -282,6 +285,8 @@ $MARKDOWN                                    |
            2>/dev/null                      ||
     true
 )
+# Check the exit to be sure the nothing in the pipeline failed.
+[[ $? -eq 0 ]] || exit 1
 
 
 # Second Pass: Code Formatting
