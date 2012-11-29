@@ -220,6 +220,7 @@ stubbs_option_commands() {
     commands=()
     for cmd_dir in $moddir/commands/*
     do
+        [[ ! -d $cmd_dir ]] && continue; # not a directory
         local -a command_options=( $(rerun_property_get $cmd_dir OPTIONS) )
         [[ -z "${command_options:-}" ]] && continue; # no option assignments.
 

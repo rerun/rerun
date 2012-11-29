@@ -4,4 +4,4 @@ ARGUMENTS=true
 REQUIRED=false
 DEFAULT=false
 SHORT=
-RANGE=
+RANGE={true,false}

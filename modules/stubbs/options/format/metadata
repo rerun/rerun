@@ -8,4 +8,4 @@ SHORT=f
 LONG=format
 DEFAULT=bin
 EXPORT=false
-
+RANGE={bin,rpm}

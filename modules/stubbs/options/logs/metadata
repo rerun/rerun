@@ -1,8 +1,0 @@
-NAME=logs
-DESCRIPTION="logs directory"
-ARGUMENTS=true
-REQUIRED=false
-DEFAULT=
-SHORT=
-LONG=logs
-RANGE=
