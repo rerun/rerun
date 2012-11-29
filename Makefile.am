@@ -47,6 +47,8 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/script \
+	modules/stubbs/lib/docs.css \
+	modules/stubbs/lib/docs.sh \
 	modules/stubbs/lib/functions.sh \
 	modules/stubbs/lib/meta-modules/README.md \
 	modules/stubbs/lib/meta-modules/bash/generate-options \
