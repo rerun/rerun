@@ -22,9 +22,13 @@
 shocco() {
     command $RERUN_MODULE_DIR/bin/shocco "$@"
 }
-markdown() {
-    command $RERUN_MODULE_DIR/bin/Markdown.pl "$@"
-}
+
+#
+# set catchall LANG support to avoid system locale errors
+#
+export LC_ALL=C
+
+
 
 # Error handling
 # ---------------

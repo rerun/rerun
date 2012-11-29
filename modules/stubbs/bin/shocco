@@ -31,6 +31,7 @@
 
 # The most important line in any shell program.
 set -e
+set -o pipefail
 
 # There's a lot of different ways to do usage messages in shell scripts.
 # This is my favorite: you write the usage message in a comment --
@@ -282,6 +283,8 @@ $MARKDOWN                                    |
            2>/dev/null                      ||
     true
 )
+# Check the exit to be sure the nothing in the pipeline failed.
+[[ $? -eq 0 ]] || exit 1
 
 
 # Second Pass: Code Formatting
