@@ -46,7 +46,7 @@ it_runs_fully_optioned() {
     validate /tmp/rerun.bin.$$
 
     # Test the version info exists
-    grep -q '^# version: 1.0' /tmp/rerun.bin.$$
+    grep -q '^# archive-version: 1.0' /tmp/rerun.bin.$$
     
     rm /tmp/rerun.bin.$$
 }
@@ -78,8 +78,8 @@ it_builds_the_stubbs_module_rpm() {
     fi
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
-    rerun stubbs:archive --format rpm --modules stubbs
-    rpm -qi -p rerun-stubbs-1.0.0-1.noarch.rpm
+    rerun stubbs:archive --format rpm --modules stubbs --release 1
+    rpm -qi -p rerun-stubbs-$(grep ^VERSION=  $RERUN_MODULES/stubbs/metadata | cut -d= -f2)-1.noarch.rpm
     popd
     rm -rf $TMPDIR
 }

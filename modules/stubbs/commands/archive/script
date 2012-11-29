@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release|-r <1>] [ --version|-v <>] 
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <1.0.0>] 
 
 
 # Load common functions
@@ -99,6 +99,7 @@ buildbinarchive() {
 	  -e "s/@DATE@/$(date)/" \
 	  -e "s/@USER@/$USER/" \
 	  -e "s/@VERSION@/$VERSION/" \
+	  -e "s/@RELEASE@/$RELEASE/" \
 	  $template > $PAYLOAD/$(basename $template) || rerun_die
       # ... and save it to the payload --^
   done
@@ -163,8 +164,7 @@ buildrpmarchive() {
 
        if [[ -z $VERSION ]]
        then
-         VERSION=1.0.0
-         echo "warning: no version in \"$MODULE_DIR/metadata\", defaulting to $VERSION"
+         rerun_die "no version in \"$MODULE_DIR/metadata\""
        fi
 
        if [[ -z $REQUIRES ]]
