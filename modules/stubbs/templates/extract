@@ -5,9 +5,15 @@
 # generator: @GENERATOR@
 # date: @DATE@
 # user: @USER@
-# version: @VERSION@
+# archive-version: @VERSION@
+# archive-release: @RELEASE@
 
-[ "$1" == '-version' ] && { grep "^# version:" $0|cut -f3 -d" " ; exit 0 ; }
+[ "$1" == '--archive-version-release' ] && {
+    vers=$(grep "^# archive-version:" $0|cut -f3 -d" ")
+    rel=$(grep  "^# archive-release:" $0|cut -f3 -d" ")
+    echo >&2 "${vers}-${rel}"
+    exit 0 ;
+}
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " >&2 ; exit 1 ; }
