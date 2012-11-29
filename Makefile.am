@@ -71,7 +71,6 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/file/metadata \
 	modules/stubbs/options/format/metadata \
 	modules/stubbs/options/meta-module/metadata \
-	modules/stubbs/options/logs/metadata \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/module/metadata \
 	modules/stubbs/options/modules/metadata \
