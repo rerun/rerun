@@ -23,6 +23,12 @@ shocco() {
     command $RERUN_MODULE_DIR/bin/shocco "$@"
 }
 
+#
+# set catchall LANG support to avoid system locale errors
+#
+export LC_ALL=C
+
+
 
 # Error handling
 # ---------------
