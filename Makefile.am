@@ -29,26 +29,35 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/options.sh \
+	modules/stubbs/commands/add-command/README.md \
 	modules/stubbs/commands/add-command/script \
 	modules/stubbs/commands/add-module/metadata \
 	modules/stubbs/commands/add-module/script \
+	modules/stubbs/commands/add-module/README.md \
 	modules/stubbs/commands/add-option/metadata \
 	modules/stubbs/commands/add-option/script \
+	modules/stubbs/commands/add-option/README.md \
 	modules/stubbs/commands/archive/metadata \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/archive/script \
+	modules/stubbs/commands/archive/README.md \
 	modules/stubbs/commands/docs/metadata \
 	modules/stubbs/commands/docs/options.sh \
 	modules/stubbs/commands/docs/script \
+	modules/stubbs/commands/docs/README.md \
 	modules/stubbs/commands/edit/metadata \
 	modules/stubbs/commands/edit/script \
+	modules/stubbs/commands/edit/README.md \
 	modules/stubbs/commands/migrate/metadata \
 	modules/stubbs/commands/migrate/options.sh \
 	modules/stubbs/commands/migrate/script \
+	modules/stubbs/commands/migrate/README.md \
 	modules/stubbs/commands/rm-option/metadata \
 	modules/stubbs/commands/rm-option/script \
+	modules/stubbs/commands/rm-option/README.md \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/script \
+	modules/stubbs/commands/test/README.md \
 	modules/stubbs/lib/docs.css \
 	modules/stubbs/lib/docs.sh \
 	modules/stubbs/lib/functions.sh \
@@ -66,27 +75,48 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/lib/meta-modules/python/templates/functions.py \
 	modules/stubbs/lib/meta-modules/python/templates/script \
 	modules/stubbs/lib/test.sh \
+	modules/stubbs/license.md \
 	modules/stubbs/metadata \
 	modules/stubbs/options/arg/metadata \
+	modules/stubbs/options/arg/README.md \
 	modules/stubbs/options/command/metadata \
+	modules/stubbs/options/command/README.md \
 	modules/stubbs/options/default/metadata \
+	modules/stubbs/options/default/README.md \
 	modules/stubbs/options/description/metadata \
+	modules/stubbs/options/description/README.md \
 	modules/stubbs/options/export/metadata \
+	modules/stubbs/options/export/README.md \
 	modules/stubbs/options/file/metadata \
+	modules/stubbs/options/file/README.md \
 	modules/stubbs/options/format/metadata \
+	modules/stubbs/options/format/README.md \
 	modules/stubbs/options/meta-module/metadata \
+	modules/stubbs/options/meta-module/README.md \
 	modules/stubbs/options/long/metadata \
+	modules/stubbs/options/long/README.md \
 	modules/stubbs/options/module/metadata \
+	modules/stubbs/options/module/README.md \
 	modules/stubbs/options/modules/metadata \
+	modules/stubbs/options/modules/README.md \
 	modules/stubbs/options/option/metadata \
+	modules/stubbs/options/option/README.md \
 	modules/stubbs/options/overwrite/metadata \
+	modules/stubbs/options/overwrite/README.md \
 	modules/stubbs/options/plan/metadata \
+	modules/stubbs/options/plan/README.md \
 	modules/stubbs/options/range/metadata \
+	modules/stubbs/options/range/README.md \
 	modules/stubbs/options/release/metadata \
+	modules/stubbs/options/release/README.md \
 	modules/stubbs/options/required/metadata \
+	modules/stubbs/options/required/README.md \
 	modules/stubbs/options/short/metadata \
+	modules/stubbs/options/short/README.md \
 	modules/stubbs/options/template/metadata \
+	modules/stubbs/options/template/README.md \
 	modules/stubbs/options/version/metadata \
+	modules/stubbs/options/version/README.md \
 	modules/stubbs/docs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
