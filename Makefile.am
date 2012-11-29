@@ -25,6 +25,8 @@ dist_man_MANS = modules/stubbs/docs/stubbs.1
 nobase_dist_pkgdata_DATA = \
 	modules/stubbs/README.md \
 	modules/stubbs/bin/roundup \
+	modules/stubbs/bin/shocco \
+	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/metadata \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
