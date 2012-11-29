@@ -9,7 +9,7 @@ if [ "clean" == "$1" ]; then
 else
   autoreconf --install
   ./configure --prefix=/opt/junk
-  mkdir tmp
+  mkdir -p tmp
   make DESTDIR=./tmp install
   make distcheck
 fi
