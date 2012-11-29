@@ -169,7 +169,7 @@ if [[ -f $RERUN_MODULES/$MODULE/options/$OPTION/metadata ]]
 then
     CURR_DESC=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION DESCRIPTION)
     CURR_REQ=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION REQUIRED)
-    CURR_EXPORT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION EXPORT)
+    CURR_EXPORT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION EXPORT) || CURR_EXPORT=false
     # Crap hack to avoid quote stripping or eval expansions. 
     # Use awk to parse the property values.
     CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
