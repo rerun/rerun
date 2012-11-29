@@ -43,7 +43,7 @@ trap 'rerun_die $? "*** command failed: stubbs:docs. ***"' ERR
 # [set]: http://ss64.com/bash/set.html
 # [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
 
-set -o nounset -o pipefail -o noclobber
+set -o nounset -o pipefail
 
 # Source the docs functions.
 . $RERUN_MODULE_DIR/lib/docs.sh
@@ -82,7 +82,7 @@ cp $RERUN_MODULE_DIR/lib/docs.css $CSS
 # -------
 #
 mkdir -p $DIR/options
-touch  $DIR/options.index.md
+cp /dev/null  $DIR/options.index.md
 for opt_me in options/*/metadata
 do
     opt_dir=$(dirname $opt_me)
@@ -102,7 +102,7 @@ done
 # -----
 
 mkdir -p $DIR/tests
-touch $DIR/tests.index.md
+cp /dev/null $DIR/tests.index.md
 # Generate shocco and markdown for all tests.
 #
 for test in tests/*-test.sh
@@ -120,7 +120,7 @@ done
 # --------
 #
 mkdir -p $DIR/commands
-touch  $DIR/commands.index.md
+cp /dev/null  $DIR/commands.index.md
 for com_me in commands/*/metadata
 do
     com_dir=$(dirname $com_me)
@@ -141,8 +141,8 @@ done
 # Library
 # -------
 #
-mkdir $DIR/lib
-touch  $DIR/library.index.md
+mkdir -p $DIR/lib
+cp /dev/null  $DIR/library.index.md
 for lib in lib/*.sh
 do
     lib_file=$(basename $lib)
