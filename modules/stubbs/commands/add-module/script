@@ -126,6 +126,7 @@ META_MODULE="$META_MODULE"
 SHELL="${COMMAND_SHELL}"
 VERSION=1.0.0
 REQUIRES=
+EXTERNALS=
 
 EOF
 ) > $RERUN_MODULES/$MODULE/metadata || rerun_die "Failed generating metadata."

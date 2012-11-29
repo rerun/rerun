@@ -4,3 +4,4 @@ NAME=stubbs
 DESCRIPTION="Simple rerun module builder"
 VERSION=1.0.1
 REQUIRES=
+EXTERNALS=rpm-build

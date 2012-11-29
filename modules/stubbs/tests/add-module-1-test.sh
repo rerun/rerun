@@ -20,6 +20,7 @@ validate() {
     test -n "$SHELL" -a "$SHELL" = "bash"
     test "$VERSION" = "1.0.0"
     grep '^REQUIRES=' $RERUN_MODULES/freddy/metadata
+    grep '^EXTERNALS=' $RERUN_MODULES/freddy/metadata
 
 }
 

@@ -156,7 +156,7 @@ buildrpmarchive() {
        mkdir $RPMTOPDIR/RPMS || rerun_die
 
        # Source the module metadata:
-       unset NAME DESCRIPTION VERSION REQUIRES
+       unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
        . $MODULE_DIR/metadata
 
        [[ -n $NAME ]] || rerun_die "no module name in \"$MODULE_DIR/metadata\""
@@ -172,6 +172,11 @@ buildrpmarchive() {
          REQUIRES="rerun = $RERUN_VERSION"
        else
          REQUIRES="rerun = $RERUN_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
+       fi
+
+       if [[ -n $EXTERNALS ]]
+       then
+         REQUIRES="$REQUIRES,$EXTERNALS"
        fi
 
        # Remove any existing builds:

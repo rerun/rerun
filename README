@@ -8,5 +8,6 @@ README file is not used, README.md is the file to READ!
 
 http://ubuntuincident.wordpress.com/2011/05/05/readme-markdown-on-github/
 
+You'll probably have to install automake/automconf ("yum install automake" in a CentOS/Red Hat box).
 When you checkout the file, run "setup.sh" which gets autoconf initialized.
 Then follow the instructions in INSTALL.  Real standard stuff...
