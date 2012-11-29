@@ -18,7 +18,7 @@ validate() {
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "A dancer in a red beret and matching suspenders"
     test -n "$META_MODULE" -a "$META_MODULE" = "bash"
     test -n "$SHELL" -a "$SHELL" = "bash"
-    grep '^VERSION=' $RERUN_MODULES/freddy/metadata
+    test "$VERSION" = "1.0.0"
     grep '^REQUIRES=' $RERUN_MODULES/freddy/metadata
 
 }
@@ -83,7 +83,7 @@ EOF
    .  $RERUN_MODULES/roger/metadata
    test -n "$NAME" -a "$NAME" = roger 
    test -n "$DESCRIPTION" -a "$DESCRIPTION" = "Another friend of rerun"
-   test "${VERSION}" = ""
+   test "${VERSION}" = "1.0.0"
 
     # No lingering freddy text should remain.
    ! grep freddy $RERUN_MODULES/roger/commands/*/script
