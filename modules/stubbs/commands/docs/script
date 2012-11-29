@@ -22,9 +22,7 @@
 shocco() {
     command $RERUN_MODULE_DIR/bin/shocco "$@"
 }
-markdown() {
-    command $RERUN_MODULE_DIR/bin/Markdown.pl "$@"
-}
+
 
 # Error handling
 # ---------------

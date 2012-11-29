@@ -85,8 +85,6 @@ PYGMENTIZE=pygmentize
 command -v "$MARKDOWN" >/dev/null || {
     if command -v Markdown.pl >/dev/null
     then alias markdown='Markdown.pl'
-    elif test -x "$(dirname $0)/Markdown.pl"
-    then MARKDOWN="$(dirname $0)/Markdown.pl"
     elif test -f "$(dirname $0)/Markdown.pl"
     then alias markdown="perl $(dirname $0)/Markdown.pl"
     else echo "$(basename $0): markdown command not found." 1>&2
