@@ -97,3 +97,10 @@ EOF
    rm -r  $RERUN_MODULES/roger
 }
 
+it_takes_descriptions_w_commas_slashes() {
+    rerun stubbs:add-module --module "freddy" \
+        --description "A dancer, in a red/burgundy beret" \
+        --meta-module bash
+   .  $RERUN_MODULES/freddy/metadata
+   test "$DESCRIPTION" = "A dancer, in a red/burgundy beret"
+}

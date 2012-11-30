@@ -134,7 +134,7 @@ EOF
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
 sed -e "s/@MODULE@/$MODULE/g" \
-	-e "s,@DESCRIPTION@,$DESCRIPTION,g" \
+	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
 	-e "s/@META_MODULE@/$META_MODULE/g" \
 	-e "s,@SHELL@,$COMMAND_SHELL,g" \
     "$META_MODULE_LIB/$TEMPLATE_FUNCTION_LIB" \
