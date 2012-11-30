@@ -684,7 +684,7 @@ rerun_command_execute() {
 
 # Check if this file is being sourced, or executed.
 # If not being executed, return now.
-if [[ "$BASH_SOURCE" != "$0" ]]
+if [[ "${BASH_SOURCE:-}" != "$0" && "$0" != "bash" ]]
 then
     return; # Stop sourcing the file here.
 fi
@@ -964,7 +964,7 @@ done
 
 # Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
 # modules located in /usr/lib/rerun/modules are appended to the modules in RERUN_MODULES.
-RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
 
 # Default the RERUN_MODULES environment variable.
 # If it is not set, then default it to either the system
