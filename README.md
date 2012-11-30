@@ -225,19 +225,19 @@ understanding rerun archives.
 A rerun module assumes the following structure:
 
     <MODULE>
-    ├── commands
-    │   └── cmdA (directory for cmdA files)
-    │       ├── metadata (command metadata)
-    │       ├── options.sh (option parsing script)
-    │       └── script (command script)
-    ├── lib
-    │   └── functions.sh (module function library)
-    ├── metadata (module metadata)
-    ├── options (module options)
-    │   └── optyY ("optY" option)
-    │       └── metadata (declares metadata for "optY" option)
-    └── tests
-        └── cmdA-1-test.sh (unit tests for cmdA)
+    |-- commands
+    |-- `-- cmdA (directory for cmdA files)
+    |--     |-- metadata (command metadata)
+    |--     |-- options.sh (option parsing script)
+    |--     `-- script (command script)
+    |-- lib
+    |-- `-- functions.sh (module function library)
+    |-- metadata (module metadata)
+    |-- options (module options)
+    |   `-- optyY ("optY" option)
+    |       `-- metadata (declares metadata for "optY" option)
+    `-- tests
+        `-- cmdA-1-test.sh (unit tests for cmdA)
     
 
 ## Command Scripts
@@ -299,25 +299,25 @@ the "freddy" module along with its commands "dance" and "study"
 are illustrated here:
 
     modules/freddy/
-    ├── commands
-    │   ├── dance
-    │   │   ├── metadata
-    │   │   ├── options.sh
-    │   │   └── script
-    │   └── study
-    │       ├── metadata
-    │       ├── options.sh
-    │       └── script
-    ├── lib
-    │   └── functions.sh
-    ├── metadata
-    ├── options
-    │   ├── jumps
-    │   │   └── metadata
-    │   └── subject
-    │       └── metadata
-    └── tests
-        └── dance-1-test.sh
+    |-- commands
+    |   |-- dance
+    |   |   |-- metadata
+    |   |   |-- options.sh
+    |   |   `-- script
+    |   `-- study
+    |       |-- metadata
+    |       |-- options.sh
+    |       `-- script
+    |-- lib
+    |   `-- functions.sh
+    |-- metadata
+    |-- options
+    |   |-- jumps
+    |   |   `-- metadata
+    |   `-- subject
+    |       `-- metadata
+    `-- tests
+        `-- dance-1-test.sh
 
 
 # ENVIRONMENT
