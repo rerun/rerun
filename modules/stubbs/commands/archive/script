@@ -174,7 +174,7 @@ buildrpmarchive() {
        then
          REQUIRES="rerun = $COMPATIBLE_VERSION"
        else
-         REQUIRES="rerun = $COMPATIBLE_VERSIO,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
+         REQUIRES="rerun = $COMPATIBLE_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
        fi
 
        if [[ -n $EXTERNALS ]]
