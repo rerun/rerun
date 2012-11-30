@@ -5,6 +5,13 @@ The `stubbs:docs` command traverses your module files, reading
 its structure, metadata, scripts, tests and user provided README
 files to generate an HTML site helpful to users and contributors.
 
+Requirements
+------------
+The `stubbs:docs` command depends on two software packages:
+
+* [dicount](http://www.pell.portland.or.us/~orc/Code/discount/)
+* [pygmentize](http://pygments.org/docs/cmdline/)
+
 Generate the documentation
 --------------------------
 
