@@ -169,6 +169,10 @@ buildrpmarchive() {
 
        # Extract the module's major version number:
        MAJOR_VERSION="$(echo $VERSION | cut -d. -f1)"
+       MINOR_VERSION="$(echo $VERSION | cut -d. -f2)"
+       REVISION_VERSION="$(echo $VERSION | cut -d. -f3)"
+
+       [[ -z $MAJOR_VERSION || -z $MINOR_VERSION || -z $REVISION_VERSION ]] && rerun_die "module version (\"$VERSION\") should be of the form \"major.minor.revision\""
 
        # Extract Rerun's major version number:
        RERUN_MAJOR_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
@@ -207,7 +211,7 @@ buildrpmarchive() {
        popd > /dev/null
 
        # Build the RPM:
-       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" --define "major $MAJOR_VERSION" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" --define "major $MAJOR_VERSION" --define "minor $MINOR_VERSION" --define "revision $REVISION_VERSION" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
 
        # Move the RPM:
        /bin/mv $RPMTOPDIR/RPMS/noarch/rerun-$NAME-$VERSION-$RELEASE.noarch.rpm . || rerun_die "failed to move rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
