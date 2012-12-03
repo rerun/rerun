@@ -12,7 +12,6 @@
 [ -r $RERUN_MODULE_DIR/commands/docs/options.sh ] && {
   source $RERUN_MODULE_DIR/commands/docs/options.sh
 }
-[ -f "$RERUN_MODULES/$MODULE/metadata" ] || rerun_die "module not found: $MODULE"
 
 # Source common function library
 . $RERUN_MODULE_DIR/lib/functions.sh || { 

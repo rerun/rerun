@@ -347,20 +347,6 @@ stubbs_command_options_write() {
     rerun_property_set $moddir/commands/$command OPTIONS="$options"
 }
 
-#
-# - - -
-#
-
-# _stubbs_init_ - Bootstrap a stubbs command script
-#
-#     stubbs_init 
-# 
-# Shell modules reside in current directory, by default. 
-# Use env var property if it exists otherwise set it to default.
-stubbs_init() {
-    homedir=$(dirname .)
-    [[ -n "$RERUN_MODULES" ]] || RERUN_MODULES=$homedir/modules    
-}
 
 #
 # - - -

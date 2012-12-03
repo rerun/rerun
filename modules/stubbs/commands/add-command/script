@@ -32,12 +32,6 @@ trap 'rerun_die $? "*** command failed: stubbs:add-command. ***"' ERR
 set -o nounset -o pipefail
 
 
-# Command implementation
-# ----------------------
-
-# Init the handler
-stubbs_init 
-
 # Command variables
 # -----------------
 
@@ -147,10 +141,10 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
 	-e "s/@META_MODULE@/$META_MODULE/g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
-	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script"
+	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script."
     echo "Wrote command script: $CMD_SCRIPT"
 }
-chmod +x $CMD_SCRIPT || rerun_die "Failed settng execute bit on command script"
+chmod +x $CMD_SCRIPT || rerun_die "Failed settng execute bit on command script."
 
 # Generate a unit test script
 mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests directory"
@@ -178,10 +172,8 @@ NAME=$COMMAND
 DESCRIPTION="$DESCRIPTION"
 OPTIONS=
 EOF
-) > $RERUN_MODULES/$MODULE/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata"
 
-# Generate empty options parser script
-#
-touch "$OPTIONS_PARSER_SCRIPT" || rerun_die "Failed initializing parser script."
+) > $RERUN_MODULES/$MODULE/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata."
 
-# Done
+
+# Done.

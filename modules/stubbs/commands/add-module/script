@@ -35,8 +35,6 @@ set -o nounset -o pipefail
 # Command implementation
 # ----------------------
 
-stubbs_init
-
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
 #/ option-variables: META_MODULE MODULE DESCRIPTION
 

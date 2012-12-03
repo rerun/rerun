@@ -10,7 +10,7 @@
 
 # Load the function library for this module.
 # This loads rerun functions and those defined for stubbs.
-. $RERUN_MODULE_DIR/lib/functions.sh || { 
+. $RERUN_MODULE_DIR/lib/functions.sh edit || { 
     echo >&2 "failed laoding function library" ; exit 1 ; 
 }
 
@@ -36,9 +36,6 @@ set -o nounset -o pipefail
 
 # Command implementation
 # ----------------------
-
-# Init the handler
-stubbs_init 
 
 # Get the options
 while [ "$#" -gt 0 ]; do

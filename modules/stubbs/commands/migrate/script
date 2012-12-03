@@ -7,7 +7,7 @@
 #/ option variables: MODULE
 
 # Read module function library.
-. $RERUN_MODULE_DIR/lib/functions.sh || { 
+. $RERUN_MODULE_DIR/lib/functions.sh migrate || { 
   echo >&2 "Failed loading function library" ; exit 1 ; 
 }
 
