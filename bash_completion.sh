@@ -24,11 +24,18 @@
 # * Arguments for specified option:
 #       `rerun module: command --file[tab][tab]`
 #
-# @author: <a href="mailto:alex@dtosolutions.com">alex@dtosolutions.com</a>
+# @author: <a href="mailto:alexhonor@yahoo.com">alexhonor@yahoo.com</a>
 
-[ -n "${RERUN_MODULES}" -a -d "${RERUN_MODULES}" ] || {
-    export RERUN_MODULES=$(pwd)/modules
-}
+if [[ -z "${RERUN_MODULES:-}" ]]
+then
+    # check if it is a system install
+    if [[ -d /usr/lib/rerun/modules ]]
+    then
+      export RERUN_MODULES="/usr/lib/rerun/modules";  # Linux FSH convention.
+    else      
+      export RERUN_MODULES=$(pwd)/modules; # Default it the current working directory.
+    fi
+fi
 
 #
 # Shell functions to support the command completion
