@@ -15,6 +15,7 @@ Group: Applications/System
 
 Source: rerun-%{module}-%{version}.tgz
 Requires: %{requires}
+Provides: rerun-%{module} = %{major}
 
 # Disables debug packages and stripping of binaries:
 %global _enable_debug_package 0

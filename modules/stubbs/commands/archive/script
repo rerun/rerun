@@ -167,14 +167,24 @@ buildrpmarchive() {
          rerun_die "no version in \"$MODULE_DIR/metadata\""
        fi
 
+       # Extract the module's major version number:
+       MAJOR_VERSION="$(echo $VERSION | cut -d. -f1)"
+
+       # Extract Rerun's major version number:
+       RERUN_MAJOR_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
+
        # Backwards compatibility is guaranteed to the minor version:
-       COMPATIBLE_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
+       if [[ ${MAJOR_VERSION} -ne ${RERUN_MAJOR_VERSION} ]]
+       then
+         rerun_die "the module's major version number (\"${MAJOR_VERSION}\") must match the major number (\"${RERUN_MAJOR_VERSION}\") of the version of Rerun being used to build the archive"
+       fi
 
        if [[ -z $REQUIRES ]]
        then
-         REQUIRES="rerun = $COMPATIBLE_VERSION"
+         REQUIRES="rerun = $RERUN_MAJOR_VERSION"
        else
-         REQUIRES="rerun = $COMPATIBLE_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e 's/\([^,]*\)/rerun-\1/g')"
+         # Enforces specified module dependencies at the major version number:
+         REQUIRES="rerun = $RERUN_MAJOR_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e "s/\([^,]*\)/rerun-\1 = ${MAJOR_VERSION}/g")"
        fi
 
        if [[ -n $EXTERNALS ]]
@@ -197,7 +207,7 @@ buildrpmarchive() {
        popd > /dev/null
 
        # Build the RPM:
-       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" --define "major $MAJOR_VERSION" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
 
        # Move the RPM:
        /bin/mv $RPMTOPDIR/RPMS/noarch/rerun-$NAME-$VERSION-$RELEASE.noarch.rpm . || rerun_die "failed to move rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"

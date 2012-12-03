@@ -13,6 +13,7 @@ URL: http://rerun.github.com/rerun
 License: ASL 2.0
 Group: Applications/System
 Requires: bash
+Provides: rerun = %{major}
 
 # Disables debug packages and stripping of binaries:
 %global _enable_debug_package 0

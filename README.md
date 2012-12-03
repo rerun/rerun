@@ -332,6 +332,9 @@ relative to the location of the rerun executable.
 labels in text to print bold in the console.
 Syntax errors will also print bold.
 
+# VERSIONING
+
+Rerun and its modules following the [Semantic Versioning Specification](http://semver.org). As a consequence, any backwards incompatible change to Rerun will result in its major version number being incremented. Module developers are expected to provide a version of their module compatible with each major version of Rerun.
 
 # SEE ALSO
 

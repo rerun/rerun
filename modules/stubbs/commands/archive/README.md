@@ -43,4 +43,6 @@ The rerun launcher creates an ephemeral workspace to load
 the included modules and then executes the included `rerun`
 executable in the user's current working directory.
 
+RPM format archives are built with "requires" and "provides" metadata that reflects Rerun's compliance with the [Semantic Versioning Specification](http://semver.org). The module RPM <i>requires</i> the (same) major version of both Rerun itself and the list of modules specified by the module's "REQUIRES" metdata token. Additionally, the  module RPM <i>provides</i> its major version to resolve installation depenendencies (typically using yum(8)).
+
 Refer to the stubbs:archive script source for further details.
