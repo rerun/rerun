@@ -61,9 +61,17 @@ set -o nounset -o pipefail
 # Change directory to be relative to what would be RERUN_MODULE_DIR.
 cd $RERUN_MODULES/$MODULE
 
+# Check the specified directory and default it if necessary.
+# 
+# * Resolve the path to be sure it's absolute, if specified.
+# * Default the documentation directory as a subdir to its module.
+if [[ -n "${DIR:-}" ]]
+then
+    DIR=$(rerun_path_absolute "$DIR")
+else
+    DIR="$RERUN_MODULES/$MODULE/docs"
+fi
 
-# Default the documentation directory as a subdir to its module.
-: ${DIR:=$RERUN_MODULES/$MODULE/docs}
 # Create the documentation directory.
 mkdir -p $DIR
 
@@ -86,20 +94,22 @@ cp $RERUN_MODULE_DIR/lib/docs.css $CSS
 #
 mkdir -p $DIR/options
 cp /dev/null  $DIR/options.index.md
-for opt_me in options/*/metadata
-do
-    opt_dir=$(dirname $opt_me)
-    option=$(basename $opt_dir)
-    mkdir -p $DIR/options/$option
-    docs_option_to_md $opt_me $MODULE > $DIR/options/$option/index.md
+if [[ -d options ]]
+then
+    for opt_me in $(find options -name metadata)
+    do
+        opt_dir=$(dirname $opt_me)
+        option=$(basename $opt_dir)
+        mkdir -p $DIR/options/$option
+        docs_option_to_md $opt_me $MODULE > $DIR/options/$option/index.md
 
-    markdown $DIR/options/$option/index.md |
-    docs_html_layout $option ../../docs.css > $DIR/options/$option/index.html
+        markdown $DIR/options/$option/index.md |
+        docs_html_layout $option ../../docs.css > $DIR/options/$option/index.html
 
-    printf "* [%s](options/%s/index.html): %s\n" \
-        $option $option "$(rerun_property_get $opt_dir DESCRIPTION)" >> $DIR/options.index.md
-done
-
+        printf "* [%s](options/%s/index.html): %s\n" \
+            $option $option "$(rerun_property_get $opt_dir DESCRIPTION)" >> $DIR/options.index.md
+    done
+fi
 
 # Tests
 # -----
@@ -188,10 +198,6 @@ $(cat $DIR/tests.index.md)
 ## LIBRARY
 
 $(cat $DIR/library.index.md)
-
-## LICENSE
-
-$(test -f license.md && cat license.md)
 
 ## METADATA
 
