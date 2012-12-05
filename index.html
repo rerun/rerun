@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Rerun by rerun</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Rerun</h1>
+        <h2>Core rerun </h2>
+
+        <section id="downloads">
+          <a href="https://github.com/rerun/rerun/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/rerun/rerun/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/rerun/rerun" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>NAME</h1>
+
+<p>rerun - a simple command runner because it's easy to forget 
+standard operating procedure.</p>
+
+<h1>SYNOPSYS</h1>
+
+<pre><code>rerun [-h][-v][-V][--version] [-M &lt;dir&gt;] [module:[command [options]]]
+</code></pre>
+
+<h1>DESCRIPTION</h1>
+
+<p>Rerun is a simple command runner that turns loose shell scripts
+into modular automation. Rerun will help you
+organize your implementation into well defined command interfaces.
+Collections of management modules can be archived and delivered as
+a single executable to facilitate team hand offs.
+Using the "stubbs" module, rerun will even facilitate 
+developing modules using a test-driven development practice.
+</p>
+
+<p>Rerun provides two modes of operation:</p>
+
+<ol>
+<li>
+<em>Listing</em>: Rerun lists modules and commands. Listing
+information includes name, description and command line usage syntax.</li>
+<li>
+<em>Execution</em>: Rerun provides option processing (possibly defaulting
+unspecified arguments) and executes a script for the specified module command.</li>
+</ol><p>For the module developer, rerun is a trivial framework following
+simple conventions that easily fit in a shell environment.
+Rerun includes a module development tool called "stubbs" that
+helps create and evolve rerun modules. Stubbs contains
+commands to automate option processing code, metadata definition
+and unit testing.</p>
+
+<p>Internally, <code>rerun</code> implements a simple dispatching mechanism to look up named
+commands and execute them. <em>Commands</em> are logically named and
+have a corresponding script.</p>
+
+<p>Commands reside in a module and can have named 
+parameters called <em>options</em>. Each option is named,
+described and can also be defined to use a default value 
+or say whether it is required or not.</p>
+
+<p>Rerun modules can also declare metadata describing name, description
+and other aspects of each command. Rerun makes use of this metadata
+to support a listing mode, a feature where modules and command usage
+are summarized for end users.</p>
+
+<p>See the <a href="https://github.com/rerun/rerun/wiki">project wiki</a>
+for additional documentation including:</p>
+
+<ul>
+<li><a href="https://github.com/rerun/rerun/wiki">Getting started</a></li>
+<li><a href="https://github.com/rerun/rerun/wiki/Installation">Installation</a></li>
+<li><a href="https://github.com/rerun/rerun/tree/master/modules/stubbs">Stubbs module tool</a></li>
+<li><a href="https://github.com/rerun/rerun/wiki/Why-rerun%3F">Why rerun?</a></li>
+</ul><h1>OPTIONS</h1>
+
+<p><code>-h</code>
+: Print help and usage then exit.</p>
+
+<p><code>-M</code> <em>DIRECTORY</em>
+: Module library directory path.</p>
+
+<p><code>-v</code> 
+: Execute <em>command</em> in verbose mode. </p>
+
+<p><code>-V</code> 
+: Execute <code>rerun</code> and <em>command</em> in verbose mode. </p>
+
+<p><code>--version</code> 
+: Print the rerun version. </p>
+
+<h1>USING</h1>
+
+<h2>Help</h2>
+
+<p>For command line syntax and example usage execute <code>rerun</code> using the <code>--help</code> flag:</p>
+
+<pre><code>$ ./rerun --help
+ _ __ ___ _ __ _   _ _ __
+| '__/ _ \ '__| | | | '_ \ 
+| | |  __/ |  | |_| | | | |
+|_|  \___|_|   \__,_|_| |_|
+Version: v0.1. License: Apache 2.0.
+
+Usage: rerun [-h][-v][-V][--version] [-M &lt;dir&gt;] [module:[command [options]]]
+
+Examples:
+| $ rerun 
+| =&gt; List all modules.
+| $ rerun freddy
+| =&gt; List all freddy commands.
+| $ rerun freddy:dance --jumps 3
+| =&gt; Execute the freddy:dance command.
+| $ rerun -M /var/rerun freddy:dance
+| =&gt; Execute the freddy:dance command found in /var/rerun
+</code></pre>
+
+<h2>Listing</h2>
+
+<p>Without arguments, <code>rerun</code> will list existing modules:</p>
+
+<pre><code>$ rerun
+  freddy: "A dancer in a red beret and matching suspenders"
+</code></pre>
+
+<p>To list the commands available from the 'freddy' module run:</p>
+
+<pre><code>$ rerun freddy
+ study: "tell freddy to study" 
+   --subject &lt;math&gt;: "the summer school subject"
+ dance: "tell freddy to dance"
+   --jumps &lt;1&gt;: "jump #num times"
+</code></pre>
+
+<p>The listing consists of info about command options 
+including default values if they were described with option metadata.</p>
+
+<p>Options that declare a default value are shown
+with a string between the "&lt;&gt;" characters.</p>
+
+<p>For example, notice how "--jumps" option shows <code>&lt;1&gt;</code>.
+The "1" is the default value assigned to the "--jumps" option.</p>
+
+<p>See the "Environment" section below to learn about the
+<code>RERUN_MODULES</code> environment variable. This variable
+specifies the directory where rerun modules exist.</p>
+
+<h3>Bash completion</h3>
+
+<p>If you are a Bash shell user, be sure to source the <code>bash_completion.sh</code> file. 
+It provides listing via the tab key.</p>
+
+<p>Type <code>rerun</code> and then the tab key. The shell will generate
+a list of existing modules.</p>
+
+<pre><code>$ rerun[TAB][TAB]
+freddy
+</code></pre>
+
+<p>Rerun shows there is a module named "freddy" installed.</p>
+
+<p>Typing the tab key again will show the commands inside the "freddy" module:</p>
+
+<pre><code>$ rerun freddy: [TAB]
+dance  study     
+</code></pre>
+
+<p>In this case, two commands are found and listed. Press tab again
+and choose a command.
+After accepting a command, typing the tab key will show arguments.</p>
+
+<pre><code>$ rerun freddy:study -[TAB]
+--subject
+</code></pre>
+
+<p>The <code>freddy:study</code> command accepts one option (--subject &lt;&gt;).</p>
+
+<h2>Command execution</h2>
+
+<p>Commands are executed by stating the module,
+command and possibly options. The basic usage form is
+"<code>rerun</code> <em>module</em>:<em>command</em> [<em>options</em>]".</p>
+
+<p>To run the "study" command in the freddy module, type:</p>
+
+<pre><code>$ rerun freddy:study
+studying (math)
+</code></pre>
+
+<p>The outputed string "studying (math)" is the printed result. 
+In this example, "math" is the subject option's default value
+as defined in the module metadata.</p>
+
+<p>Command options are passed after the "module:command" string. 
+Tell freddy to study the subject, "biology" by specifying 
+the <code>--subject &lt;&gt;</code> option:</p>
+
+<pre><code>$ rerun freddy:study --subject biology
+studying (biology)
+</code></pre>
+
+<p>If the 'freddy' module is stored in <code>/var/rerun</code>, then the command usage
+would be:</p>
+
+<pre><code>$ rerun -M /var/rerun freddy:study
+studying (math)
+</code></pre>
+
+<h3>Archives</h3>
+
+<p>An <em>archive</em> contains all the rerun modules you need
+(you might have a library of them) and gives you
+the same exact interface as rerun,... all in one file!</p>
+
+<p>Specifically, an archive is a set of modules 
+and <code>rerun</code> itself packaged into a self extracting
+script (by default in a file named "rerun.bin"). 
+Archives can be useful if you want
+to share a single self contained executable that contains all the needed modules.</p>
+
+<p>Run an archive script like you would run <code>rerun</code>.</p>
+
+<p>You can execute an archive via <code>bash</code> like so:</p>
+
+<pre><code>$ bash rerun.bin &lt;module&gt;:&lt;command&gt; --your options
+</code></pre>
+
+<p>If the execute bit is set, invoke the archive directly.</p>
+
+<p>Here the archive is executed without arguments which causes the archive
+to list the modules contained within it.</p>
+
+<pre><code>$ ./rerun.bin
+  freddy: "A dancer in a red beret and matching suspenders" - 1.0.0
+  .
+  . listing output ommitted
+</code></pre>
+
+<p>Note, ".bin" is just a suffix naming convention for a self-extracting script.
+The archive file can be named anything you wish.</p>
+
+<p>Run the <code>freddy:dance</code> command in the archive:</p>
+
+<pre><code>$ ./rerun.bin freddy:dance --jumps 3
+jumps (3)
+</code></pre>
+
+<p>See <code>stubbs:archive</code> for further information about creating and 
+understanding rerun archives.</p>
+
+
+<h1>MODULES</h1>
+
+<h2>Layout</h2>
+
+<p>A rerun module assumes the following structure:</p>
+
+<pre><code>&lt;MODULE&gt;
+├── commands
+│   ├── cmdA (directory for cmdA files)
+│   │   ├── metadata (command metadata)
+│   │   ├── script (command script)
+│   │   └── options.sh (option parsing script)
+│   └── cmdB
+│       ├── metadata
+│       ├── script 
+│       └── options.sh
+├── metadata (module metadata)
+└── lib
+</code></pre>
+
+<h2>Command Scripts</h2>
+
+<p>Rerun's internal dispatch logic uses the directory layout
+described above to find and execute scripts for each command.</p>
+
+<h2>Metadata</h2>
+
+<p>The metadata file format uses line separated <em>KEY=value</em>
+pairs to define module attributes. The module metadata
+file declares two properties:</p>
+
+<ul>
+<li>NAME: Declare name displayed to user.</li>
+<li>DESCRIPTION: Brief explanation of use.</li>
+</ul><p>For example, a module named <code>freddy</code> is named
+and described in a file called <code>RERUN_MODULES/freddy/metadata</code>:</p>
+
+<pre><code>NAME="freddy"
+DESCRIPTION="A dancer in a red beret and matching suspenders"
+</code></pre>
+
+<p>Command metadata is described in a file called
+<code>RERUN_MODULES/&lt;module&gt;/commands/&lt;command&gt;/metadata</code>.
+Here's the command metadata for the "study" command:</p>
+
+<pre><code>NAME="study"
+DESCRIPTION="tell freddy to study"
+</code></pre>
+
+<p>Options are described in a file called 
+<code>RERUN_MODULES/&lt;module&gt;/commands/&lt;command&gt;/&lt;option&gt;.option</code>.
+Beyond just NAME and DESCRIPTION, options can also declare:</p>
+
+<ul>
+<li>ARGUMENTS: Does the option take an argument.</li>
+<li>REQUIRED: Is the option required.</li>
+<li>DEFAULT: Sensible value for an option default </li>
+</ul><p>Here's <code>subject.option</code> describing an option named "subject":</p>
+
+<pre><code>NAME=subject
+DESCRIPTION="the summer school subject"
+ARGUMENTS=true
+REQUIRED=true
+DEFAULT=math
+</code></pre>
+
+<p>Combining the examples above into the layout described earlier
+the "freddy" module along with its commands "dance" and "study"
+are illustrated here:</p>
+
+<pre><code>freddy
+├── commands
+│   └── dance (directory for dance command files)
+│       ├── metadata (command metadata)
+│       ├── options.sh (option parsing script)
+│       └── script (command script)
+├── lib
+│   └── functions.sh (module function library)
+├── metadata (module metadata)
+├── options (module options)
+│   └── jumps ("jumps" command option)
+│       └── metadata (declares metadata for "jumps" option)
+└── tests
+    └── dance-1-test.sh (unit tests for dance)
+</code></pre>
+
+<h1>ENVIRONMENT</h1>
+
+<p><code>RERUN_MODULES</code>
+: Path to directory containing rerun modules.
+If RERUN_MODULES is not set, it is defaulted
+relative to the location of the rerun executable.</p>
+
+<p><code>RERUN_COLOR</code>
+: Set 'true' if you want ANSI text effects. Makes
+labels in text to print bold in the console.
+Syntax errors will also print bold.</p>
+
+
+<h1>SEE ALSO</h1>
+
+<p>To create modules, see
+<a href="https://github.com/rerun/rerun/tree/master/modules/stubbs">stubbs</a>.</p>
+
+<h1>ERROR CODE</h1>
+
+<p><code>0</code>
+: All commands executed successfully</p>
+
+<p><code>1</code>
+: One or more commands failed</p>
+
+<p><code>127</code>
+: Unknown error case</p>
+
+<h1>LICENSE</h1>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License"); 
+you may not use this file except in compliance with the License. 
+You may obtain a copy of the License at</p>
+
+<p><a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+
+<p>Unless required by applicable law or agreed to in writing, 
+software distributed under the License is distributed on an 
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
+either express or implied. See the License for the specific 
+language governing permissions and limitations under the License.</p>
+
+<p>The rerun source code and all documentation may be downloaded from
+<a href="https://github.com/rerun/rerun/">https://github.com/rerun/rerun/</a>.</p>
+<p>
+<img src="https://secure.travis-ci.org/rerun/rerun.png" alt="build status"/>
+</p>
+      </section>
+    </div>
+    
+  </body>
+</html>
