@@ -19,7 +19,7 @@ dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
 dist_bin_SCRIPTS = rerun
 
 # man pages here
-dist_man_MANS = modules/stubbs/docs/stubbs.1
+dist_man_MANS = 
 
 # The module
 nobase_dist_pkgdata_DATA = \
@@ -66,14 +66,6 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/lib/meta-modules/bash/metadata \
 	modules/stubbs/lib/meta-modules/bash/templates/functions.sh \
 	modules/stubbs/lib/meta-modules/bash/templates/script \
-	modules/stubbs/lib/meta-modules/groovy/generate-options \
-	modules/stubbs/lib/meta-modules/groovy/metadata \
-	modules/stubbs/lib/meta-modules/groovy/templates/functions \
-	modules/stubbs/lib/meta-modules/groovy/templates/script \
-	modules/stubbs/lib/meta-modules/python/generate-options \
-	modules/stubbs/lib/meta-modules/python/metadata \
-	modules/stubbs/lib/meta-modules/python/templates/functions.py \
-	modules/stubbs/lib/meta-modules/python/templates/script \
 	modules/stubbs/lib/test.sh \
 	modules/stubbs/license.md \
 	modules/stubbs/metadata \
@@ -117,7 +109,6 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/template/README.md \
 	modules/stubbs/options/version/metadata \
 	modules/stubbs/options/version/README.md \
-	modules/stubbs/docs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec \
