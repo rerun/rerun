@@ -49,7 +49,11 @@ validate() {
     # Check the option parser
     test -f $RERUN_MODULES/freddy/commands/dance/options.sh
     grep -q "\-j\|\--jumps)" $RERUN_MODULES/freddy/commands/dance/options.sh
-    grep -q '[ -z "$JUMPS" ] && JUMPS="3"' $RERUN_MODULES/freddy/commands/dance/options.sh
+
+    grep -q \
+        '[ -z "$JUMPS" ] && JUMPS="$(rerun_property_get $RERUN_MODULE_DIR/options/jumps DEFAULT)"' \
+        $RERUN_MODULES/freddy/commands/dance/options.sh
+        
     grep -q '"missing required option: --jumps"' $RERUN_MODULES/freddy/commands/dance/options.sh
 
     grep '^#/ usage: '  $RERUN_MODULES/freddy/commands/dance/options.sh

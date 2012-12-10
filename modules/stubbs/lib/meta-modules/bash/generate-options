@@ -77,7 +77,7 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 # * Return 0 for successful option parse.
 #
 rerun_options_parse() {
-    
+
     while [ "\$#" -gt 0 ]; do
         OPT="\$1"
         case "\$OPT" in
@@ -101,7 +101,7 @@ $(for opt in $(echo $options_defaulted|sort); do
 optvar=$(stubbs_option_variable $opt)
 printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" \
     $optvar $optvar \
-    "$(stubbs_option_property $moddir/$module $opt DEFAULT)"
+    "\$(rerun_property_get \$RERUN_MODULE_DIR/options/$opt DEFAULT)"
 done)
     # Check required options are set
 $(for opt in $(echo $options_required|sort); do
