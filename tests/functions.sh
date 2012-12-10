@@ -27,7 +27,6 @@ make_freddy() {
     cat > $moddir/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION="A dancer in a red beret and matching suspenders"
-META_MODULE=bash
 SHELL=${SHELL}
 EOF
     # freddy:dance

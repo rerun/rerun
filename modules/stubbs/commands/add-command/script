@@ -101,17 +101,9 @@ done
 }
 
 
-# Read language setting for module. Set it to 'bash' as a default.
-META_MODULE=$(rerun_property_get $RERUN_MODULES/$MODULE META_MODULE) || { 
-    META_MODULE=bash 
-}
+STUB=$RERUN_MODULE_DIR/lib/stub/bash
 
-
-META_MODULE_LIB=$RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE
-
-OPTIONS_SCRIPT=$(rerun_property_get $META_MODULE_LIB OPTIONS_SCRIPT) || {
-    rerun_die "required metadata not found: OPTIONS_SCRIPT"
-}
+OPTIONS_SCRIPT=$(rerun_property_get $STUB OPTIONS_SCRIPT)
 
 OPTIONS_PARSER_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTIONS_SCRIPT
 
@@ -121,12 +113,9 @@ mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die "Failed creating 
 
 VARIABLES=$(stubbs_option_variables $RERUN_MODULES/$MODULE $COMMAND)
 
-TEMPLATE_COMMAND_SCRIPT=$(rerun_property_get $META_MODULE_LIB TEMPLATE_COMMAND_SCRIPT) || {
-    rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
-}
+TEMPLATE_COMMAND_SCRIPT=$(rerun_property_get $STUB TEMPLATE_COMMAND_SCRIPT)
 
-
-TEMPLATE=$META_MODULE_LIB/$TEMPLATE_COMMAND_SCRIPT
+TEMPLATE=$STUB/$TEMPLATE_COMMAND_SCRIPT
 [ ! -f "$TEMPLATE" ] && {
     rerun_syntax_error "command script template not found: \"$TEMPLATE\""
 }
@@ -139,7 +128,6 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND
     sed -e "s/@COMMAND@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
-	-e "s/@META_MODULE@/$META_MODULE/g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script."
     echo "Wrote command script: $CMD_SCRIPT"
@@ -151,7 +139,6 @@ mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests direct
 [ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "${OVERWRITE:-}" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
-	-e "s/@META_MODULE@/$META_MODULE/g" \
 	-e "s;@RERUN@;${RERUN};g" \
 	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
 	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die

@@ -1,8 +1,0 @@
-NAME=meta-module
-DESCRIPTION="the meta-module"
-ARGUMENTS=true
-REQUIRED=false
-DEFAULT=bash
-LONG=meta-module
-SHORT=
-RANGE={bash}

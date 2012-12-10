@@ -256,14 +256,8 @@ echo "Updated command metadata:  $command_metadata"
 # Generate option parser script.
 #
 
-# Read language setting for module. Set it to 'bash' as a default.
-META_MODULE=$(. $RERUN_MODULES/$MODULE/metadata; echo ${META_MODULE:-bash});
-
-[ ! -f $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata ] && {
-    rerun_die "meta-module not found: $META_MODULE"
-}
-.  $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/metadata "
+.  $RERUN_MODULE_DIR/lib/stub/bash/metadata || {
+    rerun_die "error reading  $RERUN_MODULE_DIR/lib/stub/bash/metadata "
 }
 [ -z "$OPTIONS_GENERATOR" ] && {
     rerun_die "required metadata not found: OPTIONS_GENERATOR"
@@ -273,7 +267,7 @@ META_MODULE=$(. $RERUN_MODULES/$MODULE/metadata; echo ${META_MODULE:-bash});
 }
 options_parser=$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTIONS_SCRIPT
 
-$RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE/$OPTIONS_GENERATOR \
+$RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
     $RERUN_MODULES $MODULE $COMMAND > $options_parser || {
     rerun_die "Failed generating options parser."
 }

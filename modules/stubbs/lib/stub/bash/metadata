@@ -1,4 +1,4 @@
-#/ metadata: meta-module
+#/ metadata: stub
 NAME=bash
 
 # These are relative to the lib dir

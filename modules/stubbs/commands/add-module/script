@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 #/ command: stubbs:add-module: "add a new module"
-#/ usage: stubbs:add-module --meta-module <bash> --module|-m <> --description <>
+#/ usage: stubbs:add-module --module|-m <> --description <>
 
 # Load common functions
 # ---------------------
@@ -36,7 +36,7 @@ set -o nounset -o pipefail
 # ----------------------
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: META_MODULE MODULE DESCRIPTION
+#/ option-variables: MODULE DESCRIPTION
 
 
 # Get the options
@@ -45,11 +45,6 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
         # options without arguments
 	# options with arguments
-	--meta-module)
-	    rerun_option_check "$#" "$1"
-	    META_MODULE="$2"
-	    shift
-	    ;;
 	-m|--module)
 	    rerun_option_check "$#" "$1"
 	    MODULE="$2"
@@ -88,21 +83,15 @@ done
     read DESCRIPTION
 }
 
-# Set bash as the default stub.
-: ${META_MODULE:=bash}
+STUB=$RERUN_MODULE_DIR/lib/stub/bash
+[[ ! -d "$STUB" ]] && rerun_die "module stub not found: $STUB"
 
-META_MODULE_LIB=$RERUN_MODULE_DIR/lib/meta-modules/$META_MODULE
-[[ ! -d "$META_MODULE_LIB" ]] && rerun_die "meta-module not found: $META_MODULE_LIB"
+TEMPLATE_FUNCTION_LIB=$(rerun_property_get $STUB TEMPLATE_FUNCTION_LIB)
 
-TEMPLATE_FUNCTION_LIB=$(rerun_property_get $META_MODULE_LIB TEMPLATE_FUNCTION_LIB) || {
-    rerun_die "required metadata not found: TEMPLATE_FUNCTION_LIB"
-}
+COMMAND_SHELL=$(rerun_property_get $STUB COMMAND_SHELL) 
 
-COMMAND_SHELL=$(rerun_property_get $META_MODULE_LIB COMMAND_SHELL) 
-: ${COMMAND_SHELL:=$SHELL} ; # default it to invoking shell.
-
-[[ ! -f  $META_MODULE_LIB/$TEMPLATE_FUNCTION_LIB ]] && {
-    rerun_die "function library not found:  $META_MODULE_LIB/$TEMPLATE_FUNCTION_LIB"
+[[ ! -f  $STUB/$TEMPLATE_FUNCTION_LIB ]] && {
+    rerun_die "function library not found:  $STUB/$TEMPLATE_FUNCTION_LIB"
 }
 
 # Create module structure
@@ -120,7 +109,6 @@ cat <<EOF
 # $(date)
 NAME=$MODULE
 DESCRIPTION="$DESCRIPTION"
-META_MODULE="$META_MODULE"
 SHELL="${COMMAND_SHELL}"
 VERSION=1.0.0
 REQUIRES=
@@ -133,9 +121,8 @@ EOF
 # Replace the word "@MODULE@" with the module's given name.
 sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
-	-e "s/@META_MODULE@/$META_MODULE/g" \
 	-e "s,@SHELL@,$COMMAND_SHELL,g" \
-    "$META_MODULE_LIB/$TEMPLATE_FUNCTION_LIB" \
+    "$STUB/$TEMPLATE_FUNCTION_LIB" \
     > "$RERUN_MODULES/$MODULE/lib/$(basename $TEMPLATE_FUNCTION_LIB)" || {
     rerun_die "Failed creating function library for \"$MODULE\"."
 }

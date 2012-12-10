@@ -16,7 +16,6 @@ validate() {
     .  $RERUN_MODULES/freddy/metadata
     test -n "$NAME" -a "$NAME" = freddy 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "A dancer in a red beret and matching suspenders"
-    test -n "$META_MODULE" -a "$META_MODULE" = "bash"
     test -n "$SHELL" -a "$SHELL" = "bash"
     test "$VERSION" = "1.0.0"
     grep '^REQUIRES=' $RERUN_MODULES/freddy/metadata
@@ -43,8 +42,7 @@ EOF
 
 it_runs_fully_optioned() {
     rerun stubbs:add-module --module "freddy" \
-        --description "A dancer in a red beret and matching suspenders" \
-        --meta-module bash
+        --description "A dancer in a red beret and matching suspenders"
 
     validate
 }
@@ -99,8 +97,7 @@ EOF
 
 it_takes_descriptions_w_commas_slashes() {
     rerun stubbs:add-module --module "freddy" \
-        --description "A dancer, in a red/burgundy beret" \
-        --meta-module bash
+        --description "A dancer, in a red/burgundy beret"
    .  $RERUN_MODULES/freddy/metadata
    test "$DESCRIPTION" = "A dancer, in a red/burgundy beret"
 }

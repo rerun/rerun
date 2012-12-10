@@ -1,10 +1,10 @@
-_Status_: Experimental.
+_Status_: Deprecated.
 
 # Extending stubbs module creation.
 
 Stubbs provides a means to
 create modules supporting different styles of
-implementation, and perhaps, even other scripting languages.
+implementation.
 
 ## Stubbs commands
 
@@ -17,36 +17,36 @@ Command responsibilities:
 * `add-command`: Create a command script using a template.
 * `add-option`, `rm-option`: Generate options parsing code for command scripts.
 
-## Meta-modules
+## Stubs
 
-A _meta-module_ provides the skeleton to
+A _stub_ provides the skeleton to
 initialize a new module, create command scripts, and generate
 option parsers.
-One might liken a "meta-module" to a prototype from which
+One might liken a "stub" to a prototype from which
 modules are based.
 
-Each meta-module has a directory position under stubbs/lib/metamodules. 
+Each stub has a directory position under stubbs/lib/stub. 
 Eg:
 
-    $RERUN_MODULES/stubbs/lib/meta-modules/$META-MODULE
+    $RERUN_MODULES/stubbs/lib/stub/$STUB
 
 Within this directory structure exists code generator,
 templates and metadata needed by stubbs commands.
 
 ### Metadata
 
-Each meta-module contains metadata describing
+Each stub contains metadata describing
 the necessary components assumed and used by the stubbs commands.
 
 Metadata properties:
 
-* `NAME`: Meta-module name (eg, "bash").
+* `NAME`: Stub name (eg, "bash").
 * `TEMPLATE_FUNCTION_LIB`: The function library template.
 * `TEMPLATE_COMMAND_SCRIPT`: The command script template.
 * `OPTIONS_SCRIPT`: The options parser file name.
 * `OPTIONS_GENERATOR`: Executable that generates the option parser script.
 
-Example: stubbs/lib/meta-modules/bash/metadata
+Example: stubbs/lib/stub/bash/metadata
 
     NAME=bash
     TEMPLATE_FUNCTION_LIB=templates/functions.sh
@@ -56,13 +56,13 @@ Example: stubbs/lib/meta-modules/bash/metadata
 
 ### Directory structure
 
-Each meta-module has a directory position under lib:
+Each stub has a directory position under lib:
 
-    $RERUN_MODULES/stubbs/lib/meta-module/$META-MODULE
+    $RERUN_MODULES/stubbs/lib/stub/$STUB
     
-For example, the "bash" meta-module looks like so:
+For example, the "bash" stub looks like so:
 
-    stubbs/lib/meta-module/bash
+    stubbs/lib/stub/bash
     ├── generate-options
     ├── metadata
     └── templates

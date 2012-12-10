@@ -23,8 +23,7 @@ describe "functional: functional tests for a bash module"
 it_builds_a_functional_module() {
     # Create module: freddy
     rerun stubbs:add-module --module "freddy" \
-        --description "A dancer in a red beret and matching suspenders" \
-        --meta-module bash
+        --description "A dancer in a red beret and matching suspenders"
     
     # Create command: freddy:dance
     rerun stubbs:add-command --module "freddy" \
