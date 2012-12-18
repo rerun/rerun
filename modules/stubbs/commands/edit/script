@@ -83,7 +83,7 @@ done
     done
 }
 
-[ -z "$COMMAND" ] && {
+[ -z "${COMMAND:-}" ] && {
     echo "Command: "
     select COMMAND in $(rerun_commands $RERUN_MODULES $MODULE);
     do
