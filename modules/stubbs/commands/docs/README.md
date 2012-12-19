@@ -9,12 +9,12 @@ Requirements
 ------------
 The `stubbs:docs` command depends on two software packages:
 
-* [dicount](http://www.pell.portland.or.us/~orc/Code/discount/)
+* [discount](http://www.pell.portland.or.us/~orc/Code/discount/)
 * [pygmentize](http://pygments.org/docs/cmdline/)
   * On a Redhat/Centos system: 
   
-         sudo yum install python-setuptools
-         sudo easy_install Pygments
+           sudo yum install python-setuptools;
+           sudo easy_install Pygments;
   
 Generate the documentation
 --------------------------
