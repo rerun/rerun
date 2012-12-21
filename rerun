@@ -123,7 +123,7 @@ rerun_syntax_error() {
 # * Return 1 otherwise 
 rerun_option_check() {
     if [[ "$1" -lt 2 ]]
-    then rerun_syntax_error "option requires argument: $2"
+    then rerun_syntax_error "option requires argument: ${2:-}"
     else return 0
     fi
 }
