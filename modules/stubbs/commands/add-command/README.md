@@ -4,22 +4,22 @@ Create a new command
 --------------------
 
 After creating a module using [stubbs:add-module](../add-module/index.html),
-add a command named "dance" to the freddy module:
+add a command named "ping" to the waitfor module:
 
-    rerun stubbs:add-command --command dance --description "tell freddy to dance" --module freddy
+    rerun stubbs:add-command --command ping --description "wait for ping response from host" --module waitfor
 
 The `add-command` module generates a boilerplate 
 command script file you can edit.
 
-	Wrote command script: /Users/alexh/.rerun/modules/freddy/commands/dance/script
-	Wrote command test: /Users/alexh/.rerun/modules/freddy/tests/dance-1-test.sh
+	Wrote command script: /Users/alexh/.rerun/modules/waitfor/commands/ping/script
+	Wrote command test: /Users/alexh/.rerun/modules/waitfor/tests/ping-1-test.sh
 
 Of course, stubbs doesn't write the implementation for you, 
 merely a stub.
 
-Try running the freddy:dance command:
+Try running the waitfor:ping command:
 
-    $ rerun freddy:dance
+    $ rerun waitfor:ping
 
 The command should return without an error.
 

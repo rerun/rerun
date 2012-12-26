@@ -5,25 +5,22 @@ Create a self extracting archive
 
 The default format is a self extracting shell script.
 
-Create an archive containing the "freddy" module:
+Create an archive containing the "waitfor" module:
 
-    rerun stubbs:archive --modules "freddy"
+    rerun stubbs:archive --modules "waitfor"
 
-The `archive` command generates a "rerun.bin" file 
+The `archive` command generates an executable "rerun.bin" file 
 in the current directory.
 
 Run the self extracting archive script without options and you
-will see freddy's commands listed:
+will see waitfor's commands listed:
 
-    $ bash rerun.bin
-    freddy:
-     dance: tell freddy to dance
-        --jumps <>: "jump #num times"
+    $ rerun.bin
+    waitfor: "utility commands that wait for a condition" - 
 
-Now run the `freddy:dance` command.
+Now run the `waitfor:ping` command.
 
-    $ bash rerun.bin freddy:dance --jumps 10
-    jumps (10)
+    $ rerun.bin waitfor:ping --host localhost
 
 It works like a normal `rerun` command. Amazing !
 

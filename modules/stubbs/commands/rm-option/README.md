@@ -3,15 +3,15 @@ Use *stubbs:rm-option* to remove an option.
 Basic usage
 -----------
 
-Remove the  "--jumps" option from the `freddy:dance` command:
+Remove the  "--interval" option from the `waitfor:ping` command:
 
-    rerun stubbs:rm-option --option jumps --module freddy --command dance
+    rerun stubbs:rm-option --option interval --module waitfor --command ping
 
-The command listing shows the --jumps option is no longer assigned.
+The command listing shows the --interval option is no longer assigned.
 
-    $ rerun freddy
-    freddy:
-     dance: tell freddy to dance
+    $ rerun waitfor
+    ping: "wait for ping response from host"
+       --host <>: "the host to reach"
 
 Like [stubbs:add-option](../add-option), the `rm-option` command
 also updates the option parser script.

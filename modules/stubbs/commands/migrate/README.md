@@ -1,3 +1,5 @@
+_Status_: Experimental.
+
 Use *stubbs:migrate* to update your module to current
 rerun module conventions.
 

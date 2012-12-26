@@ -15,24 +15,28 @@ The `stubbs:docs` command depends on two software packages:
   
            sudo yum install python-setuptools;
            sudo easy_install Pygments;
+
+Included with stubbs, is a copy of Ryan Tomayko's
+excellent [shocco](https://github.com/rtomayko/shocco) doc
+generator that produces documentation from your shell scripts.
   
 Generate the documentation
 --------------------------
 
 Run the "docs" command specifying a module.
 
-    rerun stubbs:docs --module freddy
+    rerun stubbs:docs --module waitfor
 
 The `docs` command will print:
 
-    Generated unix manual: /Users/alexh/rerun-workspace/rerun/modules/freddy/freddy.1
+    Generated unix manual: /Users/alexh/rerun-workspace/rerun/modules/waitfor/waitfor.1
 
 Display the man page
 --------------------
 
 Run `nroff` to display it:
 	
-	nroff -man /Users/alexh/rerun-workspace/rerun/modules/freddy/freddy.1 | more
+	nroff -man /Users/alexh/rerun-workspace/rerun/modules/waitfor/waitfor.1 | more
 
 Writing documentation
 ---------------------
@@ -45,10 +49,10 @@ several levels of your module.
 The diagram below points out where README.md files
 can be placed.
 
-    modules/freddy/
+    modules/waitfor/
     |--README.md            <-- module usage
     |-- commands
-    |   `-- dance
+    |   `-- ping
     |       |-- README.md   <-- command usage
     |       |-- metadata
     |       |-- options.sh
@@ -62,5 +66,5 @@ can be placed.
     |       `-- metadata
     `-- tests
         |-- functions.sh
-        `-- dance-1-test.sh
+        `-- ping-1-test.sh
 

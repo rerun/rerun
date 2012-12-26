@@ -1,7 +1,6 @@
 # NAME
 
-rerun - a simple command runner because it's easy to forget 
-standard operating procedure.
+rerun - a modular shell automation framework to organize your keeper scripts.
 
 # SYNOPSYS
 
@@ -11,10 +10,11 @@ standard operating procedure.
 
 Rerun is a simple command runner that turns loose shell scripts
 into modular automation. Rerun will help you
-organize your implementation into well defined command interfaces.
+organize your scripts into well defined command interfaces.
 Collections of management modules can be archived and delivered as
 a single executable to facilitate team hand offs.
-Using the "stubbs" module, rerun will even facilitate unit tests.
+Using the "stubbs" module, rerun will even facilitate documentation
+and unit tests.
 When users execute rerun module commands, rerun can record 
 execution data into log files.
 
@@ -80,44 +80,44 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	| '__/ _ \ '__| | | | '_ \ 
 	| | |  __/ |  | |_| | | | |
 	|_|  \___|_|   \__,_|_| |_|
-	Version: v0.1. License: Apache 2.0.
+	Version: 1.0.0. License: Apache 2.0.
 
 	Usage: rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
-
-	Examples:
-	| $ rerun 
-	| => List all modules.
-	| $ rerun freddy
-	| => List all freddy commands.
-	| $ rerun freddy:dance --jumps 3
-	| => Execute the freddy:dance command.
-	| $ rerun -M /var/rerun freddy:dance
-	| => Execute the freddy:dance command found in /var/rerun
 
 
 ## Listing
 
-Without arguments, `rerun` will list existing modules:
+Without arguments, `rerun` will list existing modules and 
+their description and version:
 
     $ rerun
-      freddy: "A dancer in a red beret and matching suspenders"
+      stubbs: "Simple rerun module builder" - 1.0.1
 
-To list the commands available from the 'freddy' module run:
+To list the commands available in a module specify the module
+name too. Here the commands are listed for the 'stubbs' module:
 
-    $ rerun freddy
-     study: "tell freddy to study"
-       --subject <math>: "the summer school subject"
-     dance: "tell freddy to dance"
-       --jumps <1>: "jump #num times"
-
-The listing consists of info about command options 
-including default values if they were described with option metadata.
+    $ rerun stubbs
+     add-command: "add command to module"
+         --command|-c <>: "the command name"
+         --description <>: "the brief description"
+         --module|-m <>: "the module name"
+        [ --overwrite <false>]: "should overwrite?"
+     add-module: "add a new module"
+         --description <>: "the brief description"
+         --module|-m <>: "the module name"
+        [ --template <>]: "the template name or path"
+        .
+        . 
+        .
+        
+The command listing includes the command description and
+any options assigned to the command. 
 
 Options that declare a default value are shown
 with a string between the "<>" characters.
 
-For example, notice how "--jumps" option shows `<1>`.
-The "1" is the default value assigned to the "--jumps" option.
+For example, notice how "--overwrite" option shows `<false>`.
+The "false" is the default value assigned to the "--overwrite" option.
 
 See the "Environment" section below to learn about the
 `RERUN_MODULES` environment variable. This variable
@@ -132,51 +132,51 @@ Type `rerun` and then the tab key. The shell will generate
 a list of existing modules.
 
     $ rerun[TAB][TAB]
-    freddy
+    stubbs: 
 
-Rerun shows there is a module named "freddy" installed.
+Rerun shows the module "stubbs".
 
-Typing the tab key again will show the commands inside the "freddy" module:
+Typing the `s` character and the tab key again 
+will show the commands inside the "stubbs" module:
 
-    $ rerun freddy: [TAB]
-    dance  study     
+    $ rerun stubbs: [TAB]
+    add-command  add-module  add-option  archive  docs  edit  migrate  rm-option  test
 
-In this case, two commands are found and listed. Press tab again
-and choose a command.
-After accepting a command, typing the tab key will show arguments.
+Several commands are listed. Press tab again
+and choose a command. You can specify the first few characters
+and the command name will be completed, too.
 
-    $ rerun freddy:study -[TAB]
-    --subject
+After accepting a command, typing the tab key will list the command options.
 
-The `freddy:study` command accepts one option (--subject <>).
+    $ rerun stubbs: add-module -[TAB]
+    --description  --module  --template
+
+The `stubbs:add-module` command accepts three options 
+(--description <> --module <> --template <>).
+    
+You can continue using command completion to cycle through
+the remaining options. 
     
 ## Command execution
 
 Commands are executed by stating the module,
-command and possibly options. The basic usage form is
-"`rerun` _module_:_command_ [_options_]".
+command and any command options. The basic usage form is
+"`rerun` _module_:_command_ [ _options_ ]".
 
-To run the "study" command in the freddy module, type:
+To run the "archive" command in the stubbs module, type:
 
-    $ rerun freddy:study
-    studying (math)
+    $ rerun stubbs:archive
+    Wrote self extracting archive script: /tmp/rerun.bin
 
-The outputed string "studying (math)" is the printed result. 
-In this example, "math" is the subject option's default value
-as defined in the module metadata.
-    
 Command options are passed after the "module:command" string. 
-Tell freddy to study the subject, "biology" by specifying 
-the `--subject <>` option:
+Run the "stubbs:archive" command but specify where the archive file is written.
 
-    $ rerun freddy:study --subject biology
-    studying (biology)
+    $ rerun stubbs:archive --modules waitfor --file $HOME/rerun.bin
 
-If the 'freddy' module is stored in `/var/rerun`, then the command usage
+If the 'stubbs' module is stored in `/var/rerun`, then the command usage
 would be:
 
-    $ rerun -M /var/rerun freddy:study
-    studying (math)
+    $ rerun -M /var/rerun stubbs:archive
 
 ### Archives
 
@@ -202,17 +202,16 @@ Here the archive is executed without arguments which causes the archive
 to list the modules contained within it.
 
     $ ./rerun.bin
-      freddy: "A dancer in a red beret and matching suspenders"
+      waitfor: "utility commands that wait for a condition."
       .
       . listing output ommitted
 
 Note, ".bin" is just a suffix naming convention for a self-extracting script.
 The archive file can be named anything you wish.
 
-Run the `freddy:dance` command in the archive:
+Run the `waitfor:ping` command in the archive:
 
-	$ ./rerun.bin freddy:dance --jumps 3
-	jumps (3)
+	$ ./rerun.bin waitfor:ping --server remoteserver
 
 See `stubbs:archive` for further information about creating and 
 understanding rerun archives.
@@ -256,55 +255,56 @@ The metadata file format uses line separated _KEY=value_
 pairs to define module attributes. The module metadata
 file declares two properties:
 
-* NAME: Declare name displayed to user.
-* DESCRIPTION: Brief explanation of use.
+* `NAME`: Declare name displayed to user.
+* `DESCRIPTION`: Brief explanation of use.
 
-For example, a module named `freddy` is named
-and described in a file called `RERUN_MODULES/freddy/metadata`:
+For example, a module named `waitfor` is
+declared in a file called `RERUN_MODULES/waitfor/metadata`:
 
-    NAME="freddy"
-    DESCRIPTION="A dancer in a red beret and matching suspenders"
+    NAME="waitfor"
+    DESCRIPTION="utility commands that wait for a condition."
 
 Command metadata is described in a file called
 `RERUN_MODULES/<module>/commands/<command>/metadata`.
-Here's the command metadata for the "study" command:
+It uses NAME and DESCRIPTION properties like a module but
+adds, OPTIONS.
 
-    NAME="study"
-    DESCRIPTION="tell freddy to study"
-    OPTIONS="subject"
+* `OPTIONS`: List of options assigned to the command.
+
+Here's the command metadata for the "ping" command:
+
+    NAME="ping"
+    DESCRIPTION="wait for ping response from a host"
+    OPTIONS="host interval"
 
 Each command can have options assigned to it. The
-example above shows that the "study" command has
-an option called "subject".
+example above shows that the "ping" command has
+options called "host" and "interval".
 
 Options are described in their own metadata files
 following the naming convention:
 `RERUN_MODULES/<module>/options/<option>/metadata`.
-Beyond just NAME and DESCRIPTION, options can also declare:
+Beyond just `NAME` and `DESCRIPTION`, options can also declare:
 
 * `ARGUMENTS`: Does the option take an argument.
 * `REQUIRED`: Is the option required.
 * `DEFAULT`: Sensible value for an option default 
 
-Here's the metadata describing an option named "subject":
+Here's the metadata describing an option named "host":
 
-    NAME=subject
-    DESCRIPTION="the summer school subject"
+    NAME=host
+    DESCRIPTION="the server to reach"
     ARGUMENTS=true
     REQUIRED=true
-    DEFAULT=math
+    DEFAULT=
 
 Combining the examples above into the layout described earlier
-the "freddy" module along with its commands "dance" and "study"
+the "waitfor" module along with its command "ping"
 are illustrated here:
 
-    modules/freddy/
+    modules/waitfor/
     |-- commands
-    |   |-- dance
-    |   |   |-- metadata
-    |   |   |-- options.sh
-    |   |   `-- script
-    |   `-- study
+    |   `-- ping
     |       |-- metadata
     |       |-- options.sh
     |       `-- script
@@ -317,7 +317,7 @@ are illustrated here:
     |   `-- subject
     |       `-- metadata
     `-- tests
-        `-- dance-1-test.sh
+        `-- ping-1-test.sh
 
 
 # ENVIRONMENT
