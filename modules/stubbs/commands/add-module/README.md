@@ -11,7 +11,7 @@ The `add-module` command will print:
 
     Created module structure: /Users/alexh/.rerun/modules/waitfor
 
-See the [stubbs:add-command](../add-command) command to create a 
+* See the [stubbs:add-command](../add-command/index.html) command to create a 
 command for your module.
 
 Clone a module
