@@ -12,7 +12,7 @@ EXTRA_DIST = setup.sh bash_completion.sh
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
-docdir = ${datadir}/doc/${PACKAGE} 
+docdir = ${datadir}/doc/${PACKAGE}
 dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
 
 # the main script
@@ -61,14 +61,15 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/lib/docs.css \
 	modules/stubbs/lib/docs.sh \
 	modules/stubbs/lib/functions.sh \
-	modules/stubbs/lib/meta-modules/README.md \
-	modules/stubbs/lib/meta-modules/bash/generate-options \
-	modules/stubbs/lib/meta-modules/bash/metadata \
-	modules/stubbs/lib/meta-modules/bash/templates/functions.sh \
-	modules/stubbs/lib/meta-modules/bash/templates/script \
+	modules/stubbs/lib/stub/bash/generate-options \
+	modules/stubbs/lib/stub/bash/metadata \
+	modules/stubbs/lib/stub/bash/templates/functions.sh \
+	modules/stubbs/lib/stub/bash/templates/script \
+	modules/stubbs/lib/stub/README.md \
 	modules/stubbs/lib/test.sh \
-	modules/stubbs/license.md \
 	modules/stubbs/metadata \
+	modules/stubbs/options/answers/metadata \
+	modules/stubbs/options/answers/README.md \
 	modules/stubbs/options/arg/metadata \
 	modules/stubbs/options/arg/README.md \
 	modules/stubbs/options/command/metadata \
@@ -77,14 +78,14 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/default/README.md \
 	modules/stubbs/options/description/metadata \
 	modules/stubbs/options/description/README.md \
+	modules/stubbs/options/dir/metadata \
+	modules/stubbs/options/dir/README.md \
 	modules/stubbs/options/export/metadata \
 	modules/stubbs/options/export/README.md \
 	modules/stubbs/options/file/metadata \
 	modules/stubbs/options/file/README.md \
 	modules/stubbs/options/format/metadata \
 	modules/stubbs/options/format/README.md \
-	modules/stubbs/options/meta-module/metadata \
-	modules/stubbs/options/meta-module/README.md \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/long/README.md \
 	modules/stubbs/options/module/metadata \
@@ -109,6 +110,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/options/template/README.md \
 	modules/stubbs/options/version/metadata \
 	modules/stubbs/options/version/README.md \
+	modules/stubbs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec \
@@ -121,7 +123,8 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/tests/docs-1-test.sh \
 	modules/stubbs/tests/functional-bash-1-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
-	modules/stubbs/tests/rm-option-1-test.sh
+	modules/stubbs/tests/rm-option-1-test.sh \
+	modules/stubbs/tests/stubbs-functions-1-test.sh
 
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
@@ -129,10 +132,14 @@ nobase_dist_pkgdata_DATA = \
 # $(prefix)/bin/rerun and $(prefix)/etc/bash_completion.d/rerun
 # being the same target name so I'll use a install hook
 
-install-data-hook:
+install-data-local:
 	mkdir -p $(DESTDIR)$(sysconfdir)/bash_completion.d
 	cp -p $(srcdir)/bash_completion.sh \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
+
+uninstall-local:
+	rm -f $(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
+
 
 #
 # Testing targets
