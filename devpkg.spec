@@ -1,12 +1,12 @@
 #
 # This is a package used by the development team to assist 
-# users who use OS's are RPM based but don't have rerun 
-# provided by their OS team
+# users who use OS's that are RPM based but don't have rerun 
+# provided by the OS team's YUM repos.  
 #
 Summary: Dance your way through standard operating procedure
 Name: rerun
 Version: %{version}
-Release: %{release}
+Release: %{release}%{?dist}
 Source0: rerun-%{version}.tar.gz
 URL: http://rerun.github.com/rerun
 
