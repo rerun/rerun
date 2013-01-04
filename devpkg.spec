@@ -28,15 +28,15 @@ A simple command runner because it's easy to forget standard operating procedure
 %setup
 
 %build
-./configure
+./configure --prefix=/usr --sysconfdir=/etc
 make
 
 %install
-echo "Installing to: \"${_buildroot}\""
-make install DESTDIR=%{_buildroot}
+echo "Installing to: \"${buildroot}\""
+make install DESTDIR=%{buildroot}
 
 %clean
-rm -rf ${_buildroot}
+rm -rf ${buildroot}
 
 %files
 %defattr(-,root,root)
@@ -139,7 +139,7 @@ rm -rf ${_buildroot}
 %{_datadir}/rerun/modules/stubbs/stubbs.1
 %{_datadir}/rerun/modules/stubbs/templates/extract
 %{_datadir}/rerun/modules/stubbs/templates/launcher
-%{_datadir}/rerun/modules/stubbs/templates/rerun-module.spec
+%{_datadir}/rerun/modules/stubbs/templates/rerun-module.spec.txt
 %{_datadir}/rerun/modules/stubbs/templates/test.functions.sh
 %{_datadir}/rerun/modules/stubbs/templates/test.roundup
 %{_datadir}/rerun/modules/stubbs/tests/add-command-1-test.sh

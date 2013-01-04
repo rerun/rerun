@@ -16,11 +16,11 @@ if [ "clean" == "$1" ]; then
     rm -rf tmp rerun-* autom4te.cache config
   fi
 
-  rm -f INSTALL Makefile.in aclocal.m4 configure rerun-${RERUN_VERSION}.* rerun-stubbs-*.rpm
+  rm -f INSTALL Makefile.in aclocal.m4 configure rerun-${RERUN_VERSION}* rerun-stubbs-*.rpm
   rm -rf rpm autom4te.cache config tmp
 else
   autoreconf --install
-  ./configure 
+  ./configure
   mkdir -p tmp
   make DESTDIR=./tmp install
   make distcheck

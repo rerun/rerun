@@ -122,7 +122,7 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
-	modules/stubbs/templates/rerun-module.spec \
+	modules/stubbs/templates/rerun-module.spec.txt \
 	modules/stubbs/templates/test.functions.sh \
 	modules/stubbs/templates/test.roundup \
 	modules/stubbs/tests/add-command-1-test.sh \
@@ -138,7 +138,7 @@ nobase_dist_pkgdata_DATA = \
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
 # so well ship it as a data file.  Its a bit wonky to have
-# $(prefix)/bin/rerun and $(prefix)/etc/bash_completion.d/rerun
+# $(prefix)/bin/rerun and /etc/bash_completion.d/rerun
 # being the same target name so I'll use a install hook
 
 install-data-local:
