@@ -9,9 +9,10 @@
 # Still, as a matter of allowing patching, its not a bad idea to distribute 
 # the developer setup script in the tarball.
 EXTRA_DIST = \
-  setup.sh \
   bash_completion.sh \
+  ChangeLog \
   devpkg.spec \
+  setup.sh \
   test.sh \
   tests/functions.sh \
   tests/rerun-0-test.sh \
@@ -23,6 +24,9 @@ EXTRA_DIST = \
 # distribute it and install it with the package in the doc directory.
 docdir = ${datadir}/doc/${PACKAGE}
 dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
+
+ChangeLog:
+	git log --name-status > $@ || echo "no changelog" > $@
 
 # the main script
 dist_bin_SCRIPTS = rerun
