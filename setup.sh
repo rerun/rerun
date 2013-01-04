@@ -17,10 +17,10 @@ if [ "clean" == "$1" ]; then
   fi
 
   rm -f INSTALL Makefile.in aclocal.m4 configure rerun-${RERUN_VERSION}.* rerun-stubbs-*.rpm
-  rm -rf BUILD BUILDROOT RPMS SOURCES SRPMS autom4te.cache config tmp
+  rm -rf rpm autom4te.cache config tmp
 else
   autoreconf --install
-  ./configure --prefix=/opt/junk
+  ./configure 
   mkdir -p tmp
   make DESTDIR=./tmp install
   make distcheck

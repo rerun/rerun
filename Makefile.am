@@ -8,7 +8,16 @@
 # setup is only used by distribution developers, not package developers.
 # Still, as a matter of allowing patching, its not a bad idea to distribute 
 # the developer setup script in the tarball.
-EXTRA_DIST = setup.sh bash_completion.sh
+EXTRA_DIST = \
+  setup.sh \
+  bash_completion.sh \
+  devpkg.spec \
+  test.sh \
+  tests/functions.sh \
+  tests/rerun-0-test.sh \
+  tests/rerun-1-test.sh \
+  tests/rerun-2-test.sh \
+  tests/rerun-4-test.sh
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
@@ -158,8 +167,9 @@ test-stubbs:
 #
 RELEASE ?= 1
 
-rpmbuild:
+rpm:
 	@echo "Packaging rerun as an RPM ..."
-	mkdir -p SOURCES BUILD BUILDROOT RPMS
-	cp -f rerun-${VERSION}.zip SOURCES/rerun-${VERSION}.zip
-	rpmbuild --target noarch --buildroot ${PWD}/BUILDROOT/rerun-${VERSION}-${RELEASE}.noarch --define "_topdir ${PWD}" --define "version ${VERSION}" --define "major `echo ${VERSION} | cut -d. -f1`" --define "minor `echo ${VERSION} | cut -d. -f2`" --define "revision `echo ${VERSION} | cut -d. -f3`" --define "release ${RELEASE}" -bb --clean SPECS/rerun.spec
+	mkdir -p rpm/SOURCES rpm/BUILD rpm/BUILDROOT rpm/RPMS
+	cp -f rerun-${VERSION}.tar.gz rpm/SOURCES/rerun-${VERSION}.tar.gz
+	rpmbuild -tb --target noarch --define "_topdir ${PWD}/rpm" --define "version ${VERSION}" --define "release ${RELEASE}" rpm/SOURCES/rerun-${VERSION}.tar.gz
+	find rpm/RPMS/ -name "*.rpm" -exec mv {} ./ \;
