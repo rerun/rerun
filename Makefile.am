@@ -2,18 +2,18 @@
 # copyright DTOSOLUTIONS, 2011
 
 ## Process this file with automake to produce Makefile.in
- 
+
 #ACLOCAL_AMFLAGS = -I m4 --install
 
 # setup is only used by distribution developers, not package developers.
-# Still, as a matter of allowing patching, its not a bad idea to distribute 
+# Still, as a matter of allowing patching, its not a bad idea to distribute
 # the developer setup script in the tarball.
 EXTRA_DIST = \
   setup.sh \
   etc/bash_completion.sh \
   etc/devpkg.spec
 
-# README.md is expected in Github projects, good stuff in it, so we'll 
+# README.md is expected in Github projects, good stuff in it, so we'll
 # distribute it and install it with the package in the doc directory.
 docdir = ${datadir}/doc/${PACKAGE}
 dist_doc_DATA = README.md INSTALL COPYING AUTHORS README NEWS ChangeLog
@@ -25,54 +25,37 @@ ChangeLog:
 dist_bin_SCRIPTS = rerun
 
 # man pages here
-dist_man_MANS = 
+dist_man_MANS =
 
-# The module
-nobase_dist_pkgdata_DATA = \
+# by convention, automake hates putting data and script files in /usr/lib
+# using something like nobase_dist_pkglib_SCRIPTS.  To get around this
+# we will create our own directory name
+moddir = ${libdir}/${PACKAGE}
+nobase_dist_mod_DATA = \
 	modules/stubbs/README.md \
-	modules/stubbs/bin/roundup \
-	modules/stubbs/bin/shocco \
-	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/metadata \
-	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/README.md \
-	modules/stubbs/commands/add-command/script \
 	modules/stubbs/commands/add-module/metadata \
-	modules/stubbs/commands/add-module/script \
 	modules/stubbs/commands/add-module/README.md \
 	modules/stubbs/commands/add-option/metadata \
-	modules/stubbs/commands/add-option/script \
 	modules/stubbs/commands/add-option/README.md \
 	modules/stubbs/commands/archive/metadata \
-	modules/stubbs/commands/archive/options.sh \
-	modules/stubbs/commands/archive/script \
 	modules/stubbs/commands/archive/README.md \
 	modules/stubbs/commands/docs/metadata \
-	modules/stubbs/commands/docs/options.sh \
-	modules/stubbs/commands/docs/script \
 	modules/stubbs/commands/docs/README.md \
 	modules/stubbs/commands/edit/metadata \
-	modules/stubbs/commands/edit/script \
 	modules/stubbs/commands/edit/README.md \
 	modules/stubbs/commands/migrate/metadata \
-	modules/stubbs/commands/migrate/options.sh \
-	modules/stubbs/commands/migrate/script \
 	modules/stubbs/commands/migrate/README.md \
 	modules/stubbs/commands/rm-option/metadata \
-	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/rm-option/README.md \
 	modules/stubbs/commands/test/metadata \
-	modules/stubbs/commands/test/script \
 	modules/stubbs/commands/test/README.md \
 	modules/stubbs/lib/docs.css \
-	modules/stubbs/lib/docs.sh \
-	modules/stubbs/lib/functions.sh \
-	modules/stubbs/lib/stub/bash/generate-options \
 	modules/stubbs/lib/stub/bash/metadata \
 	modules/stubbs/lib/stub/bash/templates/functions.sh \
 	modules/stubbs/lib/stub/bash/templates/script \
 	modules/stubbs/lib/stub/README.md \
-	modules/stubbs/lib/test.sh \
 	modules/stubbs/metadata \
 	modules/stubbs/options/answers/metadata \
 	modules/stubbs/options/answers/README.md \
@@ -121,7 +104,30 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/templates/launcher \
 	modules/stubbs/templates/rerun-module.spec.txt \
 	modules/stubbs/templates/test.functions.sh \
-	modules/stubbs/templates/test.roundup \
+	modules/stubbs/templates/test.roundup
+
+# The module scripts
+nobase_dist_mod_SCRIPTS = \
+	modules/stubbs/bin/roundup \
+	modules/stubbs/bin/shocco \
+	modules/stubbs/bin/Markdown.pl \
+	modules/stubbs/commands/add-command/options.sh \
+	modules/stubbs/commands/add-command/script \
+	modules/stubbs/commands/add-module/script \
+	modules/stubbs/commands/add-option/script \
+	modules/stubbs/commands/archive/options.sh \
+	modules/stubbs/commands/archive/script \
+	modules/stubbs/commands/docs/options.sh \
+	modules/stubbs/commands/docs/script \
+	modules/stubbs/commands/edit/script \
+	modules/stubbs/commands/migrate/options.sh \
+	modules/stubbs/commands/migrate/script \
+	modules/stubbs/commands/rm-option/script \
+	modules/stubbs/commands/test/script \
+	modules/stubbs/lib/docs.sh \
+	modules/stubbs/lib/functions.sh \
+	modules/stubbs/lib/stub/bash/generate-options \
+	modules/stubbs/lib/test.sh \
 	modules/stubbs/tests/add-command-1-test.sh \
 	modules/stubbs/tests/add-module-1-test.sh \
 	modules/stubbs/tests/add-option-1-test.sh \
@@ -132,12 +138,17 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/tests/rm-option-1-test.sh \
 	modules/stubbs/tests/stubbs-functions-1-test.sh
 
+# put the tests in /usr/libexec/rerun using built in macro
 nobase_dist_pkglibexec_SCRIPTS = \
   tests/functions.sh \
   tests/rerun-0-test.sh \
   tests/rerun-1-test.sh \
   tests/rerun-2-test.sh \
   tests/rerun-4-test.sh
+
+testdir = ${libexecdir}/${PACKAGE}
+nobase_dist_test_DATA = \
+  tests/functions.sh
 
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
@@ -161,7 +172,7 @@ test: check
 check: test-rerun test-stubbs
 
 # need to take unusual measures to defend against "distcheck"
-# running in the _build directory which is separate from the 
+# running in the _build directory which is separate from the
 # source code.
 test-rerun:
 	if [ ! -d tests ]; then export MYBASEDIR="../"; fi; \
@@ -184,7 +195,7 @@ test-stubbs:
 	export RERUN=$${MYDIR}/rerun; \
 	export RERUN_MODULES=$${MYDIR}/modules; \
 	export LC_ALL=C; \
-	$${MYDIR}/rerun stubbs:test --module stubbs
+	$${RERUN} stubbs:test --module stubbs
 
 #unset RERUN_COLOR
 #
