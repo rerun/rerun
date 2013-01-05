@@ -9,11 +9,9 @@
 # Still, as a matter of allowing patching, its not a bad idea to distribute 
 # the developer setup script in the tarball.
 EXTRA_DIST = \
-  bash_completion.sh \
-  ChangeLog \
-  devpkg.spec \
   setup.sh \
-  test.sh
+  etc/bash_completion.sh \
+  etc/devpkg.spec
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
@@ -149,7 +147,7 @@ nobase_dist_pkglibexec_SCRIPTS = \
 
 install-data-local:
 	mkdir -p $(DESTDIR)$(sysconfdir)/bash_completion.d
-	cp -p $(srcdir)/bash_completion.sh \
+	cp -p $(srcdir)/etc/bash_completion.sh \
 		$(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
 
 uninstall-local:
