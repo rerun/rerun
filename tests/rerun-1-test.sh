@@ -7,9 +7,14 @@ unset RERUN_COLORS
 
 # Helpers
 # ------------
-
-
-. ./functions.sh || { echo "Failed loading test functions" ; exit 2 ; }
+for i in ./functions.sh ../tests/functions.sh `dirname $1`/functions.sh `dirname
+ $0`/functions.sh
+do
+  if [ -r ${i} ]; then
+    . ${i} || { echo "Failed loading test functions" ; exit 2 ; }
+    break
+  fi
+done
 
 rerun() {
     command $RERUN "$@"

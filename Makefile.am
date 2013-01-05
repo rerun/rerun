@@ -13,12 +13,7 @@ EXTRA_DIST = \
   ChangeLog \
   devpkg.spec \
   setup.sh \
-  test.sh \
-  tests/functions.sh \
-  tests/rerun-0-test.sh \
-  tests/rerun-1-test.sh \
-  tests/rerun-2-test.sh \
-  tests/rerun-4-test.sh
+  test.sh
 
 # README.md is expected in Github projects, good stuff in it, so we'll 
 # distribute it and install it with the package in the doc directory.
@@ -139,6 +134,13 @@ nobase_dist_pkgdata_DATA = \
 	modules/stubbs/tests/rm-option-1-test.sh \
 	modules/stubbs/tests/stubbs-functions-1-test.sh
 
+nobase_dist_pkglibexec_SCRIPTS = \
+  tests/functions.sh \
+  tests/rerun-0-test.sh \
+  tests/rerun-1-test.sh \
+  tests/rerun-2-test.sh \
+  tests/rerun-4-test.sh
+
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
 # so well ship it as a data file.  Its a bit wonky to have
@@ -157,15 +159,36 @@ uninstall-local:
 #
 # Testing targets
 #
+test: check
+check: test-rerun test-stubbs
 
-test: test-rerun test-stubbs
+# need to take unusual measures to defend against "distcheck"
+# running in the _build directory which is separate from the 
+# source code.
 test-rerun:
-	@echo "Testing rerun ..."
-	cd ./tests && ../modules/stubbs/bin/roundup
+	if [ ! -d tests ]; then export MYBASEDIR="../"; fi; \
+	MYDIR="./$${MYBASEDIR}"; \
+	echo "Testing rerun from $${MYDIR} ..."; \
+	export RERUN="$${MYDIR}rerun"; \
+	export RERUN_MODULES="$${MYDIR}modules"; \
+	export LC_ALL="C"; \
+	export PATH="$${RERUN_MODULES}/stubbs/bin:$${PATH}"; \
+	for i in $${MYDIR}tests/*-test.sh; \
+	do \
+	  $${i}; \
+	done
 test-stubbs:
-	@echo "Testing stubbs module..."
-	./rerun stubbs:test --module stubbs
+	if [ -d tests ]; \
+	  then export MYDIR="$${PWD}"; \
+	  else export MYDIR="$${PWD}/.."; \
+	fi; \
+	echo "Testing stubbs module..."; \
+	export RERUN=$${MYDIR}/rerun; \
+	export RERUN_MODULES=$${MYDIR}/modules; \
+	export LC_ALL=C; \
+	$${MYDIR}/rerun stubbs:test --module stubbs
 
+#unset RERUN_COLOR
 #
 # RPM packaging target (defaulting the release if none specified externally):
 #

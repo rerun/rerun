@@ -9,9 +9,9 @@ README file is not used, README.md is the file to READ!
 http://ubuntuincident.wordpress.com/2011/05/05/readme-markdown-on-github/
 
 You'll probably have to install automake/automconf/rpmdevtools
-("yum install automake" in a CentOS/Red Hat box).
+("yum install automake rpmdevtools" in a CentOS/Red Hat box).
 
 When you checkout the file, run "setup.sh" which gets autoconf initialized.
 Then follow the instructions in INSTALL.  Real standard stuff...
 
-Use 'make rpm' to create an RPM for your platform.
+Use 'make rpm' to create an RPM for your platform after you've run setup.sh.
