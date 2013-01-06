@@ -208,6 +208,9 @@ rpm:
 	mkdir -p rpm/SOURCES rpm/BUILD rpm/RPMS rpm/SPECS rpm/tmp
 	cp -f rerun-${VERSION}.tar.gz rpm/SOURCES/rerun-${VERSION}.tar.gz
 	rpmbuild -tb --target noarch \
+		--define "major `echo ${VERSION} | cut -d. -f1`" \
+		--define "minor `echo ${VERSION} | cut -d. -f2`" \
+		--define "revision `echo ${VERSION} | cut -d. -f3`" \
 		--define "_topdir ${PWD}/rpm" \
 		--define "_tmppath ${PWD}/rpm/tmp" \
 		--define "version ${VERSION}" \
