@@ -196,8 +196,15 @@ buildrpmarchive() {
         REQUIRES="$REQUIRES,$EXTERNALS"
       fi
 
+      # get the Distribution
+      if [[ "$(uname -s)" = "Darwin" ]]; then
+        RPMDIST=".osx"
+      else
+        RPMDIST=$(rpm --eval %{?dist})
+      fi
+
       # Remove any existing builds:
-      rm -f $MODULE_DIR/rerun-${NAME}-*-*.noarch.rpm
+      rm -f $MODULE_DIR/rerun-${NAME}*.noarch.rpm
 
       # Prepare the source archive hierarchy:
       mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
@@ -224,12 +231,12 @@ buildrpmarchive() {
         --define "minor ${MINOR_VERSION}" \
         --define "revision ${REVISION_VERSION}" \
         ${RERUN_MODULE_DIR}/templates/rerun-module.spec.txt \
-      || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
+      || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Move the RPM:
-      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}*.noarch.rpm . \
-        || rerun_die "failed to move rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
-      echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
+      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm . \
+        || rerun_die "failed to move rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
+      echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
       /bin/rm -rf ${RPMTOPDIR}
