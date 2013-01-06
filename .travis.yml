@@ -2,4 +2,4 @@ language: cpp
 compiler:
   - gcc
   - clang
-script: ./test.sh
+script: ./etc/travis-ci.sh
