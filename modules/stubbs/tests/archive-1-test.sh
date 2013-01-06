@@ -74,7 +74,12 @@ it_builds_the_stubbs_module_rpm() {
     then
         :; # ok run the test
     else
-        return 0; # bail out of the test.
+        if [[ "$(uname -s)" = "Darwin" && -x /opt/local/bin/rpmbuild ]]
+        then
+            :; # ok run the test, macports rpm installed
+        else
+            return 0; # bail out of the test.
+        fi
     fi
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR

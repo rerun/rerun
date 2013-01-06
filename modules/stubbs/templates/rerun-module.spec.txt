@@ -5,10 +5,19 @@
 # for %{module}, %{desc}, %{version} and %{requires} from the module metadata,
 # and %{release} from the command line:
 #
+
+%ifos darwin
+%define dist            .osx
+%define _prefix         /opt/rpm
+%define _sysconfdir     /opt/rpm/etc
+%define _tmppath	%{_topdir}/tmp
+%endif
+%define moddir          %{_prefix}/lib/rerun/modules
+
 Summary: Rerun %{module} module
 Name: rerun-%{module}
 Version: %{version}
-Release: %{release}
+Release: %{release}%{?dist}
  
 License: ASL 2.0
 Group: Applications/System
@@ -34,14 +43,14 @@ Provides: rerun-%{module} = %{major}, rerun-%{module} = %{major}.%{minor}, rerun
 %install
 echo "Building in: \"%{buildroot}\""
 rm -rf %{buildroot}
-install -d -m 755 %{buildroot}/usr/lib/rerun/modules/%{module}
-mv %{_builddir}/rerun-%{module}-%{version}/* %{buildroot}/usr/lib/rerun/modules/%{module}
+install -d -m 755 %{buildroot}%{moddir}/%{module}
+mv %{_builddir}/rerun-%{module}-%{version}/* %{buildroot}%{moddir}/%{module}
 
 %clean
 
 %files
 %defattr(-,root,root)
-/usr/lib/rerun/modules/%{module}
+%{moddir}/%{module}
  
 %changelog
 

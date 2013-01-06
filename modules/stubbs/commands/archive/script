@@ -83,7 +83,7 @@ buildbinarchive() {
       # Check for a commands subdir to be sure it looks like a module
       if [ -d $RERUN_MODULES/$module/commands ]
       then
-	cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
+        cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
       fi
   done
   popd >/dev/null
@@ -96,11 +96,11 @@ buildbinarchive() {
   do
       # replace the template substitution tokens ...
       sed -e "s/@GENERATOR@/stubbs:archive/" \
-	  -e "s/@DATE@/$(date)/" \
-	  -e "s/@USER@/$USER/" \
-	  -e "s/@VERSION@/$VERSION/" \
-	  -e "s/@RELEASE@/$RELEASE/" \
-	  $template > $PAYLOAD/$(basename $template) || rerun_die
+          -e "s/@DATE@/$(date)/" \
+          -e "s/@USER@/$USER/" \
+          -e "s/@VERSION@/$VERSION/" \
+          -e "s/@RELEASE@/$RELEASE/" \
+          $template > $PAYLOAD/$(basename $template) || rerun_die
       # ... and save it to the payload --^
   done
 
@@ -118,10 +118,10 @@ buildbinarchive() {
       gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
 
       if [ -e "payload.tgz.base64" ]; then
-	  #
-	  # Prepend the extract script to the payload.
-	  #    and thus turn the thing into a shell script!
-	  #
+          #
+          # Prepend the extract script to the payload.
+          #    and thus turn the thing into a shell script!
+          #
           cat extract payload.tgz.base64 > ${FILE} || rerun_die
       else
           rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
@@ -147,79 +147,93 @@ buildrpmarchive() {
 
   for MODULE_DIR in $RERUN_MODULES/$MODULES
   do
-     if [[ -r $MODULE_DIR/metadata ]]
-     then
-       # Setup a temporary directory to build the RPM:
-       RPMTOPDIR=$(/bin/mktemp -d) || rerun_die "couldn't make a temporary directory to build the rpm"
-       mkdir $RPMTOPDIR/SOURCES || rerun_die
-       mkdir $RPMTOPDIR/BUILD || rerun_die
-       mkdir $RPMTOPDIR/RPMS || rerun_die
+    if [[ -r $MODULE_DIR/metadata ]]
+    then
+      # Setup a temporary directory to build the RPM:
+      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs:rpm.XXXXXX) || rerun_die "couldn't make a temporary directory to build the rpm"
+      mkdir $RPMTOPDIR/SOURCES || rerun_die
+      mkdir $RPMTOPDIR/BUILD || rerun_die
+      mkdir $RPMTOPDIR/RPMS || rerun_die
 
-       # Source the module metadata:
-       unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
-       . $MODULE_DIR/metadata
+      # Source the module metadata:
+      unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
+      . $MODULE_DIR/metadata
 
-       [[ -n $NAME ]] || rerun_die "no module name in \"$MODULE_DIR/metadata\""
-       [[ -n $DESCRIPTION ]] || rerun_die "no description in \"$MODULE_DIR/metadata\""
+      [[ -n $NAME ]] || rerun_die "no module name in \"$MODULE_DIR/metadata\""
+      [[ -n $DESCRIPTION ]] || rerun_die "no description in \"$MODULE_DIR/metadata\""
 
-       if [[ -z $VERSION ]]
-       then
-         rerun_die "no version in \"$MODULE_DIR/metadata\""
-       fi
+      if [[ -z $VERSION ]]
+      then
+        rerun_die "no version in \"$MODULE_DIR/metadata\""
+      fi
 
-       # Extract the module's major version number:
-       MAJOR_VERSION="$(echo $VERSION | cut -d. -f1)"
-       MINOR_VERSION="$(echo $VERSION | cut -d. -f2)"
-       REVISION_VERSION="$(echo $VERSION | cut -d. -f3)"
+      # Extract the module's major version number:
+      MAJOR_VERSION="$(echo $VERSION | cut -d. -f1)"
+      MINOR_VERSION="$(echo $VERSION | cut -d. -f2)"
+      REVISION_VERSION="$(echo $VERSION | cut -d. -f3)"
 
-       [[ -z $MAJOR_VERSION || -z $MINOR_VERSION || -z $REVISION_VERSION ]] && rerun_die "module version (\"$VERSION\") should be of the form \"major.minor.revision\""
+      [[ -z $MAJOR_VERSION || -z $MINOR_VERSION || -z $REVISION_VERSION ]] && rerun_die "module version (\"$VERSION\") should be of the form \"major.minor.revision\""
 
-       # Extract Rerun's major version number:
-       RERUN_MAJOR_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
+      # Extract Rerun's major version number:
+      RERUN_MAJOR_VERSION="$(echo $RERUN_VERSION | cut -d. -f1)"
 
-       # Backwards compatibility is guaranteed to the minor version:
-       if [[ ${MAJOR_VERSION} -ne ${RERUN_MAJOR_VERSION} ]]
-       then
-         rerun_die "the module's major version number (\"${MAJOR_VERSION}\") must match the major number (\"${RERUN_MAJOR_VERSION}\") of the version of Rerun being used to build the archive"
-       fi
+      # Backwards compatibility is guaranteed to the minor version:
+      if [[ ${MAJOR_VERSION} -ne ${RERUN_MAJOR_VERSION} ]]
+      then
+        rerun_die "the module's major version number (\"${MAJOR_VERSION}\") must match the major number (\"${RERUN_MAJOR_VERSION}\") of the version of Rerun being used to build the archive"
+      fi
 
-       if [[ -z $REQUIRES ]]
-       then
-         REQUIRES="rerun = $RERUN_MAJOR_VERSION"
-       else
-         # Enforces specified module dependencies at the major version number:
-         REQUIRES="rerun = $RERUN_MAJOR_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e "s/\([^,]*\)/rerun-\1 = ${MAJOR_VERSION}/g")"
-       fi
+      if [[ -z $REQUIRES ]]
+      then
+        REQUIRES="rerun = $RERUN_MAJOR_VERSION"
+      else
+        # Enforces specified module dependencies at the major version number:
+        REQUIRES="rerun = $RERUN_MAJOR_VERSION,$(echo $REQUIRES | sed -e 's/[ \t]*//g' -e "s/\([^,]*\)/rerun-\1 = ${MAJOR_VERSION}/g")"
+      fi
 
-       if [[ -n $EXTERNALS ]]
-       then
-         REQUIRES="$REQUIRES,$EXTERNALS"
-       fi
+      if [[ -n $EXTERNALS ]]
+      then
+        REQUIRES="$REQUIRES,$EXTERNALS"
+      fi
 
-       # Remove any existing builds:
-       rm -f $MODULE_DIR/rerun-${NAME}-*-*.noarch.rpm
+      # Remove any existing builds:
+      rm -f $MODULE_DIR/rerun-${NAME}-*-*.noarch.rpm
 
-       # Prepare the source archive hierarchy:
-       mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
-       pushd $MODULE_DIR > /dev/null
-       /usr/bin/find | /bin/cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
-       popd > /dev/null
+      # Prepare the source archive hierarchy:
+      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
+      mkdir $RPMTOPDIR/tmp || rerun_die
+      pushd $MODULE_DIR > /dev/null
+      /usr/bin/find . | /usr/bin/cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+      popd > /dev/null
 
-       # Build the source archive:
-       pushd $RPMTOPDIR/SOURCES > /dev/null
-       /bin/tar -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz rerun-${NAME}-${VERSION} || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
-       popd > /dev/null
+      # Build the source archive:
+      pushd $RPMTOPDIR/SOURCES > /dev/null
+      /usr/bin/tar -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz rerun-${NAME}-${VERSION} || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
+      popd > /dev/null
 
-       # Build the RPM:
-       /usr/bin/rpmbuild --quiet --buildroot ${RPMTOPDIR}/BUILDROOT/rerun-${NAME}-${VERSION}-${RELEASE}.noarch --target noarch --define "_topdir $RPMTOPDIR" --define "module ${NAME}" --define "desc $DESCRIPTION" --define "version $VERSION" --define "release $RELEASE" --define "requires $REQUIRES" --define "major $MAJOR_VERSION" --define "minor $MINOR_VERSION" --define "revision $REVISION_VERSION" -bb $RERUN_MODULE_DIR/templates/rerun-module.spec || rerun_die "failed to build rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+      # Build the RPM:
+      rpmbuild -bb \
+        --target noarch \
+        --define "_topdir ${RPMTOPDIR}" \
+        --define "module ${NAME}" \
+        --define "desc ${DESCRIPTION}" \
+        --define "version ${VERSION}" \
+        --define "release ${RELEASE}" \
+        --define "requires ${REQUIRES}" \
+        --define "major ${MAJOR_VERSION}" \
+        --define "minor ${MINOR_VERSION}" \
+        --define "revision ${REVISION_VERSION}" \
+        ${RERUN_MODULE_DIR}/templates/rerun-module.spec.txt \
+      || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
 
-       # Move the RPM:
-       /bin/mv $RPMTOPDIR/RPMS/noarch/rerun-$NAME-$VERSION-$RELEASE.noarch.rpm . || rerun_die "failed to move rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
-       echo "Wrote $(basename $MODULE_DIR) module rpm : rerun-$NAME-$VERSION-$RELEASE.noarch.rpm"
+      # Move the RPM:
+      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}*.noarch.rpm . \
+        || rerun_die "failed to move rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
+      echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}.noarch.rpm"
 
-       # Clean up the temporary directory:
-       /bin/rm -rf $RPMTOPDIR
-     fi
+      # Clean up the temporary directory:
+      /bin/rm -rf ${RPMTOPDIR}
+    fi
   done
 }
 case $FORMAT in
