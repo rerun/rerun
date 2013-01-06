@@ -3,8 +3,16 @@
 # users who use OS's that are RPM based but don't have rerun 
 # provided by the OS team's YUM repos.  
 #
-Summary: Dance your way through standard operating procedure
+
+# this seems to get rpm working on OSX with rpm 5.1.9
+%ifos darwin
+%define dist		.osx
+%define _prefix		/opt/rpm
+%define _sysconfdir	/opt/rpm/etc
+%endif
+
 Name: rerun
+Summary: Rerun is a structured approach to bash scripting
 Version: %{version}
 Release: %{release}%{?dist}
 Source0: rerun-%{version}.tar.gz
@@ -28,7 +36,7 @@ A simple command runner because it's easy to forget standard operating procedure
 %setup
 
 %build
-./configure --prefix=/usr --sysconfdir=/etc
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
 make
 
 %install
@@ -155,7 +163,6 @@ rm -rf ${buildroot}
 %{_libexecdir}/rerun/tests/rerun-0-test.sh
 %{_libexecdir}/rerun/tests/rerun-1-test.sh
 %{_libexecdir}/rerun/tests/rerun-2-test.sh
-%{_libexecdir}/rerun/tests/rerun-3-test.sh
 %{_libexecdir}/rerun/tests/rerun-4-test.sh
 
 %changelog

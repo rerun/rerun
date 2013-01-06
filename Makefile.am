@@ -205,7 +205,12 @@ RELEASE ?= 1
 
 rpm:
 	@echo "Packaging rerun as an RPM ..."
-	mkdir -p rpm/SOURCES rpm/BUILD rpm/BUILDROOT rpm/RPMS
+	mkdir -p rpm/SOURCES rpm/BUILD rpm/RPMS rpm/SPECS rpm/tmp
 	cp -f rerun-${VERSION}.tar.gz rpm/SOURCES/rerun-${VERSION}.tar.gz
-	rpmbuild -tb --target noarch --define "_topdir ${PWD}/rpm" --define "version ${VERSION}" --define "release ${RELEASE}" rpm/SOURCES/rerun-${VERSION}.tar.gz
+	rpmbuild -tb --target noarch \
+		--define "_topdir ${PWD}/rpm" \
+		--define "_tmppath ${PWD}/rpm/tmp" \
+		--define "version ${VERSION}" \
+		--define "release ${RELEASE}" \
+		rpm/SOURCES/rerun-${VERSION}.tar.gz
 	find rpm/RPMS/ -name "*.rpm" -exec mv {} ./ \;
