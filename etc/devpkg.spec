@@ -59,6 +59,9 @@ rm -rf ${buildroot}
 
 %files
 %defattr(-,root,root,-)
+# TODO: these need to be 755 after bug 147 is fixed
+%dir %{_prefix}/lib/rerun/modules
+%dir %{_prefix}/lib/rerun/modules/stubbs/tests
 %{_bindir}/rerun
 %{_sysconfdir}/bash_completion.d/rerun
 %{_datadir}/doc/rerun/AUTHORS
@@ -179,59 +182,57 @@ rm -rf ${buildroot}
 %ifos darwin
 %dir /
 %dir /opt
-%dir /opt/rpm
-%dir /opt/rpm/bin
-%dir /opt/rpm/etc
-%dir /opt/rpm/etc/bash_completion.d
-%dir /opt/rpm/lib
-%dir /opt/rpm/lib/rerun
-%dir /opt/rpm/lib/rerun/modules
-%dir /opt/rpm/lib/rerun/modules/stubbs
-%dir /opt/rpm/lib/rerun/modules/stubbs/bin
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-command
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-module
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-option
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/archive
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/docs
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/edit
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/migrate
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/rm-option
-%dir /opt/rpm/lib/rerun/modules/stubbs/commands/test
-%dir /opt/rpm/lib/rerun/modules/stubbs/lib
-%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub
-%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub/bash
-%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub/bash/templates
-%dir /opt/rpm/lib/rerun/modules/stubbs/options
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/answers
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/arg
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/command
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/default
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/description
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/dir
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/export
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/file
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/format
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/long
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/module
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/modules
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/option
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/overwrite
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/plan
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/range
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/release
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/required
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/short
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/template
-%dir /opt/rpm/lib/rerun/modules/stubbs/options/version
-%dir /opt/rpm/lib/rerun/modules/stubbs/templates
-%dir /opt/rpm/lib/rerun/modules/stubbs/tests
-%dir /opt/rpm/libexec
-%dir /opt/rpm/libexec/rerun
-%dir /opt/rpm/libexec/rerun/tests
-%dir /opt/rpm/share
-%dir /opt/rpm/share/doc
-%dir /opt/rpm/share/doc/rerun
+%dir %{_prefix}
+%dir %{_prefix}/bin
+%dir %{_prefix}/etc
+%dir %{_prefix}/etc/bash_completion.d
+%dir %{_prefix}/lib
+%dir %{_prefix}/lib/rerun
+%dir %{_prefix}/lib/rerun/modules/stubbs
+%dir %{_prefix}/lib/rerun/modules/stubbs/bin
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/add-command
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/add-module
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/add-option
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/archive
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/docs
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/edit
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/migrate
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/rm-option
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/test
+%dir %{_prefix}/lib/rerun/modules/stubbs/lib
+%dir %{_prefix}/lib/rerun/modules/stubbs/lib/stub
+%dir %{_prefix}/lib/rerun/modules/stubbs/lib/stub/bash
+%dir %{_prefix}/lib/rerun/modules/stubbs/lib/stub/bash/templates
+%dir %{_prefix}/lib/rerun/modules/stubbs/options
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/answers
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/arg
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/command
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/default
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/description
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/dir
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/export
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/file
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/format
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/long
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/module
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/modules
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/option
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/overwrite
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/plan
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/range
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/release
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/required
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/short
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/template
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/version
+%dir %{_prefix}/lib/rerun/modules/stubbs/templates
+%dir %{_prefix}/libexec
+%dir %{_prefix}/libexec/rerun
+%dir %{_prefix}/libexec/rerun/tests
+%dir %{_prefix}/share
+%dir %{_prefix}/share/doc
+%dir %{_prefix}/share/doc/rerun
 %endif
 
 %changelog
