@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.0.0
+RERUN_VERSION=1.0.1
 
 # To disable color effects: `unset RERUN_COLOR`.
 

@@ -21,11 +21,17 @@ URL: http://rerun.github.com/rerun
 
 License: ASL 2.0
 Group: Applications/System
+# Disable automatic dependency discovery
+AutoReqProv: no
 #   Removing dependency on bash just in case some distro provides
 #   somthing like bash4...
 #Requires: bash
 Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}.%{revision}
-
+%ifos darwin
+Provides: /bin/sh, rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}.%{revision}
+%else
+Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}.%{revision}
+%endif
 # Disables debug packages and stripping of binaries:
 %global _enable_debug_package 0
 %global debug_package %{nil}
@@ -45,12 +51,14 @@ make
 %install
 echo "Installing to: \"${buildroot}\""
 make install DESTDIR=%{buildroot}
+# TODO: remove after issue 147 fixed
+chmod 777 %{buildroot}%{_prefix}/lib/rerun/modules %{buildroot}%{moddir}/tests
 
 %clean
 rm -rf ${buildroot}
 
 %files
-%defattr(-,root,root)
+%defattr(-,root,root,-)
 %{_bindir}/rerun
 %{_sysconfdir}/bash_completion.d/rerun
 %{_datadir}/doc/rerun/AUTHORS
@@ -167,6 +175,64 @@ rm -rf ${buildroot}
 %{_libexecdir}/rerun/tests/rerun-1-test.sh
 %{_libexecdir}/rerun/tests/rerun-2-test.sh
 %{_libexecdir}/rerun/tests/rerun-4-test.sh
+
+%ifos darwin
+%dir /
+%dir /opt
+%dir /opt/rpm
+%dir /opt/rpm/bin
+%dir /opt/rpm/etc
+%dir /opt/rpm/etc/bash_completion.d
+%dir /opt/rpm/lib
+%dir /opt/rpm/lib/rerun
+%dir /opt/rpm/lib/rerun/modules
+%dir /opt/rpm/lib/rerun/modules/stubbs
+%dir /opt/rpm/lib/rerun/modules/stubbs/bin
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-command
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-module
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/add-option
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/archive
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/docs
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/edit
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/migrate
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/rm-option
+%dir /opt/rpm/lib/rerun/modules/stubbs/commands/test
+%dir /opt/rpm/lib/rerun/modules/stubbs/lib
+%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub
+%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub/bash
+%dir /opt/rpm/lib/rerun/modules/stubbs/lib/stub/bash/templates
+%dir /opt/rpm/lib/rerun/modules/stubbs/options
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/answers
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/arg
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/command
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/default
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/description
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/dir
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/export
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/file
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/format
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/long
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/module
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/modules
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/option
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/overwrite
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/plan
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/range
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/release
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/required
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/short
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/template
+%dir /opt/rpm/lib/rerun/modules/stubbs/options/version
+%dir /opt/rpm/lib/rerun/modules/stubbs/templates
+%dir /opt/rpm/lib/rerun/modules/stubbs/tests
+%dir /opt/rpm/libexec
+%dir /opt/rpm/libexec/rerun
+%dir /opt/rpm/libexec/rerun/tests
+%dir /opt/rpm/share
+%dir /opt/rpm/share/doc
+%dir /opt/rpm/share/doc/rerun
+%endif
 
 %changelog
 

@@ -171,31 +171,40 @@ uninstall-local:
 test: check
 check: test-rerun test-stubbs
 
-# need to take unusual measures to defend against "distcheck"
-# running in the _build directory which is separate from the
-# source code.
+# TODO: Until issue 147 https://github.com/rerun/rerun/issues/147 is
+# dealt with, we need to open up the write priv for the modules directory
 test-rerun:
-	if [ ! -d tests ]; then export MYBASEDIR="../"; fi; \
-	MYDIR="./$${MYBASEDIR}"; \
-	echo "Testing rerun from $${MYDIR} ..."; \
-	export RERUN="$${MYDIR}rerun"; \
-	export RERUN_MODULES="$${MYDIR}modules"; \
+	echo "Testing rerun from $(srcdir) ..."
+	export RERUN="$(srcdir)/rerun"; \
+	export RERUN_MODULES="$(srcdir)/modules"; \
 	export LC_ALL="C"; \
 	export PATH="$${RERUN_MODULES}/stubbs/bin:$${PATH}"; \
-	for i in $${MYDIR}tests/*-test.sh; \
+	if [ ! -w $${RERUN_MODULES} ]; then \
+		CLEANUPDIRS="true"; \
+		chmod u+w $${RERUN_MODULES}; \
+	fi; \
+	set -e; \
+	for i in $(srcdir)/tests/*-test.sh; \
 	do \
 	  $${i}; \
-	done
+	done; \
+	if [[ "$${CLEANUPDIRS}" = "true" ]]; then chmod u-w $${RERUN_MODULES}; fi
 test-stubbs:
-	if [ -d tests ]; \
-	  then export MYDIR="$${PWD}"; \
-	  else export MYDIR="$${PWD}/.."; \
-	fi; \
 	echo "Testing stubbs module..."; \
-	export RERUN=$${MYDIR}/rerun; \
-	export RERUN_MODULES=$${MYDIR}/modules; \
-	export LC_ALL=C; \
-	$${RERUN} stubbs:test --module stubbs
+	if [[ "$(srcdir)" = "/*" ]]; then MYDIR="$(srcdir)"; else MYDIR="${PWD}/$(srcdir)"; fi; \
+	export RERUN="$${MYDIR}/rerun"; \
+	export RERUN_MODULES="$${MYDIR}/modules"; \
+	export LC_ALL="C"; \
+	echo "    modules at $${RERUN_MODULES}"; \
+	if [ ! -w $${RERUN_MODULES} ]; then \
+		CLEANUPDIRS="true"; \
+		chmod u+w $${RERUN_MODULES} $${RERUN_MODULES}/stubbs/tests; \
+	fi; \
+	set -e; \
+	$${RERUN} stubbs:test --module stubbs; \
+	if [[ "$${CLEANUPDIRS}" = "true" ]]; then \
+		chmod u-w $${RERUN_MODULES} $${RERUN_MODULES}/stubbs/tests; \
+	fi
 
 #unset RERUN_COLOR
 #
@@ -205,7 +214,8 @@ RELEASE ?= 1
 
 rpm:
 	@echo "Packaging rerun as an RPM ..."
-	mkdir -p rpm/SOURCES rpm/BUILD rpm/RPMS rpm/SPECS rpm/tmp
+	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD \
+		$(builddir)/rpm/RPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
 	cp -f rerun-${VERSION}.tar.gz rpm/SOURCES/rerun-${VERSION}.tar.gz
 	rpmbuild -tb --target noarch \
 		--define "major `echo ${VERSION} | cut -d. -f1`" \
@@ -215,5 +225,5 @@ rpm:
 		--define "_tmppath ${PWD}/rpm/tmp" \
 		--define "version ${VERSION}" \
 		--define "release ${RELEASE}" \
-		rpm/SOURCES/rerun-${VERSION}.tar.gz
-	find rpm/RPMS/ -name "*.rpm" -exec mv {} ./ \;
+		$(builddir)/rpm/SOURCES/rerun-${VERSION}.tar.gz
+	find $(builddir)/rpm/RPMS/ -name "*.rpm" -exec mv {} ./ \;

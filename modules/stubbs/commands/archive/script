@@ -69,7 +69,7 @@ buildbinarchive() {
   [ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
 
   # create a work directory the archive content
-  export PAYLOAD=`mktemp -d /tmp/rerun.stubbs:archive.XXXXXX` || rerun_die
+  export PAYLOAD=`mktemp -d /tmp/rerun.stubbs.archive.XXXXXX` || rerun_die
 
   #
   # Start preparing the payload content.
@@ -150,7 +150,7 @@ buildrpmarchive() {
     if [[ -r $MODULE_DIR/metadata ]]
     then
       # Setup a temporary directory to build the RPM:
-      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs:rpm.XXXXXX) || rerun_die "couldn't make a temporary directory to build the rpm"
+      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX) || rerun_die "couldn't make a temporary directory to build the rpm"
       mkdir $RPMTOPDIR/SOURCES || rerun_die
       mkdir $RPMTOPDIR/BUILD || rerun_die
       mkdir $RPMTOPDIR/RPMS || rerun_die
