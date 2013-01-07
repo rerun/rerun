@@ -26,7 +26,6 @@ AutoReqProv: no
 #   Removing dependency on bash just in case some distro provides
 #   somthing like bash4...
 #Requires: bash
-Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}.%{revision}
 %ifos darwin
 Provides: /bin/sh, rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}.%{revision}
 %else
