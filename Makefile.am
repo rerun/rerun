@@ -102,7 +102,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/stubbs.1 \
 	modules/stubbs/templates/extract \
 	modules/stubbs/templates/launcher \
-	modules/stubbs/templates/rerun-module.spec.txt \
+	modules/stubbs/templates/rerun-module.spec \
 	modules/stubbs/templates/test.functions.sh \
 	modules/stubbs/templates/test.roundup
 
@@ -216,8 +216,8 @@ rpm:
 	@echo "Packaging rerun as an RPM ..."
 	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD \
 		$(builddir)/rpm/RPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
-	cp -f rerun-${VERSION}.tar.gz rpm/SOURCES/rerun-${VERSION}.tar.gz
-	rpmbuild -tb --target noarch \
+	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/rpm/SOURCES/
+	rpmbuild -ba --target noarch \
 		--define "major `echo ${VERSION} | cut -d. -f1`" \
 		--define "minor `echo ${VERSION} | cut -d. -f2`" \
 		--define "revision `echo ${VERSION} | cut -d. -f3`" \
@@ -225,5 +225,5 @@ rpm:
 		--define "_tmppath ${PWD}/rpm/tmp" \
 		--define "version ${VERSION}" \
 		--define "release ${RELEASE}" \
-		$(builddir)/rpm/SOURCES/rerun-${VERSION}.tar.gz
-	find $(builddir)/rpm/RPMS/ -name "*.rpm" -exec mv {} ./ \;
+		$(srcdir)/etc/devpkg.spec
+	find $(builddir)/rpm/{RPMS,SRPMS}/ -name "*.rpm" -exec mv {} ./ \;

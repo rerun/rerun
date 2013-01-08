@@ -8,8 +8,8 @@
 
 %ifos darwin
 %define dist            .osx
-%define _prefix         /opt/rpm
-%define _sysconfdir     /opt/rpm/etc
+%define _prefix         /opt/rerun
+%define _sysconfdir     /opt/rerun/etc
 %define _tmppath	%{_topdir}/tmp
 %endif
 %define moddir          %{_prefix}/lib/rerun/modules
@@ -18,11 +18,15 @@ Summary: Rerun %{module} module
 Name: rerun-%{module}
 Version: %{version}
 Release: %{release}%{?dist}
+Source: rerun-%{module}-%{version}.tar.gz
+URL: http://rerun.github.com/rerun
+Packager: rerun-discuss@googlegroups.com
  
 License: ASL 2.0
 Group: Applications/System
+# Disable automatic dependency discovery
+AutoReqProv: no
 
-Source: rerun-%{module}-%{version}.tgz
 Requires: %{requires}
 Provides: rerun-%{module} = %{major}, rerun-%{module} = %{major}.%{minor}, rerun-%{module} = %{major}.%{minor}.%{revision}
 
@@ -30,12 +34,12 @@ Provides: rerun-%{module} = %{major}, rerun-%{module} = %{major}.%{minor}, rerun
 %global _enable_debug_package 0
 %global debug_package %{nil}
 %global __os_install_post %{nil}
+%define _binary_payload w7.lzdio
  
 %description
 %{desc}
 
 %prep
-
 %setup
 
 %build

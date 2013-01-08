@@ -72,11 +72,11 @@ it_handles_comands_using_quoted_arguments() {
 it_builds_the_stubbs_module_rpm() {
     if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
     then
-        MYDIST="$(rpm --eval %{?dist})"; # ok run the test
+        MYDIST="$(rpm --eval %{?dist})";
     else
         if [[ "$(uname -s)" = "Darwin" && -x /opt/local/bin/rpmbuild ]]
         then
-            MYDIST="osx"; # ok run the test, macports rpm installed
+            MYDIST=".osx"; # ok run the test, macports rpm installed
         else
             return 0; # bail out of the test.
         fi
