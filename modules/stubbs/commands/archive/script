@@ -215,7 +215,10 @@ buildrpmarchive() {
 
       # Build the source archive:
       pushd $RPMTOPDIR/SOURCES > /dev/null
-      /usr/bin/tar -zcf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz rerun-${NAME}-${VERSION} || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tgz\""
+      /usr/bin/tar -zcf \
+        $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz rerun-${NAME}-${VERSION} \
+        || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz\""
+      rm -rf ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
 
       # Build the RPM:
@@ -230,7 +233,7 @@ buildrpmarchive() {
         --define "major ${MAJOR_VERSION}" \
         --define "minor ${MINOR_VERSION}" \
         --define "revision ${REVISION_VERSION}" \
-        ${RERUN_MODULE_DIR}/templates/rerun-module.spec.txt \
+        ${RERUN_MODULE_DIR}/templates/rerun-module.spec \
       || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Move the RPM:

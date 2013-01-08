@@ -7,8 +7,8 @@
 # this seems to get rpm working on OSX with rpm 5.1.9
 %ifos darwin
 %define dist		.osx
-%define _prefix		/opt/rpm
-%define _sysconfdir	/opt/rpm/etc
+%define _prefix		/opt/rerun
+%define _sysconfdir	/opt/rerun/etc
 %endif
 %define moddir		%{_prefix}/lib/rerun/modules/stubbs
 
@@ -18,6 +18,7 @@ Version: %{version}
 Release: %{release}%{?dist}
 Source0: rerun-%{version}.tar.gz
 URL: http://rerun.github.com/rerun
+Packager: rerun-discuss@googlegroups.com
 
 License: ASL 2.0
 Group: Applications/System
@@ -36,11 +37,13 @@ Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}
 %global debug_package %{nil}
 %global __os_install_post %{nil}
 
+# Crank up the compression
+%define _binary_payload w7.lzdio
+
 %description
 A simple command runner because it's easy to forget standard operating procedure.
 
 %prep
-
 %setup
 
 %build
@@ -160,7 +163,7 @@ rm -rf ${buildroot}
 %{moddir}/stubbs.1
 %{moddir}/templates/extract
 %{moddir}/templates/launcher
-%{moddir}/templates/rerun-module.spec.txt
+%{moddir}/templates/rerun-module.spec
 %{moddir}/templates/test.functions.sh
 %{moddir}/templates/test.roundup
 %{moddir}/tests/add-command-1-test.sh
