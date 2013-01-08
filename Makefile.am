@@ -178,7 +178,6 @@ test-rerun:
 	export RERUN="$(srcdir)/rerun"; \
 	export RERUN_MODULES="$(srcdir)/modules"; \
 	export LC_ALL="C"; \
-	export PATH="$${RERUN_MODULES}/stubbs/bin:$${PATH}"; \
 	if [ ! -w $${RERUN_MODULES} ]; then \
 		CLEANUPDIRS="true"; \
 		chmod u+w $${RERUN_MODULES}; \
@@ -186,7 +185,7 @@ test-rerun:
 	set -e; \
 	for i in $(srcdir)/tests/*-test.sh; \
 	do \
-	  $${i}; \
+	  $${RERUN_MODULES}/stubbs/bin/roundup $${i}; \
 	done; \
 	if [[ "$${CLEANUPDIRS}" = "true" ]]; then chmod u-w $${RERUN_MODULES}; fi
 test-stubbs:
@@ -214,8 +213,8 @@ RELEASE ?= 1
 
 rpm:
 	@echo "Packaging rerun as an RPM ..."
-	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD \
-		$(builddir)/rpm/RPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
+	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD $(builddir)/rpm/RPMS \
+		$(builddir)/rpm/SRPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
 	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/rpm/SOURCES/
 	rpmbuild -ba --target noarch \
 		--define "major `echo ${VERSION} | cut -d. -f1`" \

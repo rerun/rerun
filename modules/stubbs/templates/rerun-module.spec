@@ -48,7 +48,7 @@ Provides: rerun-%{module} = %{major}, rerun-%{module} = %{major}.%{minor}, rerun
 echo "Building in: \"%{buildroot}\""
 rm -rf %{buildroot}
 install -d -m 755 %{buildroot}%{moddir}/%{module}
-if [ ! -w "%{_sourcedir}/rerun-%{module}-%{version}/metadata" ]; then
+if [ ! -w "%{_builddir}/rerun-%{module}-%{version}/metadata" ]; then
   # this happens in distcheck phase of autoconf
   chmod -R u+w %{_builddir}/rerun-%{module}-%{version} %{_sourcedir}/rerun-%{module}-%{version}
 fi
