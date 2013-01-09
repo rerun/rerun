@@ -27,6 +27,9 @@ export RERUN_MODULES=$PAYLOAD/rerun/modules
 # move into the current working directory
 cd $CWD || die "couldn't change to current working directory: $CWD"
 
+# add archive rerun script to path
+PATH=$PATH:$PAYLOAD/rerun
+
 # launch it!
 exec $PAYLOAD/rerun/rerun "$@"
 
