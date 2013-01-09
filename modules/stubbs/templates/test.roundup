@@ -1,19 +1,15 @@
 #!/usr/bin/env roundup
 #
-# This file contains the test plan for the `@COMMAND@` command.
-#    
 #/ usage:  rerun stubbs:test -m @MODULE@ -p @COMMAND@ [--answers <>]
 #
 
 # Helpers
-#
+# -------
 [[ -f ./functions.sh ]] && . ./functions.sh
 
 # The Plan
 # --------
-
 describe "@COMMAND@"
-
 
 # ------------------------------
 # Replace this test. 
