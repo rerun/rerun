@@ -211,7 +211,7 @@ test-stubbs:
 #
 RELEASE ?= 1
 
-rpm:
+rpm: dist
 	@echo "Packaging rerun as an RPM ..."
 	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD $(builddir)/rpm/RPMS \
 		$(builddir)/rpm/SRPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
@@ -226,3 +226,17 @@ rpm:
 		--define "release ${RELEASE}" \
 		$(srcdir)/etc/devpkg.spec
 	find $(builddir)/rpm/{RPMS,SRPMS}/ -name "*.rpm" -exec mv {} ./ \;
+
+release: rpm
+	echo "Releasing Rerun"
+	MYSVR="repository-stagrlee.forge.cloudbees.com/release"; \
+	echo -n "Enter cloudbees username and press [ENTER]: "; \
+	read name; \
+	echo -n "Enter cloudbees password and press [ENTER]: "; \
+	read pwd; \
+	for h in ${PACKAGE}-${VERSION}.{zip,tar.gz,tar.bz2}; do \
+	  curl -T $${h} https://$${name}:$${pwd}@$${MYSVR}/sources/${PACKAGE}/ ; \
+	done; \
+	for h in ${PACKAGE}-${VERSION}-1*.rpm; do \
+	  curl -T $${h} https://$${name}:$${pwd}@$${MYSVR}/rpms/${PACKAGE}/ ; \
+	done
