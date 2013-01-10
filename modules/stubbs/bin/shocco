@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # **shocco** is a quick-and-dirty, literate-programming-style documentation
 # generator written for and in __POSIX shell__. It borrows liberally from
 # [Docco][do], the original Q&D literate-programming-style doc generator.
