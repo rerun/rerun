@@ -11,7 +11,7 @@ use warnings;
 
 use Digest::MD5 qw(md5_hex);
 use vars qw($VERSION);
-$VERSION = '1.0.1';
+$VERSION = '1.0.0';
 # Tue 14 Dec 2004
 
 ## Disabled; causes problems under Perl 5.6.1:
@@ -1396,7 +1396,7 @@ you expected; (3) the output Markdown actually produced.
 
 See the readme file for detailed release notes for this version.
 
-1.0.1 - 14 Dec 2004
+1.0.0 - 14 Dec 2004
 
 1.0 - 28 Aug 2004
 
