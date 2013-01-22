@@ -210,12 +210,12 @@ buildrpmarchive() {
       mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
       mkdir $RPMTOPDIR/tmp || rerun_die
       pushd $MODULE_DIR > /dev/null
-      /usr/bin/find . | /usr/bin/cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+      find . | cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
 
       # Build the source archive:
       pushd $RPMTOPDIR/SOURCES > /dev/null
-      /usr/bin/tar -zcf \
+      tar -zcf \
         $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz rerun-${NAME}-${VERSION} \
         || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz\""
       if [ ! -w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/commands ]; then
