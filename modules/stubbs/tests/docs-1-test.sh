@@ -72,6 +72,6 @@ it_runs_fully_optioned() {
     validate_manpage "$DIR/stubbs.1"
     validate_webpages $DIR
 
-    rm -r "$DIR"
+    rm -rf ${DIR}
 }
 

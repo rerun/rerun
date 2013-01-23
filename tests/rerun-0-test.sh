@@ -19,25 +19,19 @@ rerun() {
     command $RERUN "$@"
 }
 
-before() {
-    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
-}
-
-after() {
-    rm ${OUT}
-}
-
 # The Plan
 # --------
 
 describe "rerun(0) Function library tests"
 
 it_can_be_sourced() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     . $RERUN > $OUT 
     ! test -s $OUT 
 
     test -n "$RERUN_VERSION"
     test -n "$RERUN"
+    rm ${OUT}
 }
 
 it_performs_rerun_die() {
@@ -244,6 +238,7 @@ it_performs_rerun_module_exists() {
 }
 
 it_performs_rerun_command_execute() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     make_freddy $RERUN_MODULES
 
     . $RERUN
@@ -259,7 +254,7 @@ it_performs_rerun_command_execute() {
     rerun_command_execute bogus xyz 2>&1 | grep "module not found: \"bogus\""
 
     rerun_command_execute freddy bogus 2>&1 | grep "command not found: \"freddy:bogus\""
-
+    rm ${OUT}
 }
 
 

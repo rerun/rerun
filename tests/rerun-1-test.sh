@@ -21,11 +21,6 @@ rerun() {
 
 before() {
     [ -z "$RERUN_MODULES" ] && die "RERUN_MODULES not set"
-    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
-}
-
-after() {
-    rm ${OUT}
 }
 
 # The Plan
@@ -54,24 +49,30 @@ it_displays_version_and_license() {
 }
 
 it_displays_modules_when_no_arguments() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     make_freddy $RERUN_MODULES
     rerun > $OUT
     head -1 $OUT | grep -q "Available modules" $OUT
+    rm ${OUT}
 }
 
 it_fails_with_nonexistent_module() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     (rerun phony -msg blar 2>&1) |tee $OUT
     test ${PIPESTATUS[0]} = 2; # syntax errors exit with 2
     grep 'module not found: "phony -msg blar"' $OUT
+    rm ${OUT}
 }
 
 
 it_displays_command_listing() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     make_freddy $RERUN_MODULES
     rerun freddy > $OUT
     head -1 $OUT | grep -q "Available commands in module"
     grep -q 'dance: "tell freddy to dance"' $OUT
     grep -q '\[ --jumps\|-j <3>]: "jump #num times"' $OUT
+    rm ${OUT}
 }
 
 it_runs_command_without_options() {
@@ -90,15 +91,19 @@ it_runs_command_with_option() {
 
 
 it_runs_command_with_verbosity() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     make_freddy $RERUN_MODULES
     rerun -v freddy:dance 2> $OUT
     grep -q "+ source" $OUT
     grep -q "+ echo 'jumps (3)'" $OUT
+    rm ${OUT}
 }
 
 it_runs_command_with_V_option() {
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
     make_freddy $RERUN_MODULES
     rerun -V freddy:dance 2> $OUT
     grep -q "+ OPT=freddy:dance" $OUT
     grep -q "+ exit 0" $OUT
+    rm ${OUT}
 }

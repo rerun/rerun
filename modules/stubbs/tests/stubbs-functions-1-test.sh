@@ -133,4 +133,6 @@ EOF
     
     ! grep freddy $moduledir/commands/*/script
     grep cloney $moduledir/commands/*/script
+
+    rm -rf ${moduledir}
 }

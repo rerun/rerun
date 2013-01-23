@@ -86,6 +86,6 @@ it_builds_the_stubbs_module_rpm() {
     rerun stubbs:archive --format rpm --modules stubbs --release 1
     rpm -qi -p rerun-stubbs-$(grep ^VERSION=  $RERUN_MODULES/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
     popd
-    rm -rf $TMPDIR
+    rm -rf ${TMPDIR}
 }
 

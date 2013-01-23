@@ -137,6 +137,8 @@ buildbinarchive() {
   #
   # Clean up the temp directory
   #
+  find ${PAYLOAD} -type d -exec chmod 755 {} \;
+  find ${PAYLOAD} -type f -exec chmod 644 {} \;
   rm -rf $PAYLOAD
 
 
