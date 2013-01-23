@@ -12,12 +12,13 @@ rerun() {
     command $RERUN -M $RERUN_MODULES "$@"
 }
 
+# Mock a module and command
 before() {
-    # Mock a module and command
     mkdir -p $RERUN_MODULES/freddy
     cat > $RERUN_MODULES/freddy/metadata <<EOF
 NAME=freddy
 EOF
+    mkdir -p $RERUN_MODULES/freddy/commands
     mkdir -p $RERUN_MODULES/freddy/commands/dance
     cat > $RERUN_MODULES/freddy/commands/dance/metadata <<EOF
 NAME=dance
@@ -28,13 +29,16 @@ EOF
 #/ usage:
 #/ rerun-variables:
 #/ option-variables:
-
 EOF
 }
 
+
+
 after() {
     # clean up the mock module
-    rm -r $RERUN_MODULES/freddy
+    if test -d $RERUN_MODULES/freddy
+    then rm -r $RERUN_MODULES/freddy
+    fi
 }
 
 validate() {
@@ -44,18 +48,11 @@ validate() {
     .  $RERUN_MODULES/freddy/options/jumps/metadata
     test -n "$NAME" -a $NAME = jumps 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
-    #
-
     # Check the option parser
     test -f $RERUN_MODULES/freddy/commands/dance/options.sh
-    grep -q "\-j\|\--jumps)" $RERUN_MODULES/freddy/commands/dance/options.sh
-
-    grep -q \
-        '[ -z "$JUMPS" ] && JUMPS="$(rerun_property_get $RERUN_MODULE_DIR/options/jumps DEFAULT)"' \
-        $RERUN_MODULES/freddy/commands/dance/options.sh
-        
-    grep -q '"missing required option: --jumps"' $RERUN_MODULES/freddy/commands/dance/options.sh
-
+    grep '\--jumps) rerun_option_check $# $1;' $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep '[ -z "$JUMPS" ]' $RERUN_MODULES/freddy/commands/dance/options.sh
+    grep '"missing required option: --jumps"' $RERUN_MODULES/freddy/commands/dance/options.sh
     grep '^#/ usage: '  $RERUN_MODULES/freddy/commands/dance/options.sh
     grep '^#/ option-variables:' $RERUN_MODULES/freddy/commands/dance/script
 
@@ -106,7 +103,6 @@ it_exports_option_variable() {
     rerun stubbs:add-option --module freddy --command dance \
         --option height --description "jump #height" --required false \
         --default 3 --export false
-
     validate
     # Check the command's option assignment
     OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
@@ -114,7 +110,6 @@ it_exports_option_variable() {
     test ${#OPTIONS[*]} = 2
     rerun_list_contains "jumps" "${OPTIONS[@]}"
     rerun_list_contains "height" "${OPTIONS[@]}"
-
     # Check the option metadata
     grep "EXPORT=true"  $RERUN_MODULES/freddy/options/jumps/metadata
     # Check the option parser
@@ -152,7 +147,6 @@ it_should_not_overquote_descriptions() {
         --option jumps --description "jump #num times" \
         --required true --export true --default 3
     # Check the description
-    
     DESC=$(awk -F= '/DESCRIPTION=.*/ {print $2}' \
         $RERUN_MODULES/freddy/options/jumps/metadata)
     test "$DESC" = '"jump #num times"'

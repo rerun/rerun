@@ -16,15 +16,15 @@ validate() {
     # Test archive is a plain file
     test -f $archive
     # Test archive is a bash script
-    file $archive | grep -q "bash"
+    file $archive | grep "bash"
     # Test shebang is correct
     test "$(head -1 $archive)" = '#!/usr/bin/env bash'
     # Test there is a version flag
-    grep -q "\-version" $archive
+    grep "\-version" $archive
     # Test their is a payload
-    grep -q "^__ARCHIVE_BELOW__" $archive
+    grep "^__ARCHIVE_BELOW__" $archive
     # Test openssl base64 is used
-    grep -q "openssl enc \-base64 \-d" $archive
+    grep "openssl enc \-base64 \-d" $archive
 }
 
 # The Plan
@@ -46,7 +46,7 @@ it_runs_fully_optioned() {
     validate /tmp/rerun.bin.$$
 
     # Test the version info exists
-    grep -q '^# archive-version: 1.0' /tmp/rerun.bin.$$
+    grep '^# archive-version: 1.0' /tmp/rerun.bin.$$
     
     rm /tmp/rerun.bin.$$
 }

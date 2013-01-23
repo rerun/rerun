@@ -15,11 +15,11 @@ validate_manpage() {
     doc=$1
     test -f $doc
 
-    file $doc | grep -q roff
-    grep -q '.TH stubbs 1' $doc
-    grep -q '.SH NAME' $doc
-    grep -q '.SH SYNOPSIS' $doc
-    grep -q '.SH COMMANDS' $doc
+    file $doc | grep roff
+    grep '.TH stubbs 1' $doc
+    grep '.SH NAME' $doc
+    grep '.SH SYNOPSIS' $doc
+    grep '.SH COMMANDS' $doc
 
 }
 

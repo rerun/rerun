@@ -368,8 +368,12 @@ stubbs_file_replace_str() {
         return 1 ;
     }
     local -r string=$1 replacewith=$2 file=$3
-    [[ ! -f "$file" ]] && rerun_die "File not found: $file"
-    printf ",s/$string/$replacewith/g\nw\nQ" | ed -s "$file" > /dev/null 2>&1
+    if [[ ! -f "$file" ]]
+    then rerun_die "File not found: $file"
+    fi
+    #printf ",s/$string/$replacewith/g\nw\nQ" | ed -s "$file" > /dev/null 2>&1
+    sed "s^$string^$replacewith^g" $file > /tmp/file.$$
+    mv /tmp/file.$$ $file
     return $?
 }
 
@@ -418,7 +422,7 @@ stubbs_module_clone() {
     #
     for file in ${files[*]:-}
     do
-        grep -q "$template_name" $file && {
+        grep "$template_name" $file >/dev/null && {
             stubbs_file_replace_str "$template_name" "$module_name" "$file"
         }
     done
