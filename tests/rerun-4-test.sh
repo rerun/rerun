@@ -46,6 +46,7 @@ EOF
     rerun --answers $modules/answers -M $modules freddy:dance > $OUT
     head -1 $OUT | grep -q "jumps ($$)" $OUT
     rm $OUT ${modules}/answers
+    rm -rf ${modules}/freddy
     rmdir ${modules}
 }
 
@@ -61,6 +62,7 @@ EOF
     rerun --answers $modules/answers -M $modules freddy:dance > $OUT
     head -1 $OUT | grep -q "jumps (3)" $OUT
     rm $OUT ${modules}/answers
+    rm -rf ${modules}/freddy
     rmdir ${modules}
 }
 
