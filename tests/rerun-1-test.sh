@@ -48,7 +48,7 @@ it_displays_usage() {
 it_displays_version_and_license() {
     rinfo=( $(rerun -help|grep Version:) )
     test "${rinfo[1]}" = "Version:"
-    test "${rinfo[2]}" = "1.0.1."
+    test "${rinfo[2]}" = "1.0.2."
     test "${rinfo[3]}" = "License:"
     test "${rinfo[4]}" = "Apache"
 }
