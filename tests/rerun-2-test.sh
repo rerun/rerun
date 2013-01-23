@@ -38,7 +38,9 @@ it_displays_modules_when_no_arguments() {
     make_freddy $modules
     rerun -M $modules > $OUT
     head -1 $OUT | grep -q "Available modules" $OUT
-    rm $OUT
+    rm ${OUT}
+    rm -rf ${modules}/freddy
+    rmdir ${modules}
 }
 
 it_displays_command_listing() {
@@ -49,24 +51,29 @@ it_displays_command_listing() {
     head -1 $OUT | grep -q "Available commands in module"
     grep -q 'study: "tell freddy to study"' $OUT
     grep -q '\[ --subject\|-s <math>]: "subject to study"' $OUT
+    rm ${OUT}
+    rm -rf ${modules}/freddy
+    rmdir ${modules}
 }
 
 it_runs_command_without_options() {
     modules=$(mktemp -d "/tmp/rerun.modules.XXXXX")
-    OUT=$modules/out.txt
     make_freddy $modules
     out=$(rerun -M $modules freddy:study)
     test "$out" = "studying (math)"
+    rm -rf ${modules}/freddy
+    rmdir ${modules}
 }
 
 it_runs_command_with_option() {
     modules=$(mktemp -d "/tmp/rerun.modules.XXXXX")
-    OUT=$modules/out.txt
     make_freddy $modules
     out=$(rerun -M $modules freddy:study --subject locking)
     test "$out" = "studying (locking)"
     out=$(rerun -M $modules freddy:study -s math)
     test "$out" = "studying (math)"
+    rm -rf ${modules}/freddy
+    rmdir ${modules}
 }
 
 

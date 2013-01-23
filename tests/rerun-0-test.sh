@@ -24,7 +24,7 @@ before() {
 }
 
 after() {
-    rm $OUT
+    rm ${OUT}
 }
 
 # The Plan
