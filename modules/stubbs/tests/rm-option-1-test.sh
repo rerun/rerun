@@ -40,9 +40,9 @@ validate() {
     ! test -f $RERUN_MODULES/freddy/options/jumps/metadata
     parser=$RERUN_MODULES/freddy/commands/dance/options.sh
     test -f $parser
-    ! grep -q "\-j\|\--jumps)" $parser 
-    ! grep -q '[ -z "$JUMPS" ] && JUMPS="1"' $parser
-    ! grep -q '"missing required option: --jumps"' $parser
+    ! grep "\-j\|\--jumps)" $parser 
+    ! grep '[ -z "$JUMPS" ] && JUMPS="1"' $parser
+    ! grep '"missing required option: --jumps"' $parser
     return $?
 }
 

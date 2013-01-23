@@ -97,7 +97,7 @@ buildbinarchive() {
       # replace the template substitution tokens ...
       sed -e "s/@GENERATOR@/stubbs:archive/" \
           -e "s/@DATE@/$(date)/" \
-          -e "s/@USER@/$USER/" \
+          -e "s/@USER@/${USER:-$LOGNAME}/" \
           -e "s/@VERSION@/$VERSION/" \
           -e "s/@RELEASE@/$RELEASE/" \
           $template > $PAYLOAD/$(basename $template) || rerun_die

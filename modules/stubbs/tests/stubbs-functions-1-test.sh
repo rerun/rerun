@@ -52,7 +52,7 @@ after() {
 # The Plan
 # --------
 
-describe "functions.sh"
+describe "stubbs-functions"
 
 
 it_performs_stubbs_option_commands() {

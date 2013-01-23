@@ -130,7 +130,7 @@ assignOptions() {
             -name \*.option -exec basename {} \;|sed 's/.option//') )
         #
         # Add an OPTIONS metadata key if necessary
-        grep -q "^OPTIONS="  $cmd_metadata || {
+        grep "^OPTIONS="  $cmd_metadata >/dev/null || {
             echo "OPTIONS=" >> $cmd_metadata
         }
         # Skip option assignment if there are no options

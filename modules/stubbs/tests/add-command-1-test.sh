@@ -32,7 +32,7 @@ validate() {
     test -f $RERUN_MODULES/freddy/commands/dance/script
     test -f $RERUN_MODULES/freddy/tests/functions.sh
     test -f $RERUN_MODULES/freddy/tests/dance-1-test.sh
-    grep -q '[[ -f ./functions.sh ]] && . ./functions.sh' \
+    grep '[[ -f ./functions.sh ]] && . ./functions.sh' \
         $RERUN_MODULES/freddy/tests/dance-1-test.sh
 }
 

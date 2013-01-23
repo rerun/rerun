@@ -439,7 +439,7 @@ rerun_property_get() {
     }
     local -r directory=$1 property=$2
     [[ ! -f ${directory}/metadata ]] && rerun_die "metadata not found: ${directory}/metadata"
-    grep -q "^$property=" ${directory}/metadata && {
+    grep "^$property=" ${directory}/metadata >/dev/null && {
         set +u
         ( . ${directory}/metadata ; 
             eval echo \$${property:-} )
@@ -480,7 +480,7 @@ rerun_property_set() {
     do
         local property=${1%=*} value=${1#*=}
 
-        if grep -q "^$property=" $directory/metadata
+        if grep "^$property=" $directory/metadata >/dev/null
         then 
             pattern=$(printf -- "-e s,%s=.*,%s=\"%s\"," $property $property "$value")
             [[ -z "${sed_patts:-}" ]] && sed_patts=( "$pattern" ) || sed_patts=( ${sed_patts[@]} "$pattern" )
