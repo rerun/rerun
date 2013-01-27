@@ -21,10 +21,11 @@ validate() {
     test "$(head -1 $archive)" = '#!/usr/bin/env bash'
     # Test there is a version flag
     grep "\-version" $archive
+    # Check for decoder comment.
+    grep '^# decoder:' $archive
     # Test their is a payload
     grep "^__ARCHIVE_BELOW__" $archive
-    # Test openssl base64 is used
-    grep "openssl enc \-base64 \-d" $archive
+
 }
 
 # The Plan
@@ -89,3 +90,21 @@ it_builds_the_stubbs_module_rpm() {
     rm -rf ${TMPDIR}
 }
 
+it_extracts_and_exits() {
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command says --description "none"
+    rerun stubbs:add-option --module freddy --command says --option msg \
+        --description none --required true --export false --default nothing
+    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+
+    /tmp/rerun.bin.$$ --extract /tmp/myextract.$$
+    test -d /tmp/myextract.$$
+    test -f /tmp/myextract.$$/launcher
+    test -d /tmp/myextract.$$/rerun
+    test -x /tmp/myextract.$$/rerun/rerun
+    test -d /tmp/myextract.$$/rerun/modules
+    test -d /tmp/myextract.$$/rerun/modules/freddy
+
+    rm -r /tmp/myextract.$$
+    rm /tmp/rerun.bin.$$
+}

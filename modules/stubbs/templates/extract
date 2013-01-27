@@ -3,30 +3,51 @@
 # extract - this is a self contained self extracting rerun 
 #
 # generator: @GENERATOR@
+# decoder: @DECODER@
 # date: @DATE@
 # user: @USER@
 # archive-version: @VERSION@
 # archive-release: @RELEASE@
 
-[ "$1" == '--archive-version-release' ] && {
-    vers=$(grep "^# archive-version:" $0|cut -f3 -d" ")
-    rel=$(grep  "^# archive-release:" $0|cut -f3 -d" ")
-    echo >&2 "${vers}-${rel}"
-    exit 0 ;
-}
 
 # Function to print error message and exit
 die() { echo "ERROR: $* " >&2 ; exit 1 ; }
 
+case "$1" in
+    --archive-version-release)
+        vers=$(grep "^# archive-version:" $0|cut -f3 -d" ")
+        rel=$(grep  "^# archive-release:" $0|cut -f3 -d" ")
+        echo >&2 "${vers}-${rel}"
+        exit 0 ;
+        ;;
+    --extract) EXTRACT_ONLY=true
+        PAYLOAD=$2
+        mkdir -p $PAYLOAD
+        shift;
+        ;;
+esac
+
+
+
 umask 0002
 
 # extracted payload goes in here
-export PAYLOAD=`mktemp -d /tmp/rerun.bin.XXXXXX` || die "failed making payload extraction directory"
+: ${PAYLOAD:=`mktemp -d /tmp/rerun.bin.XXXXXX`} || die "failed making payload extraction directory"
+export PAYLOAD
 
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
+cat $0                            | 
+sed -e '1,/^__ARCHIVE_BELOW__/ d' | 
+@DECODER@                         | 
+(cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
 
-cat $0 | sed -e '1,/^__ARCHIVE_BELOW__/ d'| openssl enc -base64 -d  | (cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
+#
+# Exit now if the --extract flag was set.
+#
+if [[ -n "$EXTRACT_ONLY" ]]
+then exit $? 
+fi
 
 # CWD and TMDIR are passed to launcher as env variables
 export oldCWD=$(pwd)
@@ -34,7 +55,7 @@ export CWD=/tmp
 export PAYLOAD
 
 # Change directory to the temp directory
-cd $PAYLOAD || die
+cd $PAYLOAD || die "Could not change directory to payload."
 
 # Run the launcher !
 bash ./launcher "$@"

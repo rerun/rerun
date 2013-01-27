@@ -57,6 +57,29 @@ rerun_options_parse "$@"
 # Command implementation
 # ----------------------
 
+decoder() {
+    if command -v openssl >/dev/null
+    then echo "openssl enc -base64 -d"
+    else echo "uudecode -p"
+    fi
+}
+
+# Encode the tar gz output so it's save across systems.
+encode() {
+    outfile=$1
+
+    if command -v openssl >/dev/null
+    then
+        openssl enc -base64 > $outfile
+        retval=$?
+    else
+        uuencode -m -o $outfile $outfile
+        chmod 444 $outfile
+        retval=$?
+    fi
+    return $retval
+}
+
 buildbinarchive() {
   CWD=$(pwd); #remember current working directory.
 
@@ -76,20 +99,20 @@ buildbinarchive() {
   #
 
   # Iterate through the the specified modules and add them to payload
-  mkdir -p $PAYLOAD/rerun/modules || rerun_die
-  pushd $RERUN_MODULES >/dev/null || rerun_die
+  mkdir -p $PAYLOAD/rerun/modules 
+  pushd $RERUN_MODULES >/dev/null 
   for module in $MODULES
   do
       # Check for a commands subdir to be sure it looks like a module
       if [ -d $RERUN_MODULES/$module/commands ]
       then
-        cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules || rerun_die
+        cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules
       fi
   done
   popd >/dev/null
 
   # Copy rerun itself to the payload
-  cp $RERUN $PAYLOAD/rerun || rerun_die
+  cp $RERUN $PAYLOAD/rerun 
 
   # Copy in the extract and launcher scripts used during execution
   for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
@@ -100,23 +123,23 @@ buildbinarchive() {
           -e "s/@USER@/${USER:-$LOGNAME}/" \
           -e "s/@VERSION@/$VERSION/" \
           -e "s/@RELEASE@/$RELEASE/" \
-          $template > $PAYLOAD/$(basename $template) || rerun_die
+          -e "s/@DECODER@/$(decoder)/" \
+          $template > $PAYLOAD/$(basename $template) 
       # ... and save it to the payload --^
   done
 
   #
   # Archive the content
   #
-
   cd $PAYLOAD
 
   # make the payload.tar file
-  tar cf payload.tar launcher extract rerun || rerun_die
+  tar cf payload.tar launcher extract rerun 
 
   # compress and base64 encode the tar file
-  if [ -e "payload.tar" ]; then
-      gzip -c payload.tar | openssl enc -base64 > payload.tgz.base64   || rerun_die
-
+  if [[ -e "payload.tar" ]]
+  then
+      gzip -c payload.tar | encode payload.tgz.base64 || rerun_die
       if [ -e "payload.tgz.base64" ]; then
           #
           # Prepend the extract script to the payload.
@@ -133,7 +156,7 @@ buildbinarchive() {
   #
   # Make the archive executable
   #
-  chmod +x ${FILE} || rerun_die "failed setting archive executable"
+  chmod +x ${FILE} 
   #
   # Clean up the temp directory
   #
@@ -152,10 +175,10 @@ buildrpmarchive() {
     if [[ -r $MODULE_DIR/metadata ]]
     then
       # Setup a temporary directory to build the RPM:
-      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX) || rerun_die "couldn't make a temporary directory to build the rpm"
-      mkdir $RPMTOPDIR/SOURCES || rerun_die
-      mkdir $RPMTOPDIR/BUILD || rerun_die
-      mkdir $RPMTOPDIR/RPMS || rerun_die
+      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX) 
+      mkdir $RPMTOPDIR/SOURCES
+      mkdir $RPMTOPDIR/BUILD
+      mkdir $RPMTOPDIR/RPMS
 
       # Source the module metadata:
       unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
@@ -165,8 +188,7 @@ buildrpmarchive() {
       [[ -n $DESCRIPTION ]] || rerun_die "no description in \"$MODULE_DIR/metadata\""
 
       if [[ -z $VERSION ]]
-      then
-        rerun_die "no version in \"$MODULE_DIR/metadata\""
+      then rerun_die "no version in \"$MODULE_DIR/metadata\""
       fi
 
       # Extract the module's major version number:
@@ -194,8 +216,7 @@ buildrpmarchive() {
       fi
 
       if [[ -n $EXTERNALS ]]
-      then
-        REQUIRES="$REQUIRES,$EXTERNALS"
+      then REQUIRES="$REQUIRES,$EXTERNALS"
       fi
 
       # get the Distribution
@@ -209,8 +230,8 @@ buildrpmarchive() {
       rm -f $MODULE_DIR/rerun-${NAME}*.noarch.rpm
 
       # Prepare the source archive hierarchy:
-      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} || rerun_die
-      mkdir $RPMTOPDIR/tmp || rerun_die
+      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} 
+      mkdir $RPMTOPDIR/tmp 
       pushd $MODULE_DIR > /dev/null
       find . | cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
@@ -218,8 +239,8 @@ buildrpmarchive() {
       # Build the source archive:
       pushd $RPMTOPDIR/SOURCES > /dev/null
       tar -zcf \
-        $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz rerun-${NAME}-${VERSION} \
-        || rerun_die "failed to build \"$RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz\""
+        $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz rerun-${NAME}-${VERSION}
+
       if [ ! -w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/commands ]; then
         # this happens in autoconf "make distcheck", so this is a workaround
         chmod -R u+w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/*
@@ -243,8 +264,7 @@ buildrpmarchive() {
       || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Move the RPM:
-      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm . \
-        || rerun_die "failed to move rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
+      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm . 
       echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
@@ -252,6 +272,8 @@ buildrpmarchive() {
     fi
   done
 }
+
+
 case $FORMAT in
   bin)
     buildbinarchive
@@ -264,7 +286,6 @@ case $FORMAT in
     ;;
 esac
 
-exit 0
-
-# Done
+exit $?
+# Done.
 
