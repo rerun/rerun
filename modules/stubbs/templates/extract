@@ -8,10 +8,19 @@
 # user: @USER@
 # archive-version: @VERSION@
 # archive-release: @RELEASE@
+#/ usage: @FILE@ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [args]
 
 
-# Function to print error message and exit
-die() { echo "ERROR: $* " >&2 ; exit 1 ; }
+# Function to print error message and exit.
+die() { echo >&2 "ERROR: $* " ; exit 1 ; }
+# 
+usage() { grep '^#/ usage:' <"$0" | cut -c4- >&2 ; }
+cleanup() {
+    for f in ${SCRATCH_FILES[*]}
+    do  rm -rf $f
+    done
+}
+
 
 case "$1" in
     --archive-version-release)
@@ -20,52 +29,63 @@ case "$1" in
         echo >&2 "${vers}-${rel}"
         exit 0 ;
         ;;
-    --extract) EXTRACT_ONLY=true
-        PAYLOAD=$2
-        mkdir -p $PAYLOAD
+    --extract-only|-N) [ -z "$2" ] && { usage ; exit 2 ; }
+        EXTRACT_ONLY=true
+        EXTRACT_DIR=$2
         shift;
+        ;;
+    --extract-dir|-D) [ -z "$2" ] && { usage ; exit 2 ; }
+        EXTRACT_DIR=$2
+        shift; shift;
         ;;
 esac
 
+trap "{ cleanup ; }" EXIT
 
+: ${TMPDIR:=/tmp}
+declare -a SCRATCH_FILES=()
 
 umask 0002
 
-# extracted payload goes in here
-: ${PAYLOAD:=`mktemp -d /tmp/rerun.bin.XXXXXX`} || die "failed making payload extraction directory"
-export PAYLOAD
+# EXTRACT_DIR is the directory where files are extracted.
+# If it is unset, create a temporary directory.
+if [[ -z "${EXTRACT_DIR}" ]]
+then
+    SCRATCH_FILES[0]=`mktemp -d ${TMPDIR}/rerun.bin.XXXXXX` || die "failed creating temporary directory."
+    EXTRACT_DIR=${SCRATCH_FILES[0]}
+else
+    mkdir -p "$EXTRACT_DIR"
+fi
+export PAYLOAD=${EXTRACT_DIR}
+
+# CWD and oldCWD are passed to launcher as env variables.
+export oldCWD=$(pwd)
+export CWD=/tmp
 
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
 cat $0                            | 
 sed -e '1,/^__ARCHIVE_BELOW__/ d' | 
 @DECODER@                         | 
-(cd $PAYLOAD && tar xzf -) || die "unarchiving of $0 failed"
+(cd $EXTRACT_DIR && tar xzf -) || die "unarchiving of $0 failed."
 
 #
-# Exit now if the --extract flag was set.
+# Exit, if the --extract-only flag was set.
 #
 if [[ -n "$EXTRACT_ONLY" ]]
 then exit $? 
 fi
 
-# CWD and TMDIR are passed to launcher as env variables
-export oldCWD=$(pwd)
-export CWD=/tmp
-export PAYLOAD
 
-# Change directory to the temp directory
-cd $PAYLOAD || die "Could not change directory to payload."
+# Change directory to the payload directory.
+cd $EXTRACT_DIR || die "Could not change directory to payload."
 
 # Run the launcher !
 bash ./launcher "$@"
 RETVAL=$?
 
 # Go back to original working directory
-cd $CWD
-
-# Clean up after ourselves
-rm -rf $PAYLOAD
+cd $oldCWD
 
 # Stop this script from executing before we reach the binary archive!
 exit ${RETVAL:=0}

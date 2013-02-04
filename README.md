@@ -213,8 +213,20 @@ Run the `waitfor:ping` command in the archive:
 
 	$ ./rerun.bin waitfor:ping --server remoteserver
 
+*Archive special options*
+
+Shell archives can be executed using special parameters of its own.
+Below is a list of these optional arguments:
+
+* `--archive-version-release`: Print the archive version and release info and exit. 
+* `--extract-only|-n <>`: Extract the archive to the specified directory and exit.
+* `--extract-dir|-n <>`: Extract the archive  to the specified directory and then execute the specified command. By default, the `TMPDIR` environment variable is used to create a directory to extract the archive.
+
+
+
 See `stubbs:archive` for further information about creating and 
 understanding rerun archives.
+
 
 
 # MODULES

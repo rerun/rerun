@@ -90,14 +90,14 @@ it_builds_the_stubbs_module_rpm() {
     rm -rf ${TMPDIR}
 }
 
-it_extracts_and_exits() {
+it_extracts_only_and_exits() {
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
     rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
 
-    /tmp/rerun.bin.$$ --extract /tmp/myextract.$$
+    /tmp/rerun.bin.$$ --extract-only /tmp/myextract.$$
     test -d /tmp/myextract.$$
     test -f /tmp/myextract.$$/launcher
     test -d /tmp/myextract.$$/rerun
@@ -108,3 +108,57 @@ it_extracts_and_exits() {
     rm -r /tmp/myextract.$$
     rm /tmp/rerun.bin.$$
 }
+
+
+it_runs_from_specified_extract_dir() {
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command says --description "none"
+    rerun stubbs:add-option --module freddy --command says --option msg \
+        --description none --required true --export false --default nothing
+    cat $RERUN_MODULES/freddy/commands/says/script |
+    sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
+    mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/says/script
+
+    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+
+    OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy)
+    echo $OUT | grep "says: \"none\""
+    OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
+    test "$OUT" = "msg (hi)"
+    rm /tmp/rerun.bin.$$
+}
+
+it_runs_archive_from_overridden_TMPDIR() {
+    export TMPDIR=/tmp/stubbs.archive.$$
+    mkdir -p $TMPDIR
+
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
+
+    cat $RERUN_MODULES/freddy/commands/print_tmpdir/script |
+    sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
+    mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
+
+    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+
+    OUT=$(/tmp/rerun.bin.$$ freddy:print_tmpdir)
+    test "$OUT" = "$TMPDIR"
+    test -d $TMPDIR
+    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$
+}
+
+it_errors_with_missing_extract_dir_arg(){
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
+    cat $RERUN_MODULES/freddy/commands/print_tmpdir/script |
+    sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
+    mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
+
+    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    ERR=$(mktemp /tmp/rerun.archive.err.$$)
+    ! /tmp/rerun.bin.$$ --extract-only 2> $ERR
+    usage="usage: rerun.bin.$$ [--extract-only|-N <>] [--extract-dir|-D <>] [args]"
+    test "${usage}" = "$(cat $ERR)"
+    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR
+}
+

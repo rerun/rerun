@@ -119,6 +119,7 @@ buildbinarchive() {
   do
       # replace the template substitution tokens ...
       sed -e "s/@GENERATOR@/stubbs:archive/" \
+          -e "s/@FILE@/$(basename $FILE)/" \
           -e "s/@DATE@/$(date)/" \
           -e "s/@USER@/${USER:-$LOGNAME}/" \
           -e "s/@VERSION@/$VERSION/" \
