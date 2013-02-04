@@ -219,8 +219,8 @@ Shell archives can be executed using special parameters of its own.
 Below is a list of these optional arguments:
 
 * `--archive-version-release`: Print the archive version and release info and exit. 
-* `--extract-only|-n <>`: Extract the archive to the specified directory and exit.
-* `--extract-dir|-n <>`: Extract the archive  to the specified directory and then execute the specified command. By default, the `TMPDIR` environment variable is used to create a directory to extract the archive.
+* `--extract-only|-N <>`: Extract the archive to the specified directory and exit.
+* `--extract-dir|-D <>`: Extract the archive  to the specified directory and then execute the specified command. By default, the `TMPDIR` environment variable is used to create a directory to extract the archive.
 
 
 
