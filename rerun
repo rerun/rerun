@@ -25,7 +25,7 @@ DEFAULT_LIBDIR="/usr/lib"
 
 # To disable color effects: `unset RERUN_COLOR`.
 
-if [[ ! -z "${RERUN_COLOR:-}" ]]
+if [[ ! -z "${RERUN_COLOR:-}" && -t 1 ]]
 then
     ul="\033[4m" ; _ul="\033[0m" ; # underline
     gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
