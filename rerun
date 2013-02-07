@@ -18,6 +18,11 @@
 
 RERUN_VERSION=1.0.2
 
+# The default system install directories.
+
+DEFAULT_BINDIR="/usr/bin"
+DEFAULT_LIBDIR="/usr/lib"
+
 # To disable color effects: `unset RERUN_COLOR`.
 
 if [[ ! -z "${RERUN_COLOR:-}" ]]
@@ -597,9 +602,10 @@ rerun_module_exists() {
        return 0
     fi
 
-    if [[ "${RERUN_LOCATION:-}" = "/usr/bin" && -f "/usr/lib/rerun/modules/$module/metadata" ]]
+    if [[ "${RERUN_LOCATION:-}" = "${DEFAULT_BINDIR}" \
+        && -f "${DEFAULT_LIBDIR}/rerun/modules/$module/metadata" ]]
     then
-       echo /usr/lib/rerun/modules/$module
+       echo ${DEFAULT_LIBDIR}/rerun/modules/$module
        return 0
     fi
 
@@ -837,12 +843,12 @@ _rerun_modules_summary() {
     do
         [[ -f $module/metadata ]] && _rerun_module_summary $module
     done
-    if [[ ${RERUN_LOCATION:-} = "/usr/bin" 
-                && ${RERUN_MODULES:-} != "/usr/lib/rerun/modules" ]]
+    if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
+                && ${RERUN_MODULES:-} != "${DEFAULT_LIBDIR}/rerun/modules" ]]
     then
         echo
-        echo -e $gray"Available modules in \"/usr/lib/rerun/modules\":"$_gray
-        for module in /usr/lib/rerun/modules/*
+        echo -e $gray"Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":"$_gray
+        for module in ${DEFAULT_LIBDIR}/rerun/modules/*
         do
            [[ -f $module/metadata ]] && _rerun_module_summary $module
         done
@@ -963,7 +969,7 @@ done
 
 
 # Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
-# modules located in /usr/lib/rerun/modules are appended to the modules in RERUN_MODULES.
+# modules located in ${DEFAULT_LIBDIR}/rerun/modules are appended to the modules in RERUN_MODULES.
 RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
 
 # Default the RERUN_MODULES environment variable.
@@ -973,9 +979,9 @@ RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
 
 if [[ -z "${RERUN_MODULES:-}" ]]
 then
-    if [[ "$RERUN_LOCATION" = "/usr/bin" ]]
+    if [[ "$RERUN_LOCATION" = "${DEFAULT_BINDIR}" ]]
     then
-      RERUN_MODULES="/usr/lib/rerun/modules";  # Linux FSH convention:
+      RERUN_MODULES="${DEFAULT_LIBDIR}/rerun/modules";
     else      
       RERUN_MODULES=${RERUN_LOCATION}/modules; # Set module directory relative to the `rerun` script:
     fi
