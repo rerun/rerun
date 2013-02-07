@@ -155,9 +155,9 @@ it_errors_with_missing_extract_dir_arg(){
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
 
     rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
-    ERR=$(mktemp /tmp/rerun.archive.err.$$)
+    ERR=$(mktemp /tmp/rerun.archive.err.$$.XXXX)
     ! /tmp/rerun.bin.$$ --extract-only 2> $ERR
-    usage="usage: rerun.bin.$$ [--extract-only|-N <>] [--extract-dir|-D <>] [args]"
+    usage="usage: rerun.bin.$$ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [args]"
     test "${usage}" = "$(cat $ERR)"
     rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR
 }
