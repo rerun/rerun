@@ -26,12 +26,15 @@
 #
 # @author: <a href="mailto:alexhonor@yahoo.com">alexhonor@yahoo.com</a>
 
+# Default system install path for the lib dir.
+DEFAULT_LIBDIR="/usr/lib"
+
 if [[ -z "${RERUN_MODULES:-}" ]]
 then
     # check if it is a system install
-    if [[ -d /usr/lib/rerun/modules ]]
+    if [[ -d ${DEFAULT_LIBDIR}/rerun/modules ]]
     then
-      export RERUN_MODULES="/usr/lib/rerun/modules";  # Linux FSH convention.
+      export RERUN_MODULES="${DEFAULT_LIBDIR}/rerun/modules";  
     else      
       export RERUN_MODULES=$(pwd)/modules; # Default it the current working directory.
     fi
