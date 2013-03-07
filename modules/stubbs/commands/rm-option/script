@@ -131,7 +131,7 @@ if [ ${#option_to_command_assignments[*]} = 0 ]
 then
     if [[ -d  "$RERUN_MODULES/$MODULE/options/$OPTION" ]]
     then
-        rm -r "$RERUN_MODULES/$MODULE/options/$OPTION" || {
+        rm -rf "$RERUN_MODULES/$MODULE/options/$OPTION" || {
             rerun_die "Error removing option: $OPTION"
         }
         echo "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
