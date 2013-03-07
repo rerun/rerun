@@ -745,11 +745,20 @@ _rerun_options_populate() {
 #
 # * Prints ANSI color codes into your output
 _rerun_banner() {
+    if [[ -t 0 ]]
+    then
     echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
     echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
     echo $(tput setaf 3) "| | |  __/ |  | |_| | | | |"
     echo $(tput setaf 4) "|_|  \___|_|   \__,_|_| |_|"
     echo $(tput setaf 5) "Version: ${RERUN_VERSION:-}. License: Apache 2.0."$(tput sgr0)
+    else
+    echo " _ __ ___ _ __ _   _ _ __"
+    echo "| '__/ _ \ '__| | | | '_ \ "
+    echo "| | |  __/ |  | |_| | | | |"
+    echo "|_|  \___|_|   \__,_|_| |_|"
+    echo "Version: ${RERUN_VERSION:-}. License: Apache 2.0."
+    fi
 }
 
 
@@ -762,7 +771,7 @@ _rerun_examples() {
         rerun_die "wrong # args: should be: _rerun_examples prog" 
     }
     local -r prog=$1
-    if [[ "${RERUN_COLOR:-}" = "true" ]]
+    if [[ "${RERUN_COLOR:-}" = "true" && -t 0 ]]
     then echo >&2 $(tput sgr 0 1)"Examples:"$(tput sgr0)
     else echo >&2 "Examples:"
     fi
@@ -866,7 +875,12 @@ _rerun_commands_summary() {
     }
     local -r directory=$1
     local -r module=$2
-    bold() { echo -e "\033[1m$*\033[0m" ; tput sgr0 ; }
+    bold() { 
+        if [[ -t 0 ]]
+        then echo -e "\033[1m$*\033[0m" ; tput sgr0 ; 
+        else echo "$*"
+        fi
+    }
 
     module_dir=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
     echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
