@@ -140,7 +140,9 @@ do
     com_name=$(basename $com_dir)
     mkdir -p $DIR/commands/$com_name
 
-    shocco -t $com_name $com_dir/script > $DIR/commands/$com_name/script.html
+    shocco -t $com_name $com_dir/script > $DIR/commands/$com_name/script.html || {
+        rerun_die "Something crazy happend calling shocco on document: \"$com_name\"."
+    }
     docs_command_to_md $com_me $MODULE > $DIR/commands/$com_name/index.md
 
     markdown $DIR/commands/$com_name/index.md |
