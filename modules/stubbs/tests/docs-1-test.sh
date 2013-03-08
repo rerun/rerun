@@ -59,11 +59,11 @@ it_runs_interactively() {
     # Use echo command to write module name to stdin
     if [[ -t 0 ]]
     then
-        rerun stubbs:docs <<EOF
+        rerun -v stubbs:docs <<EOF
 stubbs
 EOF
     else
-        echo stubbs | rerun stubbs:docs
+        echo stubbs | rerun -v stubbs:docs
     fi
 
     validate_manpage $RERUN_MODULE_DIR/docs/stubbs.1
