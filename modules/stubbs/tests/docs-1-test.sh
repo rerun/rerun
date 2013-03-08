@@ -55,9 +55,17 @@ it_runs_interactively() {
     # Bail out if pygmentize is not available.
     (command pygmentize -h 2>/dev/null) || exit 0;
 
-    rerun stubbs:docs <<EOF
+    # Check if this is an interactive shell.
+    # Use echo command to write module name to stdin
+    if [[ -t 0 ]]
+    then
+        rerun stubbs:docs <<EOF
 stubbs
 EOF
+    else
+        echo stubbs | rerun stubbs:docs
+    fi
+
     validate_manpage $RERUN_MODULE_DIR/docs/stubbs.1
     validate_webpages $RERUN_MODULE_DIR/docs
 }
