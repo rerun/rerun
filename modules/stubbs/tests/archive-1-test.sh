@@ -71,6 +71,8 @@ it_handles_comands_using_quoted_arguments() {
 }
 
 it_builds_the_stubbs_module_rpm() {
+    [[ "$(id -un)" != "root" ]] && return 
+
     if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
     then
         MYDIST="$(rpm --eval %{?dist})";

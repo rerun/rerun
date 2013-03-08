@@ -53,7 +53,7 @@ describe "docs"
 it_runs_interactively() {
     
     # Bail out if pygmentize is not available.
-    (command pygmentize 2>/dev/null) || exit 0;
+    (command pygmentize -h 2>/dev/null) || exit 0;
 
     rerun stubbs:docs <<EOF
 stubbs
