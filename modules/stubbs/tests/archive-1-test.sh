@@ -107,8 +107,8 @@ it_extracts_only_and_exits() {
     test -d /tmp/myextract.$$/rerun/modules
     test -d /tmp/myextract.$$/rerun/modules/freddy
 
-    rm -r /tmp/myextract.$$
-    rm /tmp/rerun.bin.$$
+    rm -rf /tmp/myextract.$$
+    rm -rf /tmp/rerun.bin.$$
 }
 
 
