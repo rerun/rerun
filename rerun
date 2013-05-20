@@ -969,7 +969,7 @@ while [ "$#" -gt 0 ]; do
 	    RERUN_MODULES="$(rerun_path_absolute $2)"
 	    shift
 	    ;;
-	--answers)
+	--answer*)
 	    rerun_option_check "$#" "$1"
 	    ANSWERS="$2"
         [[ ! -f $ANSWERS ]] && rerun_syntax_error "answers file not found: $ANSWERS"
