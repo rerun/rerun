@@ -85,7 +85,7 @@ $(for option in $(rerun_options $moddir $module $command); do
 printf "          %s\n" "$(generate_option_parser $option)"; 
 done)
             # help option
-            -?)
+            -|--*?)
                 rerun_option_usage
                 exit 2
                 ;;

@@ -38,7 +38,8 @@ Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}
 %global __os_install_post %{nil}
 
 # Crank up the compression
-%define _binary_payload w7.lzdio
+%define _binary_payload w0.gzdio
+
 
 %description
 A simple command runner because it's easy to forget standard operating procedure.
