@@ -6,3 +6,6 @@ script: ./etc/travis-ci.sh
 notifications:
   irc:
     - "irc.freenode.org#rerun"
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq markdown
