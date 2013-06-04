@@ -7,7 +7,7 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
-#/ usage: rerun [-h][-v][-V][--version] [-M <dir>] [--answer <file>] [module:[command [options]]]
+#/ usage: rerun [-h][-v][-V][--version] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
 #
 # __Install__
 # 
@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.0.3
+RERUN_VERSION=1.0.4
 
 # The default system install directories.
 
@@ -969,7 +969,7 @@ while [ "$#" -gt 0 ]; do
 	    RERUN_MODULES="$(rerun_path_absolute $2)"
 	    shift
 	    ;;
-	--answer*)
+	-A|--answer[s]*)
 	    rerun_option_check "$#" "$1"
 	    ANSWERS="$2"
         [[ ! -f $ANSWERS ]] && rerun_syntax_error "answers file not found: $ANSWERS"
