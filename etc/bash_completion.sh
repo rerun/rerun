@@ -4,6 +4,10 @@
 #  **rerun** is a simple, small modular automation
 #  framework based on Bash, the POSIX shell.
 #
+
+# Enable RERUN_COLOR
+export RERUN_COLOR=true
+
 # Installation
 # -------------
 #
