@@ -32,7 +32,7 @@ then
     red="\033[31m" ; _red="\033[0m" ; # red
     bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
 else
-    ul="" _ul=""    gray="" _gray=""    red=""_red=""
+    ul="" _ul=""    gray="" _gray=""    red="" _red=""
     bold="" ; _bold="" ; 
 fi
 
