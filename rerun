@@ -935,7 +935,9 @@ _rerun_commands_summary() {
 
 # Parse rerun command line options
 # --------------------------------
-RERUN_VERBOSE=
+
+export RERUN_VERBOSE=
+
 # There are two sets of options, `rerun` specific arguments 
 # and command options.
 
