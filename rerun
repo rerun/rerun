@@ -658,10 +658,11 @@ rerun_command_execute() {
     local -r RERUN_SHELL=$SHELL
     local COMMAND_SHELL=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
     : ${COMMAND_SHELL:=$RERUN_SHELL}; # default it.
+    local RERUN_MODULE_VERSION=$(rerun_property_get "$RERUN_MODULE_DIR" VERSION)
 
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
 
-    export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR
+    export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR RERUN_MODULE_VERSION
     
     if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
