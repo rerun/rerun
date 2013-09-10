@@ -76,7 +76,7 @@ done
 
 # Post process the options
 
-[ -z "$MODULE" ] && {
+[ -z "${MODULE:-}" ] && {
     echo "Module: "
     select MODULE in $(rerun_modules $RERUN_MODULES);
     do
@@ -85,7 +85,7 @@ done
     done
 }
 
-[ -z "$COMMAND" ] && {
+[ -z "${COMMAND:-}" ] && {
     echo "Command: "
     select COMMAND in $(rerun_commands $RERUN_MODULES $MODULE);
     do
