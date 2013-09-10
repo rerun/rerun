@@ -109,7 +109,7 @@ nobase_dist_mod_DATA = \
 # The module scripts
 nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/bin/roundup \
-	modules/stubbs/bin/shocco \
+	modules/stubbs/bin/shocco.sh \
 	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
