@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # **shocco** is a quick-and-dirty, literate-programming-style documentation
 # generator written for and in __POSIX shell__. It borrows liberally from
 # [Docco][do], the original Q&D literate-programming-style doc generator.
@@ -31,7 +31,6 @@
 
 # The most important line in any shell program.
 set -e
-set -o pipefail
 
 # There's a lot of different ways to do usage messages in shell scripts.
 # This is my favorite: you write the usage message in a comment --
@@ -71,10 +70,12 @@ file="$1"
 
 # These are replaced with the full paths to real utilities by the
 # configure/make system.
-#MARKDOWN='/usr/local/bin/markdown'
-#PYGMENTIZE='/usr/local/bin/pygmentize'
-MARKDOWN=markdown
-PYGMENTIZE=pygmentize
+MARKDOWN='markdown'
+PYGMENTIZE='pygmentize'
+
+# On GNU systems, csplit doesn't elide empty files by default:
+CSPLITARGS=$( (csplit --version 2>/dev/null | grep -i gnu >/dev/null) && echo "--elide-empty-files" || true )
+
 # We're going to need a `markdown` command to run comments through. This can
 # be [Gruber's `Markdown.pl`][md] (included in the shocco distribution) or
 # Discount's super fast `markdown(1)` in C. Try to figure out if either are
@@ -277,14 +278,13 @@ $MARKDOWN                                    |
 # the source code.
 (
     csplit -sk                               \
+           $CSPLITARGS                       \
            -f docs                           \
            -n 4                              \
            - '/<h5>DIVIDER<\/h5>/' '{9999}'  \
            2>/dev/null                      ||
     true
 )
-# Check the exit to be sure the nothing in the pipeline failed.
-[[ $? -eq 0 ]] || exit 1
 
 
 # Second Pass: Code Formatting
@@ -323,6 +323,7 @@ sed '
 (
     DIVIDER='/<span class="c"># DIVIDER</span>/'
     csplit -sk                   \
+           $CSPLITARGS           \
            -f code               \
            -n 4 -                \
            "$DIVIDER" '{9999}'   \
@@ -347,24 +348,19 @@ layout () {
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-eqiv='content-type' content='text/html;charset=utf-8'>
+    <meta http-equiv='content-type' content='text/html;charset=utf-8'>
     <title>$1</title>
-    <link rel=stylesheet href="http://jashkenas.github.com/docco/resources/classic/docco.css">
+    <link rel="stylesheet" media="all" href="http://jashkenas.github.io/docco/resources/linear/public/stylesheets/normalize.css" />
+    <link rel="stylesheet" media="all" href="http://jashkenas.github.io/docco/resources/linear/docco.css" />
 </head>
 <body>
-<div id=container>
-    <div id=background></div>
-    <table cellspacing=0 cellpadding=0>
-    <thead>
-      <tr>
-        <th class=docs><h1>$1</h1></th>
-        <th class=code></th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr><td class='docs'>$(cat)</td><td class='code'></td></tr>
-    </tbody>
-    </table>
+<div class="container">
+  <div class="page">
+        <div class="header"><h1>$1</h1></div>
+        $(cat)
+  </div>
+  <div class="fleur">h</div>
+
 </div>
 </body>
 </html>
@@ -431,9 +427,9 @@ xargs cat                                    |
 # so that the CSS kicks in properly.
 {
     DOCSDIVIDER='<h5>DIVIDER</h5>'
-    DOCSREPLACE='</pre></div></td></tr><tr><td class=docs>'
+    DOCSREPLACE='</pre></div>'
     CODEDIVIDER='<span class="c"># DIVIDER</span>'
-    CODEREPLACE='</td><td class=code><div class=highlight><pre>'
+    CODEREPLACE='<div class="highlight"><pre>'
     sed "
         s@${DOCSDIVIDER}@${DOCSREPLACE}@
         s@${CODEDIVIDER}@${CODEREPLACE}@

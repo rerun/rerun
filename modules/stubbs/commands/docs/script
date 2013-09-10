@@ -19,7 +19,7 @@
 }
 
 shocco() {
-    command $RERUN_MODULE_DIR/bin/shocco "$@"
+    command $RERUN_MODULE_DIR/bin/shocco.sh "$@"
 }
 
 #
