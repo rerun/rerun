@@ -1,4 +1,4 @@
-AC_INIT([rerun], [1.0.5], [rerun-discuss@googlegroups.com],
+AC_INIT([rerun], [1.0.6], [rerun-discuss@googlegroups.com],
              [rerun], [https://github.com/rerun/rerun/wiki])
 
 dnl Created by thompson@dtosolutions, 27SEP11

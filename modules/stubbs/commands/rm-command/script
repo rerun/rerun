@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+#/ command: stubbs:rm-command: "remove a command"
+#/ usage: stubbs:rm-command --command|-c <> --module|-m
+
+# Load common functions
+# ---------------------
+
+# Load the function library for this module.
+# This loads rerun functions and those defined for stubbs.
+
+. $RERUN_MODULE_DIR/lib/functions.sh rm-command || { 
+    echo >&2 "failed laoding function library" ; exit 1 ; 
+}
+
+
+# Error handling
+# ---------------
+
+# This script is designed to _fail-fast_.
+
+# Trap errors and exit. The call to `rerun_die` will print the
+# the error message and exit with the error command exit status. 
+
+trap 'rerun_die $? "*** command failed: stubbs:rm-command. ***"' ERR
+
+# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
+# so a pipeline return status is the value of the last 
+# (rightmost) command to exit with non-zero status.
+#
+# [set]: http://ss64.com/bash/set.html
+# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
+
+set -o nounset -o pipefail
+
+
+# Get the options
+while [ "$#" -gt 0 ]; do
+    OPT="$1"
+    case "$OPT" in
+	# options with arguments
+	-c|--command)
+	    rerun_option_check "$#" "$1"
+		# Parse if command is named "module:command"
+	 	regex='([^:]+)(:)([^:]+)'
+		if [[ $2 =~ $regex ]]
+		then
+			MODULE=${BASH_REMATCH[1]}
+			COMMAND=${BASH_REMATCH[3]}
+		else
+	    	COMMAND="$2"		
+	    fi
+	    shift
+	    ;;
+	-m|--module)
+	    rerun_option_check "$#" "$1"
+	    MODULE="$2"
+	    shift
+	    ;;
+        # unknown option
+	-?)
+	    rerun_option_usage
+        exit 2
+	    ;;
+	  # end of options, just arguments left
+	*)
+	    break
+    esac
+    shift
+done
+
+# Post process the options
+
+[[ -z "${MODULE:-}" ]] && {
+    echo "Module: "
+    select MODULE in $(rerun_modules $RERUN_MODULES);
+    do
+	echo "You picked module $MODULE ($REPLY)"
+	break
+    done
+}
+
+[[ -z "${COMMAND:-}" ]] && {
+    echo "Command: "
+    select COMMAND in $(rerun_commands $RERUN_MODULES $MODULE);
+    do
+	echo "You picked command $COMMAND ($REPLY)"
+	break
+    done
+}
+
+#
+# Verify specified command exists.
+#
+[[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ]] || {
+    exit 0
+}
+
+#
+# Remove tests for this command.
+#
+rm -f $RERUN_MODULES/$MODULE/tests/$COMMAND-*-test.sh
+
+#
+# Look up the options used by this command and remove any would be unused option.
+#
+command_options=( $(rerun_options $RERUN_MODULES $MODULE $COMMAND) )
+for opt in ${command_options[*]:-}
+do  
+    # Check if this option is only assigned to this command.
+    commands_assigned_to_option=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $opt) )
+    if [[ ${#commands_assigned_to_option[*]} == 1 && $commands_assigned_to_option == $COMMAND ]]
+    then
+        #
+        # Remove the option since only this command was assigned to it.
+        #
+        if [[ -d  "$RERUN_MODULES/$MODULE/options/$opt" ]]
+        then
+            rm -rf "$RERUN_MODULES/$MODULE/options/$opt" || {
+                rerun_die "Error removing option: $opt"
+            }
+            echo "Removed $RERUN_MODULES/$MODULE/options/$opt"
+        fi
+    fi
+done
+
+#
+# Remove the command directory from the module.
+#
+rm -rf $RERUN_MODULES/$MODULE/commands/$COMMAND
+
+# Done
+exit $?

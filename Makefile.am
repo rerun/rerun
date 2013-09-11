@@ -47,8 +47,10 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/commands/edit/README.md \
 	modules/stubbs/commands/migrate/metadata \
 	modules/stubbs/commands/migrate/README.md \
+	modules/stubbs/commands/rm-command/metadata \
+	modules/stubbs/commands/rm-command/README.md \
 	modules/stubbs/commands/rm-option/metadata \
-	modules/stubbs/commands/rm-option/README.md \
+	modules/stubbs/commands/rm-option/README.md \	
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/README.md \
 	modules/stubbs/lib/docs.css \
@@ -122,6 +124,7 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/commands/edit/script \
 	modules/stubbs/commands/migrate/options.sh \
 	modules/stubbs/commands/migrate/script \
+	modules/stubbs/commands/rm-command/script \
 	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/script \
 	modules/stubbs/lib/docs.sh \
@@ -135,6 +138,7 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/tests/docs-1-test.sh \
 	modules/stubbs/tests/functional-bash-1-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
+	modules/stubbs/tests/rm-command-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh \
 	modules/stubbs/tests/stubbs-functions-1-test.sh
 
