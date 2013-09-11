@@ -69,6 +69,21 @@ List the waitfor commands to see "ping" and the new
         --host <>: "the host to reach"
         [ --interval <30>]: "seconds between checks"
 
+Add an option to multiple commands
+----------------------------------
+
+The "--command" option can take a comma separated list
+of command names. This is useful if commands in your module
+need to share the same option.
+
+    rerun stubbs:add-option \
+      --option interval -description "seconds between checks" \
+      --module waitfor --command ping,pgrep,nc \
+      --required false --export false \
+      --default 30
+
+Commands that don't exist are skipped.
+
 
 Internal details
 ----------------

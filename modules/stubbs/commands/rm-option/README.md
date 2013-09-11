@@ -23,3 +23,16 @@ If you like to hack around your module sometimes using stubbs
 (and sometimes not), you can end up with scripts or option metadata
 that is inconsistent. 
 You can run "rm-option" to clean things up.
+
+Remove an option to multiple commands
+--------------------------------------
+
+The "--command" option can take a comma separated list
+of command names. This is useful if you want to remove
+an option that is shared across commands in your module.
+
+    rerun stubbs:rm-option \
+      --option interval -description "seconds between checks" \
+      --module waitfor --command ping,pgrep,nc
+
+Commands that don't exist are skipped.

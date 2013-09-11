@@ -148,12 +148,6 @@ done
     done
 }
 
-# Verify this command exists
-#
-[ ! -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] && {
-    rerun_option_error "command not found: \"$MODULE:$COMMAND\""
-}
-
 # Was option argument specified?
 [ -z "${OPTION:-}" ] && {
     printf "Option: \n"
@@ -232,66 +226,69 @@ EOF
 }
 echo "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
 
-#
-# Update the command metadata.
-#
-command_options=( $(rerun_options $RERUN_MODULES $MODULE $COMMAND) )
-# Add this OPTION to the list if it is not yet assigned.
-rerun_list_contains "$OPTION" "${command_options[@]:-}" || {
-    if [[ -z "${command_options:-}" ]]
-    then command_options=( $OPTION ) 
-    else command_options=( ${command_options[*]} $OPTION )
+COMMAND_LIST=( ${COMMAND//,/ } )
+for cmd in ${COMMAND_LIST[*]}
+do
+    #
+    # Verify this command exists
+    #
+    [ ! -d $RERUN_MODULES/$MODULE/commands/$cmd ] && {
+        echo >&2 "command not found: \"$MODULE:$cmd\".... skipping."
+        continue
+    }
+    #
+    # Update the command metadata.
+    #
+    command_options=( $(rerun_options $RERUN_MODULES $MODULE $cmd) )
+    # Add this OPTION to the list if it is not yet assigned.
+    rerun_list_contains "$OPTION" "${command_options[@]:-}" || {
+        if [[ -z "${command_options:-}" ]]
+        then command_options=( $OPTION ) 
+        else command_options=( ${command_options[*]} $OPTION )
+        fi
+    }
+    command_metadata=$RERUN_MODULES/$MODULE/commands/$cmd/metadata
+    stubbs_command_options_write \
+        $RERUN_MODULES/$MODULE $cmd \
+        "${command_options[*]}" || rerun_die "Failed generating command metadata"
+    echo "Updated command metadata:  $command_metadata"
+    #
+    # Generate option parser script.
+    #
+    .  $RERUN_MODULE_DIR/lib/stub/bash/metadata || {
+        rerun_die "error reading  $RERUN_MODULE_DIR/lib/stub/bash/metadata "
+    }
+    [ -z "$OPTIONS_GENERATOR" ] && {
+        rerun_die "required metadata not found: OPTIONS_GENERATOR"
+    }
+    [ -z "$OPTIONS_SCRIPT" ] && {
+       rerun_die "required metadata not found: OPTIONS_SCRIPT"
+    }
+    options_parser=$RERUN_MODULES/$MODULE/commands/$cmd/$OPTIONS_SCRIPT
+    $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
+        $RERUN_MODULES $MODULE $cmd > $options_parser || {
+        rerun_die "Failed generating options parser."
+    }
+    #
+    # Update the command script header to give it the updated
+    # variable summary and usage info.
+    [ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
+        rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
+    }
+    command_script=$RERUN_MODULES/$MODULE/commands/$cmd/$(basename $TEMPLATE_COMMAND_SCRIPT)
+    if [ -f "$command_script" ]
+    then
+        stubbs_script_header \
+            $RERUN_MODULES/$MODULE $cmd > ${command_script}.$$ || {
+            rerun_die "Error updating command script header"
+        }
+        mv $command_script.$$ $command_script || {
+            rerun_die "Error updating command script header"
+        }
+        chmod +x $command_script || rerun_die "Failed setting execute bit on command script."
+        echo "Updated command script header: $command_script"
     fi
-}
-
-command_metadata=$RERUN_MODULES/$MODULE/commands/$COMMAND/metadata
-
-stubbs_command_options_write \
-    $RERUN_MODULES/$MODULE $COMMAND \
-    "${command_options[*]}" || rerun_die "Failed generating command metadata"
-echo "Updated command metadata:  $command_metadata"
-
-
-#
-# Generate option parser script.
-#
-
-.  $RERUN_MODULE_DIR/lib/stub/bash/metadata || {
-    rerun_die "error reading  $RERUN_MODULE_DIR/lib/stub/bash/metadata "
-}
-[ -z "$OPTIONS_GENERATOR" ] && {
-    rerun_die "required metadata not found: OPTIONS_GENERATOR"
-}
-[ -z "$OPTIONS_SCRIPT" ] && {
-    rerun_die "required metadata not found: OPTIONS_SCRIPT"
-}
-options_parser=$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTIONS_SCRIPT
-
-$RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
-    $RERUN_MODULES $MODULE $COMMAND > $options_parser || {
-    rerun_die "Failed generating options parser."
-}
-
-# Update the command script header to give it the updated
-# variable summary and usage info.
-
-[ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
-    rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
-}
-
-command_script=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND_SCRIPT)
-if [ -f "$command_script" ]
-then
-    stubbs_script_header \
-        $RERUN_MODULES/$MODULE $COMMAND > ${command_script}.$$ || {
-        rerun_die "Error updating command script header"
-    }
-    mv $command_script.$$ $command_script || {
-        rerun_die "Error updating command script header"
-    }
-    chmod +x $command_script || rerun_die "Failed setting execute bit on command script."
-    echo "Updated command script header: $command_script"
-fi
+done
 
 # Done
 exit $?
