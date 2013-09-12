@@ -164,12 +164,12 @@ rerun_log() {
     }
     local ctx=()
     [[ -n "$RERUN_MODULE_DIR" ]] && {
-        local ctx=( ${ctx[*]} $(basename $RERUN_MODULE_DIR) )
+        local ctx=( ${ctx[*]:-} $(basename $RERUN_MODULE_DIR) )
     }
     [[ -n "$RERUN_COMMAND_DIR" ]] && {
-        local ctx=( ${ctx[*]} $(basename $RERUN_COMMAND_DIR) )
+        local ctx=( ${ctx[*]:-} $(basename $RERUN_COMMAND_DIR) )
     }
-    command=$( IFS=:; echo "${ctx[*]}" )
+    command=$( IFS=:; echo "${ctx[*]:-}" )
     case "$1" in
         levels)
             printf "%s\n" "${RERUN_LOGLEVELS[*]}"; return 0
