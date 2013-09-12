@@ -25,7 +25,7 @@ ChangeLog:
 dist_bin_SCRIPTS = rerun
 
 # man pages here
-dist_man_MANS =
+dist_man_MANS = man/man1/rerun.1
 
 # by convention, automake hates putting data and script files in /usr/lib
 # using something like nobase_dist_pkglib_SCRIPTS.  To get around this

@@ -1,0 +1,642 @@
+.TH  "" "" 
+.SH NAME
+.PP
+rerun \- a modular shell automation framework to organize your keeper
+scripts.
+.SH SYNOPSYS
+.IP
+.nf
+\f[C]
+rerun\ [\-h][\-v][\-V]\ [\-M\ <dir>]\ [\-\-loglevel\ <>]\ [module:[command\ [options]]]
+\f[]
+.fi
+.SH DESCRIPTION
+.PP
+Rerun is a simple command runner that turns loose shell scripts into
+modular automation.
+Rerun will help you organize your scripts into well defined command
+interfaces.
+Collections of management modules can be archived and delivered as a
+single executable to facilitate team hand offs.
+Using the "stubbs" module, rerun will even facilitate documentation and
+unit tests.
+.PP
+Rerun provides two modes of operation:
+.IP "1." 3
+\f[I]Listing\f[]: Rerun lists modules and commands.
+Listing information includes name, description and command line usage
+syntax.
+.IP "2." 3
+\f[I]Execution\f[]: Rerun provides option processing (possibly
+defaulting unspecified arguments) and executes a script for the
+specified module command.
+.PP
+For the module developer, rerun is a trivial framework following simple
+conventions that easily fit in a shell environment.
+Rerun includes a module development tool called "stubbs" that helps
+create and evolve rerun modules.
+Stubbs contains commands to automate option processing code, metadata
+definition and unit testing.
+.PP
+Internally, \f[C]rerun\f[] implements a simple dispatching mechanism to
+look up named commands and execute them.
+\f[I]Commands\f[] are logically named and have a corresponding script.
+.PP
+Commands reside in a module and can have named parameters called
+\f[I]options\f[].
+Each option is named, described and can also be defined to use a default
+value or say whether it is required or not.
+.PP
+Rerun modules can also declare metadata describing name, description and
+other aspects of each command.
+Rerun makes use of this metadata to support a listing mode, a feature
+where modules and command usage are summarized for end users.
+.PP
+See the project wiki (https://github.com/rerun/rerun/wiki) for
+additional documentation including:
+.IP \[bu] 2
+Getting started (https://github.com/rerun/rerun/wiki)
+.IP \[bu] 2
+Installation (https://github.com/rerun/rerun/wiki/Installation)
+.IP \[bu] 2
+Stubbs module
+tool (https://github.com/rerun/rerun/tree/master/modules/stubbs)
+.IP \[bu] 2
+Why rerun? (https://github.com/rerun/rerun/wiki/Why-rerun%3F)
+.SH OPTIONS
+.PP
+\f[C]\-h\f[] : Print help and usage then exit.
+.PP
+\f[C]\-\-loglevel\f[] \f[I]level\f[] : Set the default log level (debug
+info warn error fatal).
+See rerun_log API.
+.PP
+\f[C]\-M\f[] \f[I]DIRECTORY\f[] : Module library directory path.
+.PP
+\f[C]\-v\f[] : Execute \f[I]command\f[] in verbose mode.
+.PP
+\f[C]\-V\f[] : Execute \f[C]rerun\f[] and \f[I]command\f[] in verbose
+mode.
+.SH USING
+.SS Help
+.PP
+For command line syntax and example usage execute \f[C]rerun\f[] using
+the \f[C]\-\-help\f[] flag:
+.IP
+.nf
+\f[C]
+$\ ./rerun\ \-\-help
+\ _\ __\ ___\ _\ __\ _\ \ \ _\ _\ __
+|\ \[aq]__/\ _\ \\\ \[aq]__|\ |\ |\ |\ \[aq]_\ \\\ 
+|\ |\ |\ \ __/\ |\ \ |\ |_|\ |\ |\ |\ |
+|_|\ \ \\___|_|\ \ \ \\__,_|_|\ |_|
+Version:\ 1.0.3.\ License:\ Apache\ 2.0.
+
+Usage:\ rerun\ [\-h][\-v][\-V]\ [\-M\ <dir>]\ [module:[command\ [options]]]
+\f[]
+.fi
+.SS Listing
+.PP
+Without arguments, \f[C]rerun\f[] will list existing modules and their
+description and version:
+.IP
+.nf
+\f[C]
+$\ rerun
+\ \ stubbs:\ "Simple\ rerun\ module\ builder"\ \-\ 1.0.3
+\f[]
+.fi
+.PP
+To list the commands available in a module specify the module name too.
+Here the commands are listed for the \[aq]stubbs\[aq] module:
+.IP
+.nf
+\f[C]
+$\ rerun\ stubbs
+\ add\-command:\ "add\ command\ to\ module"
+\ \ \ \ \ \-\-command|\-c\ <>:\ "the\ command\ name"
+\ \ \ \ \ \-\-description\ <>:\ "the\ brief\ description"
+\ \ \ \ \ \-\-module|\-m\ <>:\ "the\ module\ name"
+\ \ \ \ [\ \-\-overwrite\ <false>]:\ "should\ overwrite?"
+\ add\-module:\ "add\ a\ new\ module"
+\ \ \ \ \ \-\-description\ <>:\ "the\ brief\ description"
+\ \ \ \ \ \-\-module|\-m\ <>:\ "the\ module\ name"
+\ \ \ \ [\ \-\-template\ <>]:\ "the\ template\ name\ or\ path"
+\ \ \ \ .
+\ \ \ \ .\ 
+\ \ \ \ .
+\ \ \ \ 
+\f[]
+.fi
+.PP
+The command listing includes the command description and any options
+assigned to the command.
+.PP
+Options that declare a default value are shown with a string between the
+"<>" characters.
+.PP
+For example, notice how "\-\-overwrite" option shows \f[C]<false>\f[].
+The "false" is the default value assigned to the "\-\-overwrite" option.
+.PP
+See the "Environment" section below to learn about the
+\f[C]RERUN_MODULES\f[] environment variable.
+This variable specifies the directory where rerun modules exist.
+.SS Bash completion
+.PP
+If you are a Bash shell user, be sure to source the
+\f[C]bash_completion.sh\f[] file.
+It provides listing via the tab key.
+.PP
+Type \f[C]rerun\f[] and then the tab key.
+The shell will generate a list of existing modules.
+.IP
+.nf
+\f[C]
+$\ rerun[TAB][TAB]
+stubbs:\ 
+\f[]
+.fi
+.PP
+Rerun shows the module "stubbs".
+.PP
+Typing the \f[C]s\f[] character and the tab key again will show the
+commands inside the "stubbs" module:
+.IP
+.nf
+\f[C]
+$\ rerun\ stubbs:\ [TAB]
+add\-command\ \ add\-module\ \ add\-option\ \ archive\ \ docs\ \ edit\ \ migrate\ \ rm\-option\ \ test
+\f[]
+.fi
+.PP
+Several commands are listed.
+Press tab again and choose a command.
+You can specify the first few characters and the command name will be
+completed, too.
+.PP
+After accepting a command, typing the tab key will list the command
+options.
+.IP
+.nf
+\f[C]
+$\ rerun\ stubbs:\ add\-module\ \-[TAB]
+\-\-description\ \ \-\-module\ \ \-\-template
+\f[]
+.fi
+.PP
+The \f[C]stubbs:add\-module\f[] command accepts three options
+(\-\-description <> \-\-module <> \-\-template <>).
+.PP
+You can continue using command completion to cycle through the remaining
+options.
+.SS Command execution
+.PP
+Commands are executed by stating the module, command and any command
+options.
+The basic usage form is "\f[C]rerun\f[] \f[I]module\f[]:\f[I]command\f[]
+[ \f[I]options\f[] ]".
+.PP
+To run the "archive" command in the stubbs module, type:
+.IP
+.nf
+\f[C]
+$\ rerun\ stubbs:archive
+Wrote\ self\ extracting\ archive\ script:\ /tmp/rerun.bin
+\f[]
+.fi
+.PP
+Command options are passed after the "module:command" string.
+Run the "stubbs:archive" command but specify where the archive file is
+written.
+.IP
+.nf
+\f[C]
+$\ rerun\ stubbs:archive\ \-\-modules\ waitfor\ \-\-file\ $HOME/rerun.bin
+\f[]
+.fi
+.PP
+If the \[aq]stubbs\[aq] module is stored in \f[C]/var/rerun\f[], then
+the command usage would be:
+.IP
+.nf
+\f[C]
+$\ rerun\ \-M\ /var/rerun\ stubbs:archive
+\f[]
+.fi
+.SS Archives
+.PP
+An \f[I]archive\f[] contains all the rerun modules you need (you might
+have a library of them) and gives you the same exact interface as
+rerun,...
+all in one file!
+.PP
+Specifically, an archive is a set of modules and \f[C]rerun\f[] itself
+packaged into a self extracting script (by default in a file named
+"rerun.bin").
+Archives can be useful if you want to share a single self contained
+executable that contains all the needed modules.
+.PP
+Run an archive script like you would run \f[C]rerun\f[].
+.PP
+You can execute an archive via \f[C]bash\f[] like so:
+.IP
+.nf
+\f[C]
+$\ bash\ rerun.bin\ <module>:<command>\ \-\-your\ options
+\f[]
+.fi
+.PP
+If the execute bit is set, invoke the archive directly.
+.PP
+Here the archive is executed without arguments which causes the archive
+to list the modules contained within it.
+.IP
+.nf
+\f[C]
+$\ ./rerun.bin
+\ \ waitfor:\ "utility\ commands\ that\ wait\ for\ a\ condition."
+\ \ .
+\ \ .\ listing\ output\ ommitted
+\f[]
+.fi
+.PP
+Note, ".bin" is just a suffix naming convention for a self\-extracting
+script.
+The archive file can be named anything you wish.
+.PP
+Run the \f[C]waitfor:ping\f[] command in the archive:
+.IP
+.nf
+\f[C]
+$\ ./rerun.bin\ waitfor:ping\ \-\-server\ remoteserver
+\f[]
+.fi
+.PP
+\f[I]Archive special options\f[]
+.PP
+Shell archives can be executed using special parameters of its own.
+Below is a list of these optional arguments:
+.IP \[bu] 2
+\f[C]\-\-archive\-version\-release\f[]: Print the archive version and
+release info and exit.
+.IP \[bu] 2
+\f[C]\-\-extract\-only|\-N\ <>\f[]: Extract the archive to the specified
+directory and exit.
+.IP \[bu] 2
+\f[C]\-\-extract\-dir|\-D\ <>\f[]: Extract the archive to the specified
+directory and then execute the specified command.
+By default, the \f[C]TMPDIR\f[] environment variable is used to create a
+directory to extract the archive.
+.PP
+See \f[C]stubbs:archive\f[] for further information about creating and
+understanding rerun archives.
+.SH MODULES
+.SS Layout
+.PP
+A rerun module assumes the following structure:
+.IP
+.nf
+\f[C]
+<MODULE>
+|\-\-\ commands
+|\-\-\ `\-\-\ cmdA\ (directory\ for\ cmdA\ files)
+|\-\-\ \ \ \ \ |\-\-\ metadata\ (command\ metadata)
+|\-\-\ \ \ \ \ |\-\-\ options.sh\ (option\ parsing\ script)
+|\-\-\ \ \ \ \ `\-\-\ script\ (command\ script)
+|\-\-\ lib
+|\-\-\ `\-\-\ functions.sh\ (module\ function\ library)
+|\-\-\ metadata\ (module\ metadata)
+|\-\-\ options\ (module\ options)
+|\ \ \ `\-\-\ optyY\ ("optY"\ option)
+|\ \ \ \ \ \ \ `\-\-\ metadata\ (declares\ metadata\ for\ "optY"\ option)
+`\-\-\ tests
+\ \ \ \ `\-\-\ cmdA\-1\-test.sh\ (unit\ tests\ for\ cmdA)
+\f[]
+.fi
+.SS Command Scripts
+.PP
+Rerun\[aq]s internal dispatch logic uses the directory layout described
+above to find and execute scripts for each command.
+.PP
+Rerun expects an implementation script for each command.
+.IP \[bu] 2
+\f[C]script\f[]: Script implementation.
+.IP \[bu] 2
+\f[C]options.sh\f[]: Script to parse options (generated by stubbs for
+"bash" modules).
+.SS Metadata
+.PP
+The metadata file format uses line separated \f[I]KEY=value\f[] pairs to
+define module attributes.
+The module metadata file declares two properties:
+.IP \[bu] 2
+\f[C]NAME\f[]: Declare name displayed to user.
+.IP \[bu] 2
+\f[C]DESCRIPTION\f[]: Brief explanation of use.
+.PP
+For example, a module named \f[C]waitfor\f[] is declared in a file
+called \f[C]RERUN_MODULES/waitfor/metadata\f[]:
+.IP
+.nf
+\f[C]
+NAME="waitfor"
+DESCRIPTION="utility\ commands\ that\ wait\ for\ a\ condition."
+\f[]
+.fi
+.PP
+Command metadata is described in a file called
+\f[C]RERUN_MODULES/<module>/commands/<command>/metadata\f[].
+It uses NAME and DESCRIPTION properties like a module but adds, OPTIONS.
+.IP \[bu] 2
+\f[C]OPTIONS\f[]: List of options assigned to the command.
+.PP
+Here\[aq]s the command metadata for the "ping" command:
+.IP
+.nf
+\f[C]
+NAME="ping"
+DESCRIPTION="wait\ for\ ping\ response\ from\ a\ host"
+OPTIONS="host\ interval"
+\f[]
+.fi
+.PP
+Each command can have options assigned to it.
+The example above shows that the "ping" command has options called
+"host" and "interval".
+.PP
+Options are described in their own metadata files following the naming
+convention: \f[C]RERUN_MODULES/<module>/options/<option>/metadata\f[].
+Beyond just \f[C]NAME\f[] and \f[C]DESCRIPTION\f[], options can also
+declare:
+.IP \[bu] 2
+\f[C]ARGUMENTS\f[]: Does the option take an argument.
+.IP \[bu] 2
+\f[C]REQUIRED\f[]: Is the option required.
+.IP \[bu] 2
+\f[C]DEFAULT\f[]: Sensible value for an option default
+.PP
+Here\[aq]s the metadata describing an option named "host":
+.IP
+.nf
+\f[C]
+NAME=host
+DESCRIPTION="the\ server\ to\ reach"
+ARGUMENTS=true
+REQUIRED=true
+DEFAULT=
+\f[]
+.fi
+.PP
+Combining the examples above into the layout described earlier the
+"waitfor" module along with its command "ping" are illustrated here:
+.IP
+.nf
+\f[C]
+modules/waitfor/
+|\-\-\ commands
+|\ \ \ `\-\-\ ping
+|\ \ \ \ \ \ \ |\-\-\ metadata
+|\ \ \ \ \ \ \ |\-\-\ options.sh
+|\ \ \ \ \ \ \ `\-\-\ script
+|\-\-\ lib
+|\ \ \ `\-\-\ functions.sh
+|\-\-\ metadata
+|\-\-\ options
+|\ \ \ |\-\-\ jumps
+|\ \ \ |\ \ \ `\-\-\ metadata
+|\ \ \ `\-\-\ subject
+|\ \ \ \ \ \ \ `\-\-\ metadata
+`\-\-\ tests
+\ \ \ \ `\-\-\ ping\-1\-test.sh
+\f[]
+.fi
+.SH API
+.PP
+The rerun executable is also a sourceable file containing a number of
+public functions useful in your modules.
+Read the rerun source file for the inline documentation.
+.SS Exit on error
+.PP
+The \f[C]rerun_die\f[] function will print a message and exit.
+.IP
+.nf
+\f[C]
+rerun_die\ "hit\ a\ nasty\ problem."
+\f[]
+.fi
+.PP
+The default exit code is "1".
+You can specify another code:
+.IP
+.nf
+\f[C]
+rerun_die\ 3\ "exiting\ this\ program\ with\ exit\ code\ 3"
+\f[]
+.fi
+.SS Listing
+.PP
+A number of functions are useful for listing modules, commands and
+options.
+.IP \[bu] 2
+\f[C]rerun_modules\ directory\f[] \- list the modules in the directory
+.PD 0
+.P
+.PD
+.IP \[bu] 2
+\f[C]rerun_commands\ directory\ module\f[] \- List the commands for the
+specified module.
+.IP \[bu] 2
+\f[C]rerun_options\ directory\ module\ command\f[] \- List the options
+assigned to command.
+.IP \[bu] 2
+\f[C]rerun_module_options\ directory\ module\f[] \- List the options for
+the specified module
+.SS Logging
+.PP
+The \f[C]rerun_log\f[] function provides an API to standard logging
+functions.
+The \f[C]rerun_log\f[] function can perform a variety of actions but the
+default one is to log a message to the configured (or default) log
+level.
+.IP
+.nf
+\f[C]
+rerun_log\ "this\ is\ my\ message\ text"
+\f[]
+.fi
+.PP
+The rerun_log function can perform a number of actions:
+.IP \[bu] 2
+\f[C]levels\f[] \- print the supported log levels.
+(eg, debug info warn error fatal)
+.IP \[bu] 2
+\f[C]level\ ?level?\f[] \- set or get the current log level.
+.IP \[bu] 2
+\f[C]log\ priority\ message\f[] \- write the message to the log at the
+specified priority.
+.IP \[bu] 2
+\f[C]logfile\ ?path?\f[] \- set or get the current log file to write
+messages.
+.IP \[bu] 2
+\f[C]syslog\ ?facility?\f[] \- set or get the current syslog facility.
+Set it to empty disables syslog.
+.PP
+To list the set of supported log levels use the \f[C]levels\f[] action:
+.IP
+.nf
+\f[C]
+$\ rerun_log\ levels
+debug\ info\ warn\ error\ fatal
+\f[]
+.fi
+.PP
+To find out the currently set level use the \f[C]level\f[] action:
+.IP
+.nf
+\f[C]
+rerun_log\ level
+info
+\f[]
+.fi
+.PP
+Messages will only be logged if the level is the same or greater than
+the current level.
+You can set it to another level to control what messages are produced.
+.IP
+.nf
+\f[C]
+rerun_log\ level\ error
+\f[]
+.fi
+.PP
+Now only messages of error or fatal will be produced.
+.PP
+To write a message to a particular level, just specify it.
+Here a message at "info" is used:
+.IP
+.nf
+\f[C]
+rerun_log\ info\ "here\ is\ an\ info\ message"
+\f[]
+.fi
+.PP
+To write a message at error, use "error":
+.IP
+.nf
+\f[C]
+rerun_log\ error\ "here\ is\ an\ error\ message"
+\f[]
+.fi
+.PP
+Log messages can also be written to a log file by specifying the
+\f[C]logfile\f[] action.
+.IP
+.nf
+\f[C]
+rerun_log\ logfile\ my.log
+rerun_log\ warn\ "here\ is\ a\ warning\ message"
+
+cat\ my.log
+2013\-09\-12T121553\-PDT]\ warn\ \ :\ here\ is\ a\ warning\ message
+\f[]
+.fi
+.PP
+To stop messages being written from the log file, set it to ""
+.IP
+.nf
+\f[C]
+rerun_log\ logfile\ ""
+\f[]
+.fi
+.PP
+Messages can also be directed to syslog by assigning a syslog facility
+via \f[C]syslog\f[] action.
+.IP
+.nf
+\f[C]
+rerun_log\ syslog\ "local3"
+\f[]
+.fi
+.PP
+Messages produced by rerun_log will directed to the local3.{level}
+priority.
+.IP
+.nf
+\f[C]
+rerun_log\ info\ "here\ is\ a\ message\ also\ visible\ in\ syslog"
+\f[]
+.fi
+.PP
+On a linux system this will be visible in /var/log/messages:
+.IP
+.nf
+\f[C]
+Sep\ 12\ 09:59:28\ Targa.local\ alexh\ (rerun)[92715]:\ here\ is\ a\ message\ also\ visible\ in\ syslog
+\f[]
+.fi
+.PP
+Typically, the rerun_log function is called from the context of a
+command script.
+The module and command name will be read from the executing context and
+included as part of the standard message.
+Imagine a command \f[C]hello:say\ \-\-msg\ HI\f[] that does
+.IP
+.nf
+\f[C]
+rerun_log\ "message:\ $MSG"
+\f[]
+.fi
+.PP
+The user would see the following message:
+.IP
+.nf
+\f[C]
+2013\-09\-12T121553\-PDT]\ info\ (hello:say):\ message:\ HI
+\f[]
+.fi
+.SH ENVIRONMENT
+.PP
+\f[C]RERUN_MODULES\f[] : Path to directory containing rerun modules.
+If RERUN_MODULES is not set, it is defaulted relative to the location of
+the rerun executable.
+.PP
+\f[C]RERUN_COLOR\f[] : Set \[aq]true\[aq] if you want ANSI text effects.
+Makes labels in text to print bold in the console.
+Syntax errors will also print bold.
+.SH VERSIONING
+.PP
+Rerun and its modules following the Semantic Versioning
+Specification (http://semver.org).
+As a consequence, any backwards incompatible change to Rerun will result
+in its major version number being incremented.
+Module developers are expected to provide a version of their module
+compatible with each major version of Rerun.
+.SH SEE ALSO
+.PP
+To create modules, see
+stubbs (https://github.com/rerun/rerun/tree/master/modules/stubbs).
+.SH ERROR CODE
+.PP
+\f[C]0\f[] : All commands executed successfully.
+.PP
+\f[C]1\f[] : One or more commands failed.
+.PP
+\f[C]2\f[] : Option syntax error.
+.PP
+\f[C]127\f[] : Unknown error case.
+.SH LICENSE
+.PP
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use this file except in compliance with the License.
+You may obtain a copy of the License at
+.PP
+http://www.apache.org/licenses/LICENSE\-2.0
+.PP
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+.PP
+The rerun source code and all documentation may be downloaded from
+<https://github.com/rerun/rerun/>.
