@@ -184,8 +184,9 @@ rerun_log() {
             ;;
         debug|info|warn|error|fatal)
             level=$1
-            if (( $(rerun_list_index $level "${RERUN_LOGLEVELS[*]}") >= \
-                $(rerun_list_index $RERUN_LOGLEVEL "${RERUN_LOGLEVELS[*]}") ))
+            local specified_level=$(rerun_list_index $level "${RERUN_LOGLEVELS[*]}")
+            local current_level=$(rerun_list_index $RERUN_LOGLEVEL "${RERUN_LOGLEVELS[*]}")
+            if (( $specified_level >= $current_level ))
             then
                 rerun_log_puts $level "$command" "$2"
                 [[ -n "${RERUN_LOGFILE:-}" ]] && {
