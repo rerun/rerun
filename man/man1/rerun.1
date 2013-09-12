@@ -1,4 +1,4 @@
-.TH  "" "" 
+.TH RERUN 1 "" "RERUN User Manual" "Version 1.1.0"
 .SH NAME
 .PP
 rerun \- a modular shell automation framework to organize your keeper
@@ -415,6 +415,17 @@ modules/waitfor/
 The rerun executable is also a sourceable file containing a number of
 public functions useful in your modules.
 Read the rerun source file for the inline documentation.
+.PP
+Using stubbs:add\-command to add commands to your module will already
+take care of sourcing the rerun file for you.
+.PP
+To source rerun yourself, simply "dot" the file:
+.IP
+.nf
+\f[C]
+\&.\ $(which\ rerun)
+\f[]
+.fi
 .SS Exit on error
 .PP
 The \f[C]rerun_die\f[] function will print a message and exit.
@@ -455,6 +466,9 @@ the specified module
 .PP
 The \f[C]rerun_log\f[] function provides an API to standard logging
 functions.
+If you would like to standardize how you write messages to the console
+or to a logfile (or syslog), consider \f[C]rerun_log\f[].
+.PP
 The \f[C]rerun_log\f[] function can perform a variety of actions but the
 default one is to log a message to the configured (or default) log
 level.

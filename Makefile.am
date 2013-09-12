@@ -168,6 +168,11 @@ install-data-local:
 uninstall-local:
 	rm -f $(DESTDIR)$(sysconfdir)/bash_completion.d/$(PACKAGE)
 
+#
+# Doc targets
+#
+man:
+	sed "s/@VERSION@/${VERSION}/g" README.md | pandoc -s -w man -o man/man1/rerun.1
 
 #
 # Testing targets

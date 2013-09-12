@@ -7,7 +7,7 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
-#/ usage: rerun [-h][-v][-V][--version] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
+#/ usage: rerun [-h][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
 #
 # __Install__
 # 

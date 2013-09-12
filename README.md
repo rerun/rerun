@@ -1,3 +1,6 @@
+% RERUN(1) RERUN User Manual | Version @VERSION@
+
+
 # NAME
 
 rerun - a modular shell automation framework to organize your keeper scripts.
@@ -337,6 +340,13 @@ are illustrated here:
 The rerun executable is also a sourceable file containing a number of public functions
 useful in your modules. Read the rerun source file for the inline documentation.
 
+Using stubbs:add-command to add commands to your module will already
+take care of sourcing the rerun file for you.
+
+To source rerun yourself, simply "dot" the file:
+
+    . $(which rerun)
+
 ## Exit on error
 
 The `rerun_die` function will print a message and exit. 
@@ -358,9 +368,12 @@ A number of functions are useful for listing modules, commands and options.
 
 ## Logging
 
-The `rerun_log` function provides an API to standard logging functions. The `rerun_log`
-function can perform a variety of actions but the default one is to log a message to
-the configured (or default) log level.
+The `rerun_log` function provides an API to standard logging functions. 
+If you would like to standardize how you write messages to the console or
+to a logfile (or syslog), consider `rerun_log`.
+
+The `rerun_log` function can perform a variety of actions but the default 
+one is to log a message to the configured (or default) log level.
 
     rerun_log "this is my message text"
 
