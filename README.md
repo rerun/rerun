@@ -15,8 +15,6 @@ Collections of management modules can be archived and delivered as
 a single executable to facilitate team hand offs.
 Using the "stubbs" module, rerun will even facilitate documentation
 and unit tests.
-When users execute rerun module commands, rerun can record 
-execution data into log files.
 
 Rerun provides two modes of operation:
 
@@ -331,6 +329,94 @@ are illustrated here:
     `-- tests
         `-- ping-1-test.sh
 
+# API
+
+The rerun executable is also a sourceable file containing a number of public functions
+useful in your modules. Read the rerun source file for the inline documentation.
+
+## Exit on error
+
+The `rerun_die` function will print a message and exit. 
+
+    rerun_die "hit a nasty problem."
+
+The default exit code is "1". You can specify another code:
+
+    rerun_die 3 "exiting this program with exit code 3"
+
+## Listing
+
+A number of functions are useful for listing modules, commands and options.
+
+* `rerun_modules directory` - list the modules in the directory    
+* `rerun_commands directory module` - List the commands for the specified module.
+* `rerun_options directory module command` - List the options assigned to command.
+* `rerun_module_options directory module` - List the options for the specified module
+
+## Logging
+
+The `rerun_log` function provides an API to standard logging functions. The `rerun_log`
+function can perform a variety of actions but the default one is to log a message to
+the configured (or default) log level.
+
+    rerun_log "this is my message text"
+
+The rerun_log function can perform a number of actions:
+
+* `levels` - print the supported log levels. (eg, debug info warn error fatal)
+* `level ?level?` - set or get the current log level.
+* `log priority message` - write the message to the log at the specified priority.
+* `logfile ?path?` - set or get the current log file to write messages.
+* `syslog ?facility?` - set or get the current syslog facility. Set it to empty disables syslog.
+
+To list the set of supported log levels use the `levels` action:
+
+    $ rerun_log levels
+    debug info warn error fatal
+
+To find out the current set lot level use the `level` action:
+
+    rerun_log level
+    info
+
+Messages will only be logged if the level is the same or greater than the current level.
+You can set it to another level to control what messages are produced.
+
+    rerun_log level error
+
+Now only messages of error or fatal will be produced.
+
+To write a message to a particular level, just specify it. Here a message at "info" is used:
+
+    rerun_log info "here is an info message"
+
+To write a message at error, use "error":
+
+    rerun_log error "here is an error message"
+
+Log messages can also be written to a log file by specifying the `logfile` action.
+
+    rerun_log logfile my.log
+    rerun_log warn "here is a warning message"
+    
+    cat my.log
+    2013-09-12T121553-PDT] warn  : here is a warning message
+
+To stop messages being written from the log file, set it to ""
+
+    rerun_log logfile ""
+
+Messages can also be directed to syslog by assigning a syslog facility via `syslog` action.
+
+    rerun_log syslog "local3"
+
+Messages produced by rerun_log will directed to the local3.{level} priority.
+
+    rerun_log info "here is a message also visible in syslog"
+
+On a linux system this will be visible in /var/log/messages:
+
+    Sep 12 09:59:28 Targa.local alexh (rerun)[92715]: here is a message also visible in syslog
 
 # ENVIRONMENT
 
