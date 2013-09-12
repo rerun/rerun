@@ -78,12 +78,12 @@ rerun_log_puts() {
     if (( $current_level >= $threshold_level ))
     then
         # write message to stderr
-        printf >&2 -- "[%s] %-5s %s %s\n" "$tstamp" "$level" "$command" "$message"
+        printf >&2 -- "[%s] %-5s %s: %s\n" "$tstamp" "$level" "$command" "$message"
     else
         # write message to stdout
         printf -- "[%s] %-5s %s: %s\n" "$tstamp" "$level" "$command" "$message"
     fi
-    [[ -n "$RERUN_SYSLOG" ]] && rerun_log_syslog "$RERUN_SYSLOG" "$level" "$command" "$message"
+    [[ -n "${RERUN_SYSLOG:-}" ]] && rerun_log_syslog "$RERUN_SYSLOG" "$level" "$command" "$message"
 
     return 0
 }
@@ -99,8 +99,8 @@ rerun_log_puts() {
 #
 # Arguments:
 #
-# * facility: Log facility. (eg local3)
-# * level:    Log level. (debug|info|warn|error|fatal)
+# * facility: Valid syslog facility. (eg local3)
+# * level:    A rerun_log level. (debug|info|warn|error|fatal)
 # * command:  Command name. Usually module:command. If empty, 'rerun' is used.
 # * message:  The message text.
 #
@@ -108,7 +108,7 @@ rerun_log_puts() {
 #
 # * Rerun log levels are mapped to similar syslog priority.
 # * RERUN_SYSLOG environment variable enables syslogging to specified facility.
-: ${RERUN_SYSLOG:=local3}
+: ${RERUN_SYSLOG:=}
 #
 rerun_log_syslog() {
     [[ $# == 4 ]] || {
