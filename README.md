@@ -4,7 +4,7 @@ rerun - a modular shell automation framework to organize your keeper scripts.
 
 # SYNOPSYS
 
-	rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
+	rerun [-h][-v][-V] [-M <dir>] [--loglevel <>] [module:[command [options]]]
 
 # DESCRIPTION
 
@@ -56,6 +56,9 @@ for additional documentation including:
 
 `-h`
 : Print help and usage then exit.
+
+`--loglevel` *level*
+: Set the default log level (debug info warn error fatal). See rerun_log API.
 
 `-M` *DIRECTORY*
 : Module library directory path.
@@ -374,7 +377,7 @@ To list the set of supported log levels use the `levels` action:
     $ rerun_log levels
     debug info warn error fatal
 
-To find out the current set lot level use the `level` action:
+To find out the currently set level use the `level` action:
 
     rerun_log level
     info
@@ -417,6 +420,17 @@ Messages produced by rerun_log will directed to the local3.{level} priority.
 On a linux system this will be visible in /var/log/messages:
 
     Sep 12 09:59:28 Targa.local alexh (rerun)[92715]: here is a message also visible in syslog
+
+Typically, the rerun_log function is called from the context of a command script.
+The module and command name will be read from the executing context and included
+as part of the standard message. Imagine a command `hello:say --msg HI` that does
+
+    rerun_log "message: $MSG"
+
+The user would see the following message:
+
+    2013-09-12T121553-PDT] info (hello:say): message: HI
+
 
 # ENVIRONMENT
 
