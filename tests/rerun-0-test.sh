@@ -97,6 +97,17 @@ it_performs_rerun_list_remove() {
     rerun_list_contains "three" "${arr2[@]}"
 }
 
+it_performs_rerun_list_index() {
+    . $RERUN
+    arr1=( zero one two three four )
+    test "0" = $(rerun_list_index zero  "${arr1[@]}")
+    test "1" = $(rerun_list_index one   "${arr1[@]}")
+    test "2" = $(rerun_list_index two   "${arr1[@]}")
+    test "3" = $(rerun_list_index three "${arr1[@]}")
+    test "4" = $(rerun_list_index four  "${arr1[@]}")
+    test "-1" = $(rerun_list_index five  "${arr1[@]}")
+}
+
 it_performs_rerun_modules() {
     make_freddy $RERUN_MODULES
 
@@ -257,4 +268,52 @@ it_performs_rerun_command_execute() {
     rm ${OUT}
 }
 
+it_performs_rerun_log_puts() {
+    . $RERUN
+    # "[%s] %s %s: %s\n" "$tstamp" "$level" "$command" "$message"
 
+    out=($(rerun_log_puts info freddy:dance "hi there"))
+    test "info" = "${out[1]}"
+    test "freddy:dance:" = "${out[2]}"
+    message="${out[@]:3:${#out[@]}}"
+    test "hi there" = "$message"
+
+    test -z "$(rerun_log_puts error freddy:dance "oh no, an error")"
+    out=($(rerun_log_puts error freddy:dance "oh no, an error" 2>&1))
+    test -n "$out"
+}
+
+it_performs_rerun_log() {
+    . $RERUN
+    # check the default log level
+    test "info" = "$(rerun_log level)"
+    # Set the loglevel to warn
+    rerun_log level warn
+    test "warn" = "$(rerun_log level)"
+
+    # Get the log levels
+    test -n "${RERUN_LOGLEVELS[*]}"
+    levels=($(rerun_log levels))
+    test "${#levels[*]}" = "${#RERUN_LOGLEVELS[*]}"
+    test "${levels[*]}" = "${RERUN_LOGLEVELS[*]}"
+
+    # Get the configured logfile
+    test -z "$(rerun_log logfile)"
+    logfile=$(mktemp "/tmp/rerun.test.XXXXX")
+    # Set the logfile
+    rerun_log logfile $logfile
+    test "$logfile" = $(rerun_log logfile)
+
+    rerun_log warn "test message"
+    test "1" = $(wc -l $logfile | awk '{print $1}')
+    rerun_log level info
+    test "1" = $(wc -l $logfile | awk '{print $1}')
+    # Lower the loglevel
+    rerun_log level info
+    rerun_log info "info message"
+    test "2" = $(wc -l $logfile | awk '{print $1}')
+
+    grep "info message" $logfile
+
+    rm "$logfile"
+}
