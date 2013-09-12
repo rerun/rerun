@@ -290,7 +290,8 @@ it_performs_rerun_log() {
     # Set the loglevel to warn
     rerun_log level warn
     test "warn" = "$(rerun_log level)"
-
+    ! rerun_log level "total crap"
+    
     # Get the log levels
     test -n "${RERUN_LOGLEVELS[*]}"
     levels=($(rerun_log levels))
@@ -314,6 +315,11 @@ it_performs_rerun_log() {
     test "2" = $(wc -l $logfile | awk '{print $1}')
 
     grep "info message" $logfile
+
+    test -z $(rerun_log syslog)
+    rerun_log syslog user 
+    ! rerun_log syslog "total crap"
+
 
     rm "$logfile"
 }

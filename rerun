@@ -194,7 +194,13 @@ rerun_log() {
             fi
             ;;
         syslog)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_SYSLOG}" || RERUN_SYSLOG=$2
+            [[ $# == 1 ]] && printf "%s\n" "${RERUN_SYSLOG}" || {
+                [[ "$2" =~ ^[[:alnum:]]+$ ]] || {
+                    printf >&2 "rerun_log syslog: facility is not a valid name: '$2'\n"
+                    return 2
+                }
+                RERUN_SYSLOG=$2
+            }
             ;;
         log)
             rerun_log_puts $RERUN_LOGLEVEL "$command" "$2"
