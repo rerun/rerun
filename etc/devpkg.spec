@@ -76,7 +76,7 @@ rm -rf ${buildroot}
 %{_datadir}/doc/rerun/README.md
 %{moddir}/bin/Markdown.pl
 %{moddir}/bin/roundup
-%{moddir}/bin/shocco
+%{moddir}/bin/shocco.sh
 %{moddir}/commands/add-command/metadata
 %{moddir}/commands/add-command/options.sh
 %{moddir}/commands/add-command/README.md
@@ -102,6 +102,9 @@ rm -rf ${buildroot}
 %{moddir}/commands/migrate/options.sh
 %{moddir}/commands/migrate/README.md
 %{moddir}/commands/migrate/script
+%{moddir}/commands/rm-command/metadata
+%{moddir}/commands/rm-command/README.md
+%{moddir}/commands/rm-command/script
 %{moddir}/commands/rm-option/metadata
 %{moddir}/commands/rm-option/README.md
 %{moddir}/commands/rm-option/script
@@ -201,6 +204,7 @@ rm -rf ${buildroot}
 %dir %{_prefix}/lib/rerun/modules/stubbs/commands/docs
 %dir %{_prefix}/lib/rerun/modules/stubbs/commands/edit
 %dir %{_prefix}/lib/rerun/modules/stubbs/commands/migrate
+%dir %{_prefix}/lib/rerun/modules/stubbs/commands/rm-command
 %dir %{_prefix}/lib/rerun/modules/stubbs/commands/rm-option
 %dir %{_prefix}/lib/rerun/modules/stubbs/commands/test
 %dir %{_prefix}/lib/rerun/modules/stubbs/lib
