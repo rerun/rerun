@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e
 export LC_ALL=C
 RERUN_VERSION=$(grep ^RERUN_VERSION rerun  | cut -d= -f2)
 
