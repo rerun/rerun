@@ -34,8 +34,10 @@ Provides: rerun-%{module} = %{major}, rerun-%{module} = %{major}.%{minor}, rerun
 %global _enable_debug_package 0
 %global debug_package %{nil}
 %global __os_install_post %{nil}
-%define _binary_payload w7.lzdio
- 
+# Use gzip compression for binary payload for better backwards compatible.
+#   See: [#172](https://github.com/rerun/rerun/issues/172)
+%define _binary_payload w0.gzdio
+
 %description
 %{desc}
 
