@@ -314,10 +314,10 @@ it_performs_rerun_log() {
     ! rerun_log level "total crap"
 
     # Get the log levels
-    test -n "${RERUN_LOGLEVELS[*]}"
+    test -n "${RERUN_LOG_LEVELS[*]}"
     levels=($(rerun_log levels))
-    test "${#levels[*]}" = "${#RERUN_LOGLEVELS[*]}"
-    test "${levels[*]}" = "${RERUN_LOGLEVELS[*]}"
+    test "${#levels[*]}" = "${#RERUN_LOG_LEVELS[*]}"
+    test "${levels[*]}" = "${RERUN_LOG_LEVELS[*]}"
 
     # Get the configured logfile
     test -z "$(rerun_log logfile)"
