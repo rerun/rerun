@@ -64,24 +64,39 @@ fi
 export RERUN_LOGLEVELS=(debug info warn error fatal)
 # * RERUN_LOGLEVEL specifies the current log level (default=info)
 : ${RERUN_LOGLEVEL:=info}
+# * RERUN_LOG_FMT_CONSOLE
+: ${RERUN_LOG_FMT_CONSOLE:="[%level%] %command%: %message%"}
+# * RERUN_LOG_FMT_LOGFILE
+: ${RERUN_LOG_FMT_LOGFILE:="[%tstamp%] [%level%] %command%: %message%"}
 #
 rerun_log_puts() {
-    [[ $# == 3 ]] || {
-        printf >&2 'wrong # args: should be: rerun_log_puts (debug|info|warn|error|fatal) command message\n'
+    [[ $# == 4 ]] || {
+        printf >&2 'wrong # args: should be: rerun_log_puts format (debug|info|warn|error|fatal) command message\n'
         return 2
     }
-    local level="$1" command="$2" message="$3"
+    local format="$1" level="$2" command="$3" message="$4"
     local tstamp=$(date '+%Y-%m-%dT%H%M%S-%Z') 
-
+    local fmt_spec=
+    case "$format" in
+        console) fmt_spec=$RERUN_LOG_FMT_CONSOLE
+        ;;
+        logfile) fmt_spec=$RERUN_LOG_FMT_LOGFILE
+        ;;
+    esac
+    output=$(printf -- "%s" "$fmt_spec" | 
+    sed -e "s/%tstamp%/$tstamp/g" \
+        -e "s/%level%/$level/g" \
+        -e "s/%command%/$command/g" \
+        -e "s/%message%/$message/g")
     local current_level=$(rerun_list_index $level "${RERUN_LOGLEVELS[*]}" )
     local threshold_level=$(rerun_list_index error "${RERUN_LOGLEVELS[*]}")
     if (( $current_level >= $threshold_level ))
     then
         # write message to stderr
-        printf >&2 -- "[%s] %-5s %s: %s\n" "$tstamp" "$level" "$command" "$message"
+        printf >&2 -- "%s\n" "$output"
     else
         # write message to stdout
-        printf -- "[%s] %-5s %s: %s\n" "$tstamp" "$level" "$command" "$message"
+        printf -- "%s\n" "$output"
     fi
     [[ -n "${RERUN_SYSLOG:-}" ]] && rerun_log_syslog "$RERUN_SYSLOG" "$level" "$command" "$message"
 
@@ -158,41 +173,25 @@ rerun_log_syslog() {
 # * RERUN_LOGFILE should be controlled via `rerun_log logfile`.
 
 rerun_log() {
-    (( $# <= 2 )) || {
+    (( $# >= 1 )) || {
         printf >&2 'usage: rerun_log ?action? ?args?\n'
         return 2
     }
-    local ctx=()
-    [[ -n "$RERUN_MODULE_DIR" ]] && {
-        local ctx=( ${ctx[*]:-} $(basename $RERUN_MODULE_DIR) )
-    }
-    [[ -n "$RERUN_COMMAND_DIR" ]] && {
-        local ctx=( ${ctx[*]:-} $(basename $RERUN_COMMAND_DIR) )
-    }
-    command=$( IFS=:; echo "${ctx[*]:-}" )
-    case "$1" in
+    local action="$1"
+    case "$action" in
         levels)
-            printf "%s\n" "${RERUN_LOGLEVELS[*]}"; return 0
+            printf "%s\n" "${RERUN_LOGLEVELS[*]}"
+            return 0
             ;;
         level)
             [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOGLEVEL}" || {
                 (( $(rerun_list_index $2 "${RERUN_LOGLEVELS[*]}") >= 0 )) && RERUN_LOGLEVEL=$2
             }
+            return 0
             ;;
         logfile)
             [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOGFILE}"  || RERUN_LOGFILE=$2
-            ;;
-        debug|info|warn|error|fatal)
-            level=$1
-            local specified_level=$(rerun_list_index $level "${RERUN_LOGLEVELS[*]}")
-            local current_level=$(rerun_list_index $RERUN_LOGLEVEL "${RERUN_LOGLEVELS[*]}")
-            if (( $specified_level >= $current_level ))
-            then
-                rerun_log_puts $level "$command" "$2"
-                [[ -n "${RERUN_LOGFILE:-}" ]] && {
-                    rerun_log_puts $level "$command" "$2" >> $RERUN_LOGFILE
-                }
-            fi
+            return 0
             ;;
         syslog)
             [[ $# == 1 ]] && printf "%s\n" "${RERUN_SYSLOG}" || {
@@ -202,14 +201,45 @@ rerun_log() {
                 }
                 RERUN_SYSLOG=$2
             }
+            return 0
+            ;;
+        fmt-console)
+            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_FMT_CONSOLE}"  || RERUN_LOG_FMT_CONSOLE=$2
+            return 0
+            ;;
+        fmt-logfile)
+            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_FMT_LOGFILE}"  || RERUN_LOG_FMT_LOGFILE=$2
+            return 0
+            ;;
+        debug|info|warn|error|fatal)
+            local level="$action" message="$2"
             ;;
         log)
-            rerun_log_puts $RERUN_LOGLEVEL "$command" "$2"
+            local level="$2"; shift
+            local message="$*"
             ;;
         *)
-            rerun_log_puts $RERUN_LOGLEVEL "$command" "$*"
+            local message="$*"
             ;;
     esac
+    local ctx=()
+    [[ -n "$RERUN_MODULE_DIR" ]] && {
+        ctx=( ${ctx[*]:-} $(basename $RERUN_MODULE_DIR) )
+    }
+    [[ -n "$RERUN_COMMAND_DIR" ]] && {
+        ctx=( ${ctx[*]:-} $(basename $RERUN_COMMAND_DIR) )
+    }
+    local command=$( IFS=:; printf "${ctx[*]:-}" )
+    : ${level:=$RERUN_LOGLEVEL}
+    local specified_level=$(rerun_list_index ${level} "${RERUN_LOGLEVELS[*]}")
+    local current_level=$(rerun_list_index $RERUN_LOGLEVEL "${RERUN_LOGLEVELS[*]}")
+    if (( $specified_level >= $current_level ))
+    then
+        rerun_log_puts console $level "$command" "$message"
+        [[ -n "${RERUN_LOGFILE:-}" ]] && {
+            rerun_log_puts logfile $level "$command" "$message" >> $RERUN_LOGFILE
+        }
+    fi
     return 0
 }
 

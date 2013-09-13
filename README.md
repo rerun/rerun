@@ -1,4 +1,4 @@
-% RERUN(1) RERUN User Manual | Version @VERSION@
+% RERUN(1) RERUN User Manual | @VERSION@
 
 
 # NAME
@@ -377,8 +377,21 @@ one is to log a message to the configured (or default) log level.
 
     rerun_log "this is my message text"
 
+On the console, the user would see:
+
+    [info] : this is my message text
+
+The default message level is "info". 
+
 The rerun_log function can perform a number of actions:
 
+* `fmt-console ?format-string?` - set or get the message format printed to console.  Default: `[%level%] %command%: %message%`
+* `fmt-logfile ?format-string?` - set or get the message format printed to logfiles. Default `[%tstamp%] [%level%] %command%: %message%`
+    * Message format strings support the following tokens:
+        - %tstamp%: Date-timestamp (i.e., `+%Y-%m-%dT%H%M%S-%Z`)
+        - %level%: The message level.
+        - %command%: The command context (formatted as: module:command).
+        - %message%: The message text.
 * `levels` - print the supported log levels. (eg, debug info warn error fatal)
 * `level ?level?` - set or get the current log level.
 * `log priority message` - write the message to the log at the specified priority.
@@ -387,10 +400,10 @@ The rerun_log function can perform a number of actions:
 
 To list the set of supported log levels use the `levels` action:
 
-    $ rerun_log levels
+    rerun_log levels
     debug info warn error fatal
 
-To find out the currently set level use the `level` action:
+To find out the currently set log level use the `level` action:
 
     rerun_log level
     info
@@ -400,25 +413,31 @@ You can set it to another level to control what messages are produced.
 
     rerun_log level error
 
-Now only messages of error or fatal will be produced.
+Now only messages of error or fatal will be produced. Invalid log levels are ignored.
 
-To write a message to a particular level, just specify it. Here a message at "info" is used:
+To write a message to a particular level, just specify it. Here's an info level message:
 
     rerun_log info "here is an info message"
 
-To write a message at error, use "error":
+To write an error level message, use "error" action:
 
     rerun_log error "here is an error message"
 
-Log messages can also be written to a log file by specifying the `logfile` action.
+Messages of error or fatal level are written to stderr.
+
+Log messages can also be written to a log file by specifying one via 
+the `logfile` action.
 
     rerun_log logfile my.log
     rerun_log warn "here is a warning message"
-    
-    cat my.log
-    2013-09-12T121553-PDT] warn  : here is a warning message
 
-To stop messages being written from the log file, set it to ""
+Use the `cat` command to see the log messages:
+
+    cat my.log
+    [2013-09-12T121553-PDT] [warn] : here is a warning message
+
+Notice the the logfile also includes a timestamp before the level name.
+To stop messages being written to the log file, set it to "" (empty string):
 
     rerun_log logfile ""
 
@@ -430,19 +449,22 @@ Messages produced by rerun_log will directed to the local3.{level} priority.
 
     rerun_log info "here is a message also visible in syslog"
 
-On a linux system this will be visible in /var/log/messages:
+On my system this is visible in /var/log/messages:
 
     Sep 12 09:59:28 Targa.local alexh (rerun)[92715]: here is a message also visible in syslog
 
-Typically, the rerun_log function is called from the context of a command script.
+Be sure to specify a valid syslog facility name or you will get an error.
+
+Typically, the rerun_log function is called from inside a command script.
 The module and command name will be read from the executing context and included
-as part of the standard message. Imagine a command `hello:say --msg HI` that does
+as part of the standard message. Imagine a command `hello:say --msg HI` that logs
+its message:
 
-    rerun_log "message: $MSG"
+    rerun_log info "the message is '$MSG'"
 
-The user would see the following message:
+The user would see the following message on the console:
 
-    2013-09-12T121553-PDT] info (hello:say): message: HI
+    [info] hello:say: the message is 'HI'
 
 
 # ENVIRONMENT

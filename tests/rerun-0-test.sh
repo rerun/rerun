@@ -270,17 +270,38 @@ it_performs_rerun_command_execute() {
 
 it_performs_rerun_log_puts() {
     . $RERUN
-    # "[%s] %s %s: %s\n" "$tstamp" "$level" "$command" "$message"
 
-    out=($(rerun_log_puts info freddy:dance "hi there"))
-    test "info" = "${out[1]}"
+    # Verify the default format is returned by fmt-console action.
+    test "$RERUN_LOG_FMT_CONSOLE" = "$(rerun_log fmt-console)"
+    # Print a message to the console
+    out=($(rerun_log_puts console info freddy:dance "hi there"))
+    test "4" = "${#out[*]}"        
+    test "[info]" = "${out[0]}"
+    test "freddy:dance:" = "${out[1]}"
+    message="${out[@]:2:${#out[@]}}"
+    test "hi there" = "$message"
+    test "[info] freddy:dance: hi there" = "${out[*]}"
+
+    # Print an error level message and be sure it's not written to stdout.
+    test -z "$(rerun_log_puts console error freddy:dance "oh no, an error")"
+    # Print the message and redirect stderr to capture the output
+    out=($(rerun_log_puts console error freddy:dance "oh no, an error" 2>&1))
+    test -n "$out"
+
+    # Verify the default format is returned by fmt-logfile action.
+    test "$RERUN_LOG_FMT_LOGFILE" = "$(rerun_log fmt-logfile)"
+    # Write a message using logfile output.
+    out=($(rerun_log_puts logfile info freddy:dance "hi there"))
+    test "5" = "${#out[*]}"        
+    test "[info]" = "${out[1]}"
     test "freddy:dance:" = "${out[2]}"
     message="${out[@]:3:${#out[@]}}"
     test "hi there" = "$message"
 
-    test -z "$(rerun_log_puts error freddy:dance "oh no, an error")"
-    out=($(rerun_log_puts error freddy:dance "oh no, an error" 2>&1))
-    test -n "$out"
+    # Be sure error message is is written to stderr and not stdout
+    test -z "$(rerun_log_puts logfile error freddy:dance "oh no, an error")"
+    out=($(rerun_log_puts logfile error freddy:dance "oh no, an error" 2>&1))
+    test -n "$out"    
 }
 
 it_performs_rerun_log() {
@@ -291,7 +312,7 @@ it_performs_rerun_log() {
     rerun_log level warn
     test "warn" = "$(rerun_log level)"
     ! rerun_log level "total crap"
-    
+
     # Get the log levels
     test -n "${RERUN_LOGLEVELS[*]}"
     levels=($(rerun_log levels))
@@ -313,8 +334,16 @@ it_performs_rerun_log() {
     rerun_log level info
     rerun_log info "info message"
     test "2" = $(wc -l $logfile | awk '{print $1}')
-
     grep "info message" $logfile
+
+
+    RERUN_MODULE_DIR=$RERUN_MODULES/freddy
+    RERUN_COMMAND_DIR=$RERUN_MODULE_DIR/commands/dance
+    out=$(rerun_log info "freddy says hi")
+    test "[info] freddy:dance: freddy says hi" = "$out"
+
+    out=$(rerun_log "freddy says hi")
+    test "[info] freddy:dance: freddy says hi" = "$out"
 
     test -z $(rerun_log syslog)
     rerun_log syslog user 

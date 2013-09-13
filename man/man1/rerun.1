@@ -1,4 +1,4 @@
-.TH RERUN 1 "" "RERUN User Manual" "Version 1.1.0"
+.TH RERUN 1 "" "RERUN User Manual" "1.1.0"
 .SH NAME
 .PP
 rerun \- a modular shell automation framework to organize your keeper
@@ -479,7 +479,39 @@ rerun_log\ "this\ is\ my\ message\ text"
 \f[]
 .fi
 .PP
+On the console, the user would see:
+.IP
+.nf
+\f[C]
+[info]\ :\ this\ is\ my\ message\ text
+\f[]
+.fi
+.PP
+The default message level is "info".
+.PP
 The rerun_log function can perform a number of actions:
+.IP \[bu] 2
+\f[C]fmt\-console\ ?format\-string?\f[] \- set or get the message format
+printed to console.
+Default: \f[C][%level%]\ %command%:\ %message%\f[]
+.IP \[bu] 2
+\f[C]fmt\-logfile\ ?format\-string?\f[] \- set or get the message format
+printed to logfiles.
+Default \f[C][%tstamp%]\ [%level%]\ %command%:\ %message%\f[]
+.RS 2
+.IP \[bu] 2
+Message format strings support the following tokens:
+.RS 2
+.IP \[bu] 2
+%tstamp%: Date\-timestamp (i.e., \f[C]+%Y\-%m\-%dT%H%M%S\-%Z\f[])
+.IP \[bu] 2
+%level%: The message level.
+.IP \[bu] 2
+%command%: The command context (formatted as: module:command).
+.IP \[bu] 2
+%message%: The message text.
+.RE
+.RE
 .IP \[bu] 2
 \f[C]levels\f[] \- print the supported log levels.
 (eg, debug info warn error fatal)
@@ -499,12 +531,12 @@ To list the set of supported log levels use the \f[C]levels\f[] action:
 .IP
 .nf
 \f[C]
-$\ rerun_log\ levels
+rerun_log\ levels
 debug\ info\ warn\ error\ fatal
 \f[]
 .fi
 .PP
-To find out the currently set level use the \f[C]level\f[] action:
+To find out the currently set log level use the \f[C]level\f[] action:
 .IP
 .nf
 \f[C]
@@ -524,9 +556,10 @@ rerun_log\ level\ error
 .fi
 .PP
 Now only messages of error or fatal will be produced.
+Invalid log levels are ignored.
 .PP
 To write a message to a particular level, just specify it.
-Here a message at "info" is used:
+Here\[aq]s an info level message:
 .IP
 .nf
 \f[C]
@@ -534,7 +567,7 @@ rerun_log\ info\ "here\ is\ an\ info\ message"
 \f[]
 .fi
 .PP
-To write a message at error, use "error":
+To write an error level message, use "error" action:
 .IP
 .nf
 \f[C]
@@ -542,20 +575,30 @@ rerun_log\ error\ "here\ is\ an\ error\ message"
 \f[]
 .fi
 .PP
-Log messages can also be written to a log file by specifying the
+Messages of error or fatal level are written to stderr.
+.PP
+Log messages can also be written to a log file by specifying one via the
 \f[C]logfile\f[] action.
 .IP
 .nf
 \f[C]
 rerun_log\ logfile\ my.log
 rerun_log\ warn\ "here\ is\ a\ warning\ message"
-
-cat\ my.log
-2013\-09\-12T121553\-PDT]\ warn\ \ :\ here\ is\ a\ warning\ message
 \f[]
 .fi
 .PP
-To stop messages being written from the log file, set it to ""
+Use the \f[C]cat\f[] command to see the log messages:
+.IP
+.nf
+\f[C]
+cat\ my.log
+[2013\-09\-12T121553\-PDT]\ [warn]\ :\ here\ is\ a\ warning\ message
+\f[]
+.fi
+.PP
+Notice the the logfile also includes a timestamp before the level name.
+To stop messages being written to the log file, set it to "" (empty
+string):
 .IP
 .nf
 \f[C]
@@ -581,7 +624,7 @@ rerun_log\ info\ "here\ is\ a\ message\ also\ visible\ in\ syslog"
 \f[]
 .fi
 .PP
-On a linux system this will be visible in /var/log/messages:
+On my system this is visible in /var/log/messages:
 .IP
 .nf
 \f[C]
@@ -589,23 +632,26 @@ Sep\ 12\ 09:59:28\ Targa.local\ alexh\ (rerun)[92715]:\ here\ is\ a\ message\ al
 \f[]
 .fi
 .PP
-Typically, the rerun_log function is called from the context of a
-command script.
+Be sure to specify a valid syslog facility name or you will get an
+error.
+.PP
+Typically, the rerun_log function is called from inside a command
+script.
 The module and command name will be read from the executing context and
 included as part of the standard message.
-Imagine a command \f[C]hello:say\ \-\-msg\ HI\f[] that does
+Imagine a command \f[C]hello:say\ \-\-msg\ HI\f[] that logs its message:
 .IP
 .nf
 \f[C]
-rerun_log\ "message:\ $MSG"
+rerun_log\ info\ "the\ message\ is\ \[aq]$MSG\[aq]"
 \f[]
 .fi
 .PP
-The user would see the following message:
+The user would see the following message on the console:
 .IP
 .nf
 \f[C]
-2013\-09\-12T121553\-PDT]\ info\ (hello:say):\ message:\ HI
+[info]\ hello:say:\ the\ message\ is\ \[aq]HI\[aq]
 \f[]
 .fi
 .SH ENVIRONMENT
