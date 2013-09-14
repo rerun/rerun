@@ -20,6 +20,9 @@ Source0: rerun-%{version}.tar.gz
 URL: http://rerun.github.com/rerun
 Packager: rerun-discuss@googlegroups.com
 
+# Redhat 5 needs this defined, not needed in later versions of RPM
+BuildRoot: %{_tmppath}/%{name}-root
+
 License: ASL 2.0
 Group: Applications/System
 # Disable automatic dependency discovery
@@ -52,13 +55,13 @@ A simple command runner because it's easy to forget standard operating procedure
 make
 
 %install
-echo "Installing to: \"${buildroot}\""
+echo "Installing to: \"%{buildroot}\""
 make install DESTDIR=%{buildroot}
 # TODO: remove after issue 147 fixed
 chmod 777 %{buildroot}%{_prefix}/lib/rerun/modules %{buildroot}%{moddir}/tests
 
 %clean
-rm -rf ${buildroot}
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root,-)
