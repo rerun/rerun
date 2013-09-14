@@ -70,6 +70,7 @@ rm -rf %{buildroot}
 %dir %{_prefix}/lib/rerun/modules/stubbs/tests
 %{_bindir}/rerun
 %{_sysconfdir}/bash_completion.d/rerun
+%{_mandir}/man1/rerun.1
 %{_datadir}/doc/rerun/AUTHORS
 %{_datadir}/doc/rerun/ChangeLog
 %{_datadir}/doc/rerun/COPYING
@@ -180,6 +181,7 @@ rm -rf %{buildroot}
 %{moddir}/tests/docs-1-test.sh
 %{moddir}/tests/functional-bash-1-test.sh
 %{moddir}/tests/migrate-1-test.sh
+%{moddir}/tests/rm-command-1-test.sh
 %{moddir}/tests/rm-option-1-test.sh
 %{moddir}/tests/stubbs-functions-1-test.sh
 %{_libexecdir}/rerun/tests/functions.sh
