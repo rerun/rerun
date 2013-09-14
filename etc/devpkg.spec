@@ -21,7 +21,8 @@ URL: http://rerun.github.com/rerun
 Packager: rerun-discuss@googlegroups.com
 
 # Redhat 5 needs this defined, not needed in later versions of RPM
-BuildRoot: %{_tmppath}/%{name}-root
+# see http://fedoraproject.org/wiki/EPEL:Packaging#BuildRoot_tag
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 License: ASL 2.0
 Group: Applications/System
@@ -56,11 +57,15 @@ make
 
 %install
 echo "Installing to: \"%{buildroot}\""
-make install DESTDIR=%{buildroot}
+# Needed only for RH5
+rm -rf %{buildroot}
+# Staged install http://www.gnu.org/prep/standards/html_node/DESTDIR.html
+make DESTDIR=%{buildroot} install
 # TODO: remove after issue 147 fixed
 chmod 777 %{buildroot}%{_prefix}/lib/rerun/modules %{buildroot}%{moddir}/tests
 
 %clean
+# Needed only for RH5
 rm -rf %{buildroot}
 
 %files
