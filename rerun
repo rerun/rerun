@@ -53,17 +53,19 @@ fi
 #
 # Arguments:
 #
-# * level:    Log level. (debug|info|warn|error|fatal)
+# * level:    The numeric log level. 
 # * command:  Command name. Usually module:command
 # * message:  The message text.
 #
 # Notes: 
 #
 # * Messages are written to stdout if below error level.
-# * RERUN_LOG_LEVELS defines the set of valid log levels.
-RERUN_LOG_LEVELS=(debug info warn error fatal)
-# * RERUN_LOG_LEVEL specifies the current log level (default=info)
-: ${RERUN_LOG_LEVEL:=info}
+# * RERUN_LOG_LEVELS defines the set of valid log levels 
+RERUN_LOG_LEVELS=([0]=debug [1]=info [2]=warn [3]=error [4]=fatal)
+# * RERUN_LOG_LEVEL specifies the current log level (default: info)
+: ${RERUN_LOG_LEVEL:=1}
+# * RERUN_LOG_ERR_LEVEL specifies the minimum level for messages printed to stderr.
+: ${RERUN_LOG_ERR_LEVEL:=3}
 # * RERUN_LOG_FMT_CONSOLE
 : ${RERUN_LOG_FMT_CONSOLE:="[%level%] %command%: %message%"}
 # * RERUN_LOG_FMT_LOGFILE
@@ -71,11 +73,12 @@ RERUN_LOG_LEVELS=(debug info warn error fatal)
 #
 rerun_log_puts() {
     [[ $# == 4 ]] || {
-        printf >&2 'wrong # args: should be: rerun_log_puts format (debug|info|warn|error|fatal) command message\n'
+        printf >&2 'wrong # args: should be: rerun_log_puts format level command message\n'
         return 2
     }
-    local format="$1" level="$2" command="$3" message="$4"
-    local tstamp=$(date '+%Y-%m-%dT%H%M%S-%Z') 
+    [[ "$2" =~ [0-9]+ ]] || { printf >&2 "rerun_log_puts: level must be numeric: '$2'\n"; return 2; }
+    local -r format="$1" level="$2" command="$3" message="$4"
+    local -r tstamp=$(date '+%Y-%m-%dT%H%M%S-%Z') 
     local fmt_spec=
     case "$format" in
         console) fmt_spec=$RERUN_LOG_FMT_CONSOLE
@@ -83,14 +86,12 @@ rerun_log_puts() {
         logfile) fmt_spec=$RERUN_LOG_FMT_LOGFILE
         ;;
     esac
-    output=$(printf -- "%s" "$fmt_spec" | 
-    sed -e "s/%tstamp%/$tstamp/g" \
-        -e "s/%level%/$level/g" \
-        -e "s/%command%/$command/g" \
-        -e "s/%message%/$message/g")
-    local current_level=$(rerun_list_index $level "${RERUN_LOG_LEVELS[*]}" )
-    local threshold_level=$(rerun_list_index error "${RERUN_LOG_LEVELS[*]}")
-    if (( $current_level >= $threshold_level ))
+    local output=$(printf -- "%s" "$fmt_spec" | 
+    sed -e "s^%tstamp%^$tstamp^g" \
+        -e "s^%level%^${RERUN_LOG_LEVELS[$level]}^g" \
+        -e "s^%command%^$command^g" \
+        -e "s^%message%^$message^g")
+    if (( $level >= $RERUN_LOG_ERR_LEVEL ))
     then
         # write message to stderr
         printf >&2 -- "%s\n" "$output"
@@ -98,7 +99,6 @@ rerun_log_puts() {
         # write message to stdout
         printf -- "%s\n" "$output"
     fi
-    [[ -n "${RERUN_LOG_SYSLOG:-}" ]] && rerun_log_syslog "$RERUN_LOG_SYSLOG" "$level" "$command" "$message"
 
     return 0
 }
@@ -114,31 +114,29 @@ rerun_log_puts() {
 #
 # Arguments:
 #
-# * facility: Valid syslog facility. (eg local3)
-# * level:    A rerun_log level. (debug|info|warn|error|fatal)
-# * command:  Command name. Usually module:command. If empty, 'rerun' is used.
+# * facility: Valid syslog facility. (e.g., local3)
+# * level:    The numeric log level. 
+# * command:  Command name. Usually formatted "module:command". If empty, 'rerun' is used.
 # * message:  The message text.
 #
 # Notes:
 #
-# * Rerun log levels are mapped to similar syslog priority.
-# * RERUN_LOG_SYSLOG environment variable enables syslogging to specified facility.
-: ${RERUN_LOG_SYSLOG:=}
+# * rerun_log levels are mapped to equivalent syslog priority.
 #
 rerun_log_syslog() {
     [[ $# == 4 ]] || {
-        printf >&2 'wrong # args: should be: rerun_log_syslog facility (debug|info|warn|error|fatal) command message\n'
+        printf >&2 'wrong # args: should be: rerun_log_syslog facility level command message\n'
         return 2
     }
-    local facility="$1" level="$2" command="${3:-rerun}" message="$4"
+    local -r facility="$1" level="$2" command="${3:-rerun}" message="$4"
 
     # map rerun_log level to syslog priority.
     local pri=
     case "$level" in
-        fatal) pri="fatal"       ;;
-        error) pri="err"         ;;
-        warn)  pri="warning"     ;;
-        info|debug) pri="$level" ;;
+        4) pri="fatal"    ;;
+        3) pri="err"      ;;
+        2)  pri="warning" ;;
+        1|0) pri="$level" ;;
     esac
     logger -p "${facility}.${pri}" -t "${LOGNAME:-$USER} ($command)" -- "$message"
     return $?
@@ -171,21 +169,25 @@ rerun_log_syslog() {
 # * RERUN_LOG_LEVELS should be considered immutable
 # * RERUN_LOG_LEVEL should only be controlled via `rerun_log level`.
 # * RERUN_LOG_FILE should be controlled via `rerun_log logfile`.
-
+# * RERUN_LOG_SYSLOG specifies syslog facility. Must be set to enable syslogging (unset by default).
+: ${RERUN_LOG_SYSLOG:=}
+#
 rerun_log() {
     (( $# >= 1 )) || {
         printf >&2 'usage: rerun_log ?action? ?args?\n'
         return 2
     }
-    local action="$1"
+    local -r action="$1"
     case "$action" in
         levels)
             printf "%s\n" "${RERUN_LOG_LEVELS[*]}"
             return 0
             ;;
         level)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_LEVEL}" || {
-                (( $(rerun_list_index $2 "${RERUN_LOG_LEVELS[*]}") >= 0 )) && RERUN_LOG_LEVEL=$2
+            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_LEVELS[$RERUN_LOG_LEVEL]}"
+            [[ $# == 2 ]] && { 
+                local level=$(rerun_list_index $2 "${RERUN_LOG_LEVELS[*]}")
+                (( "$level" >= 0 && "$level" <= ${#RERUN_LOG_LEVELS[*]})) && RERUN_LOG_LEVEL=$level || { printf >&2 "rerun_log level: invalid level: $2\n"; return 2; }
             }
             return 0
             ;;
@@ -212,17 +214,21 @@ rerun_log() {
             return 0
             ;;
         debug|info|warn|error|fatal)
-            local level="$action" message="$2"
+            local level=$(rerun_list_index $action "${RERUN_LOG_LEVELS[*]}")
+            shift
+            local message="$*"
             ;;
         log)
-            local level="$2"; shift
+            local level=$(rerun_list_index $2 "${RERUN_LOG_LEVELS[*]}")
+            (( "$level" >= 0 && "$level" <= 4)) || { "rerun_log log: invalid level: $2"; return 2; }
+            shift
             local message="$*"
             ;;
         *)
             local message="$*"
             ;;
     esac
-    local ctx=()
+    local -a ctx=()
     [[ -n "${RERUN_MODULE_DIR:-}" ]] && {
         ctx=( ${ctx[*]:-} $(basename $RERUN_MODULE_DIR) )
     }
@@ -231,15 +237,17 @@ rerun_log() {
     }
     local command=$( IFS=:; printf "${ctx[*]:-}" )
     : ${level:=$RERUN_LOG_LEVEL}
-    local specified_level=$(rerun_list_index ${level} "${RERUN_LOG_LEVELS[*]}")
-    local current_level=$(rerun_list_index $RERUN_LOG_LEVEL "${RERUN_LOG_LEVELS[*]}")
-    if (( $specified_level >= $current_level ))
+    local current_level=$RERUN_LOG_LEVEL
+    if (( $level >= $current_level ))
     then
         rerun_log_puts console $level "$command" "$message"
         [[ -n "${RERUN_LOG_FILE:-}" ]] && {
             rerun_log_puts logfile $level "$command" "$message" >> $RERUN_LOG_FILE
         }
     fi
+    [[ -n "${RERUN_LOG_SYSLOG:-}" ]] && {
+        rerun_log_syslog "$RERUN_LOG_SYSLOG" "$level" "$command" "$message"
+    }
     return 0
 }
 
@@ -265,7 +273,7 @@ rerun_log() {
 # * Exit status returned to invoking command: 0
 rerun_die() {   
    [[ $# -gt 1 ]] && { 
-	    exit_status=$1
+        local exit_status=$1
         shift        
     } 
     local -i frame=0; local info= 
@@ -675,7 +683,7 @@ rerun_property_get() {
     [[ ! $# -eq 2 ]] && { 
         rerun_die 'wrong # args: should be: rerun_property_get directory property'
     }
-    local -r directory=$1 property=$2
+    local -r directory="$1" property="$2"
     [[ ! -f ${directory}/metadata ]] && rerun_die "metadata not found: ${directory}/metadata"
     grep "^$property=" ${directory}/metadata >/dev/null && {
         set +u
@@ -711,7 +719,7 @@ rerun_property_set() {
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
 
-    local -r directory=$1 
+    local -r directory="$1" 
     local -a sed_patts=()
     shift ;
     while [ "$#" -gt 0 ]
@@ -762,8 +770,8 @@ rerun_script_lookup() {
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
 
-    local -r module_dir=$1 command=$2
-    local -r command_dir=$module_dir/commands/${command}
+    local -r module_dir="$1" command="$2"
+    local -r command_dir="$module_dir/commands/${command}"
 
     local -a searchlist=( $command_dir/script  $command_dir/default.sh )
     for file in ${searchlist[*]}
@@ -799,7 +807,7 @@ rerun_script_exists() {
     [[ ! $# -eq 2 ]] && { 
         rerun_die 'wrong # args: should be: rerun_script_exists directory command'
     }
-    local -r module_dir=$1 command=$2
+    local -r module_dir="$1" command="$2"
     if [[ -f "$(rerun_script_lookup $module_dir $command)" ]]
     then return 0
     else return 1
@@ -827,7 +835,7 @@ rerun_module_exists() {
     [[ ! $# -eq 1 ]] && { 
         rerun_die 'wrong # args: should be: rerun_module_exists module'
     }
-    local -r module=$1
+    local -r module="$1"
 
     if [[ -f "${RERUN_MODULES:-}/$module/metadata" ]]
     then
@@ -879,8 +887,8 @@ rerun_command_execute() {
     [[ ! $# -ge 2 ]] && { 
         rerun_die "wrong # args: should be: rerun_command_execute module command options" 
     }
-    local -r module=$1; 
-    local -r command=$2; 
+    local -r module="$1"
+    local -r command="$2"
     shift; shift; # options are the remaining positional parameters.
 
     RERUN_MODULE_DIR=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
