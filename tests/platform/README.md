@@ -4,8 +4,8 @@ as vagrant configurations.
 Usage
 -----
 
-   cd {platform-dir}
-   vagrant up
+    cd {platform-dir}
+    vagrant up
 
 
 TODO

@@ -46,11 +46,11 @@ it_installs_in_standard_locations() {
 }
 
 it_performs_rerun_module_listings() {
-   rerun | grep stubbs
+	rerun | grep stubbs
 }
 
 it_performs_rerun_command_listings() {
-   rerun stubbs
+	rerun stubbs
 }
 
 it_performs_rerun_stubbs_tests() {

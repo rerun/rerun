@@ -6,6 +6,9 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "http://tag1consulting.com/files/centos-5.8-x86-64-minimal.box"
   config.vm.box = "centos-5.8-x86-64-minimal"
 
+  config.vm.synced_folder "../common/", "/tests/common"
+
   config.vm.provision :shell, :path => "bootstrap.sh"
+  config.vm.provision :shell, :path => "test.sh", :args => "/tests/common"
 
 end
