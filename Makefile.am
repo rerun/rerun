@@ -50,7 +50,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/commands/rm-command/metadata \
 	modules/stubbs/commands/rm-command/README.md \
 	modules/stubbs/commands/rm-option/metadata \
-	modules/stubbs/commands/rm-option/README.md \	
+	modules/stubbs/commands/rm-option/README.md \
 	modules/stubbs/commands/test/metadata \
 	modules/stubbs/commands/test/README.md \
 	modules/stubbs/lib/docs.css \
