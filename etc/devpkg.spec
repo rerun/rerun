@@ -4,12 +4,14 @@
 # provided by the OS team's YUM repos.  
 #
 
-# this seems to get rpm working on OSX with rpm 5.1.9
+# seems to get rpm working on OSX with rpm 5.1.9
+# this is development integration testing functionality only
 %ifos darwin
 %define dist		.osx
 %define _prefix		/opt/rerun
 %define _sysconfdir	/opt/rerun/etc
 %endif
+
 %define moddir		%{_prefix}/lib/rerun/modules/stubbs
 
 Name: rerun
@@ -49,6 +51,26 @@ Provides: rerun = %{major}, rerun = %{major}.%{minor}, rerun = %{major}.%{minor}
 A simple command runner because it's easy to forget standard operating procedure.
 
 %prep
+
+# Detect undefined dist for CENTOS5/RHEL5
+%if "0%{?dist}" == "0"
+%{error:*************************************************}
+%{error:The "dist" tag not defined!}
+%{error:   This usually happens in RHEL5/Centos5 when}
+%{error:   the "buildsys-macros" RPM is not installed.}
+%{error:   See https://github.com/rerun/rerun/issues/171}
+%{error:*************************************************}
+exit 1
+%endif
+
+# Detect real bad buildroot config
+%if "x%{?buildroot}" == "x" || "x%{?buildroot}" == "x/" || "x%{?buildroot}" == "x/usr"
+%{error:*************************************************}
+%{error:The buildroot RPM macro definition is dangerous}
+%{error:*************************************************}
+exit 1
+%endif
+
 %setup
 
 %build
@@ -195,6 +217,7 @@ rm -rf %{buildroot}
 %{_libexecdir}/rerun/tests/rerun-2-test.sh
 %{_libexecdir}/rerun/tests/rerun-4-test.sh
 
+# not sure if I like RPM5, it requires directories to be listed
 %ifos darwin
 %dir /
 %dir /opt
