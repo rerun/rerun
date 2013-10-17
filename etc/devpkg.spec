@@ -74,7 +74,8 @@ exit 1
 %setup
 
 %build
-./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir}
+# mandir needed per issue-185
+./configure --prefix=%{_prefix} --sysconfdir=%{_sysconfdir} --mandir=%{_prefix}/share/man
 make
 
 %install
