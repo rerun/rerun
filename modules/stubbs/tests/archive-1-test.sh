@@ -71,7 +71,7 @@ it_handles_comands_using_quoted_arguments() {
 }
 
 it_builds_the_stubbs_module_rpm() {
-    [[ "$(id -un)" != "root" ]] && return 
+    #[[ "$(id -un)" != "root" ]] && return 
 
     if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
     then
@@ -87,7 +87,41 @@ it_builds_the_stubbs_module_rpm() {
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
     rerun stubbs:archive --format rpm --modules stubbs --release 1
-    rpm -qi -p rerun-stubbs-$(grep ^VERSION=  $RERUN_MODULES/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM1=rerun-stubbs-$(grep ^VERSION=  $RERUN_MODULES/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    rpm -qi -p ${RPM1} | grep stubbs
+    popd
+    rm -rf ${TMPDIR}
+}
+
+it_builds_a_list_of_rpms() {
+    if [[ "$(uname -s)" = "Linux" && -x /usr/bin/rpmbuild ]]
+    then
+        MYDIST="$(rpm --eval %{?dist})";
+    else
+        if [[ "$(uname -s)" = "Darwin" && -x /opt/local/bin/rpmbuild ]]
+        then
+            MYDIST=".osx"; # ok run the test, macports rpm installed
+        else
+            return 0; # bail out of the test.
+        fi
+    fi
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command says --description "none"
+    rerun stubbs:add-option --module freddy --command says --option msg \
+        --description none --required true --export false --default nothing
+    rerun stubbs:add-module --module dance --description "none"
+    rerun stubbs:add-command --module dance --command says --description "none"
+    rerun stubbs:add-option --module dance --command says --option msg \
+        --description none --required true --export false --default nothing
+    TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
+    pushd $TMPDIR
+
+    rerun stubbs:archive --format rpm --modules "freddy dance" --release 1
+
+    RPM1=rerun-freddy-$(grep ^VERSION=  $RERUN_MODULES/freddy/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM2=rerun-dance-$(grep ^VERSION=  $RERUN_MODULES/dance/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    rpm -qi -p ${RPM1} | grep freddy
+    rpm -qi -p ${RPM2} | grep dance
     popd
     rm -rf ${TMPDIR}
 }

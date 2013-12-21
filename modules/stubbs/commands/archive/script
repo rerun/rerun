@@ -171,9 +171,10 @@ buildbinarchive() {
 
 buildrpmarchive() {
 
-  for MODULE_DIR in $RERUN_MODULES/$MODULES
+  for MODULE in ${MODULES}
   do
-    if [[ -r $MODULE_DIR/metadata ]]
+    MODULE_DIR=${RERUN_MODULES}/${MODULE}
+    if [[ -r ${MODULE_DIR}/metadata ]]
     then
       # Setup a temporary directory to build the RPM:
       RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX) 
