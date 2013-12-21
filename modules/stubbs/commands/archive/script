@@ -224,8 +224,10 @@ buildrpmarchive() {
       # get the Distribution
       if [[ "$(uname -s)" = "Darwin" ]]; then
         RPMDIST=".osx"
+        TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
       else
         RPMDIST=$(rpm --eval %{?dist})
+        TAREXCL="--exclude-vcs"
       fi
 
       # Remove any existing builds:
@@ -246,11 +248,8 @@ buildrpmarchive() {
         chmod -R u+w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/*
       fi
 
-      tar -czf \
-        $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \
-        --exclude='.git' --exclude='.svn' --exclude='.gitignore' \
-        --exclude='.hg' --exclude='.hgignore' \
-        rerun-${NAME}-${VERSION}
+      tar -czf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \
+        ${TAREXCL} rerun-${NAME}-${VERSION}
 
       rm -rf ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
