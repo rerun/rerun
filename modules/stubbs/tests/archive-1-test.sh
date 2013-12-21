@@ -113,6 +113,7 @@ it_builds_a_list_of_rpms() {
     rerun stubbs:add-command --module dance --command says --description "none"
     rerun stubbs:add-option --module dance --command says --option msg \
         --description none --required true --export false --default nothing
+    mkdir $RERUN_MODULES/freddy/commands/.git $RERUN_MODULES/freddy/commands/.svn
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
 
@@ -122,6 +123,8 @@ it_builds_a_list_of_rpms() {
     RPM2=rerun-dance-$(grep ^VERSION=  $RERUN_MODULES/dance/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
     rpm -qi -p ${RPM1} | grep freddy
     rpm -qi -p ${RPM2} | grep dance
+    rpm2cpio ${RPM1} | cpio -t - | grep "\/\.git$" && exit 1
+    rpm2cpio ${RPM1} | cpio -t - | grep "\/\.svn$" && exit 1
     popd
     rm -rf ${TMPDIR}
 }
