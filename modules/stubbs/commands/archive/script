@@ -250,9 +250,9 @@ buildrpmarchive() {
       # Build the source archive:
       pushd $RPMTOPDIR/SOURCES > /dev/null
 
-      if [ ! -w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/commands ]; then
+      if [[ ! -w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION} ]]; then
         # this happens in autoconf "make distcheck", so this is a workaround
-        chmod -R u+w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}/*
+        chmod -R u+w ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
       fi
 
       tar -czf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \

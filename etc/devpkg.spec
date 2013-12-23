@@ -98,7 +98,7 @@ rm -rf %{buildroot}
 %dir %{_prefix}/lib/rerun/modules/stubbs/tests
 %{_bindir}/rerun
 %{_sysconfdir}/bash_completion.d/rerun
-%{_mandir}/man1/rerun.1
+%{_prefix}/share/man/man1/rerun.1
 %{_datadir}/doc/rerun/AUTHORS
 %{_datadir}/doc/rerun/ChangeLog
 %{_datadir}/doc/rerun/COPYING
@@ -274,6 +274,7 @@ rm -rf %{buildroot}
 %dir %{_prefix}/share
 %dir %{_prefix}/share/doc
 %dir %{_prefix}/share/doc/rerun
+%dir %{_prefix}/share/man/man1
 %endif
 
 %changelog
