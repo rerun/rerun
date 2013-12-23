@@ -58,7 +58,7 @@ it_handles_comands_using_quoted_arguments() {
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
     cat $RERUN_MODULES/freddy/commands/says/script |
-    sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
+        sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/says/script
 
     rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
@@ -134,6 +134,8 @@ it_extracts_only_and_exits() {
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
+    mkdir $RERUN_MODULES/freddy/.svn
+    mkdir $RERUN_MODULES/freddy/.git
     rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
 
     /tmp/rerun.bin.$$ --extract-only /tmp/myextract.$$
@@ -143,6 +145,8 @@ it_extracts_only_and_exits() {
     test -x /tmp/myextract.$$/rerun/rerun
     test -d /tmp/myextract.$$/rerun/modules
     test -d /tmp/myextract.$$/rerun/modules/freddy
+    [[ -e /tmp/myextract.$$/rerun/modules/freddy/.svn ]] && exit 1
+    [[ -e /tmp/myextract.$$/rerun/modules/freddy/.git ]] && exit 1
 
     rm -rf /tmp/myextract.$$
     rm -rf /tmp/rerun.bin.$$

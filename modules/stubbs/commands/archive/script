@@ -94,22 +94,28 @@ buildbinarchive() {
   # create a work directory the archive content
   export PAYLOAD=`mktemp -d /tmp/rerun.stubbs.archive.XXXXXX` || rerun_die
 
+  if [[ "$(uname -s)" = "Darwin" ]]; then
+    # Github issue-166
+    TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
+  else
+    TAREXCL="--exclude-vcs"
+  fi
   #
   # Start preparing the payload content.
   #
 
   # Iterate through the the specified modules and add them to payload
   mkdir -p $PAYLOAD/rerun/modules 
-  pushd $RERUN_MODULES >/dev/null 
   for module in $MODULES
   do
       # Check for a commands subdir to be sure it looks like a module
-      if [ -d $RERUN_MODULES/$module/commands ]
+      if [ -d ${RERUN_MODULES}/${module}/commands ]
       then
-        cp -r $RERUN_MODULES/$module $PAYLOAD/rerun/modules
+        pushd ${RERUN_MODULES} > /dev/null 
+        tar -c ${TAREXCL} -f - ${module} | ( cd $PAYLOAD/rerun/modules; tar xpf - )
+        popd >/dev/null
       fi
   done
-  popd >/dev/null
 
   # Copy rerun itself to the payload
   cp $RERUN $PAYLOAD/rerun 
@@ -224,6 +230,7 @@ buildrpmarchive() {
       # get the Distribution
       if [[ "$(uname -s)" = "Darwin" ]]; then
         RPMDIST=".osx"
+        # Github issue-155
         TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
       else
         RPMDIST=$(rpm --eval %{?dist})
