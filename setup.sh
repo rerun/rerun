@@ -18,7 +18,7 @@ if [ "clean" == "$1" ]; then
   fi
 
   rm -f INSTALL ChangeLog Makefile.in aclocal.m4 configure rerun-${RERUN_VERSION}* rerun-stubbs-*.rpm
-  rm -rf rpm autom4te.cache config tmp
+  rm -rf rpm autom4te.cache config tmp deb
 else
   autoreconf --install
   ./configure

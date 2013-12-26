@@ -236,6 +236,19 @@ rpm: dist
 		$(srcdir)/etc/devpkg.spec
 	find $(builddir)/rpm/{RPMS,SRPMS}/ -name "*.rpm" -exec mv {} ./ \;
 
+deb: dist
+	@echo "Packaging rerun as an Debian ..."
+	mkdir -p $(builddir)/deb
+	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/deb/rerun-${VERSION}.orig.tar.gz
+	pushd $(builddir)/deb
+	tar xzf rerun-${VERSION}.orig.tar.gz
+	DEBFULLNAME="rerun-discuss@googlegroups.com"
+	dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com 
+	
+	
+	popd
+
+
 release: rpm
 	echo "Releasing Rerun"
 	MYSVR="repository-stagrlee.forge.cloudbees.com/release"; \
