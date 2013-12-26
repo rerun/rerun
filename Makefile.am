@@ -240,14 +240,10 @@ deb: dist
 	@echo "Packaging rerun as an Debian ..."
 	mkdir -p $(builddir)/deb
 	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/deb/rerun-${VERSION}.orig.tar.gz
-	pushd $(builddir)/deb
-	tar xzf rerun-${VERSION}.orig.tar.gz
-	DEBFULLNAME="rerun-discuss@googlegroups.com"
+	cd $(builddir)/deb; \
+	tar xzf rerun-${VERSION}.orig.tar.gz; \
+	DEBFULLNAME="rerun-discuss@googlegroups.com"; \
 	dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com 
-	
-	
-	popd
-
 
 release: rpm
 	echo "Releasing Rerun"
