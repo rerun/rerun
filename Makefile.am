@@ -199,7 +199,8 @@ test-rerun:
 	if [[ "$${CLEANUPDIRS}" = "true" ]]; then chmod u-w $${RERUN_MODULES}; fi
 test-stubbs:
 	echo "Testing stubbs module..."; \
-	if [[ "$(srcdir)" = "/*" ]]; then MYDIR="$(srcdir)"; else MYDIR="${PWD}/$(srcdir)"; fi; \
+	if [[ "$${PWD}x" = "x" ]]; then export PWD="$(shell pwd)"; fi; \
+	if [[ "$(srcdir)" = "/*" ]]; then MYDIR="$(srcdir)"; else MYDIR="$${PWD}/$(srcdir)"; fi; \
 	export RERUN="$${MYDIR}/rerun"; \
 	export RERUN_MODULES="$${MYDIR}/modules"; \
 	export LC_ALL="C"; \
@@ -239,11 +240,34 @@ rpm: dist
 deb: dist
 	@echo "Packaging rerun as an Debian ..."
 	mkdir -p $(builddir)/deb
-	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/deb/rerun-${VERSION}.orig.tar.gz
+	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/deb/rerun_${VERSION}.orig.tar.gz
 	cd $(builddir)/deb; \
-	tar xzf rerun-${VERSION}.orig.tar.gz; \
+	tar xzf rerun_${VERSION}.orig.tar.gz; \
+	cd rerun-${VERSION}; \
 	DEBFULLNAME="rerun-discuss@googlegroups.com"; \
-	dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com 
+	yes | dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com 
+	sed -i  -e 's/ unknown$$/ shells/g' \
+		-e 's/ root / stagrlee /g' \
+		-e 's@^Homepage:.*$$@Homepage: http://rerun.github.io/rerun@g' \
+		-e 's/^Description:.*$$/Description: Command runner to make remembering procedures easier/g' \
+		-e '/^Depends:.*$$/d' \
+		-e '$$d' \
+		$(builddir)/deb/rerun-${VERSION}/debian/control
+	echo -e \
+	" Rerun is a simple command runner that turns loose shell scripts\n" \
+	" into modular automation. Rerun will help you organize your implementation\n" \
+	" into well defined command interfaces. Collections of management modules\n" \
+	" can be archived and delivered as a single executable to facilitate team\n" \
+	" hand offs. Using the "stubbs" module, rerun will even facilitate\n" \
+	" developing modules using a test-driven development practice.\c" \
+	>> $(builddir)/deb/rerun-${VERSION}/debian/control
+	sed -i 	-e 's@^Source:.*$$@Source: https://github.com/rerun/rerun@' \
+		-e 's/^Copyright:.*$$/Copyright: 2011-2013, Alex Honor AlexHonor@yahoo.com/' \
+		-e '/likewise for another/d' \
+		-e '/^# /d' \
+		$(builddir)/deb/rerun-${VERSION}/debian/copyright
+	cd $(builddir)/deb/rerun-${VERSION}; debuild -us -uc
+	mv $(builddir)/deb/rerun_* ./
 
 release: rpm
 	echo "Releasing Rerun"
