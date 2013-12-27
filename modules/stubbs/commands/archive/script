@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <1.0.0>] 
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <1.0.0>]
 
 
 # Load common functions
@@ -9,8 +9,8 @@
 
 # Load the function library for this module.
 # This loads rerun functions and those defined for stubbs.
-. $RERUN_MODULE_DIR/lib/functions.sh || { 
-    echo >&2 "failed laoding function library" ; exit 1 ; 
+. $RERUN_MODULE_DIR/lib/functions.sh || {
+    echo >&2 "failed laoding function library" ; exit 1 ;
 }
 
 # Parse the command options
@@ -25,12 +25,12 @@
 # This script is designed to _fail-fast_.
 
 # Trap errors and exit. The call to `rerun_die` will print the
-# the error message and exit with the error command exit status. 
+# the error message and exit with the error command exit status.
 
 trap 'rerun_die $? "*** command failed: stubbs:archive. ***"' ERR
 
 # Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
-# so a pipeline return status is the value of the last 
+# so a pipeline return status is the value of the last
 # (rightmost) command to exit with non-zero status.
 #
 # [set]: http://ss64.com/bash/set.html
@@ -49,7 +49,7 @@ set -o nounset -o pipefail
 #/ option-variables: FILE FORMAT MODULES RELEASE VERSION
 
 # The `rerun_options_parse` function processes the command line
-# arguments. Each accepted command line flag results in setting 
+# arguments. Each accepted command line flag results in setting
 # one the corresponding option variables.
 
 rerun_options_parse "$@"
@@ -84,7 +84,7 @@ buildbinarchive() {
   CWD=$(pwd); #remember current working directory.
 
   # Check if file option was specified and if not set it to rerun.bin.
-  [ -z "${FILE:-}"  ] && FILE=rerun.bin 
+  [ -z "${FILE:-}"  ] && FILE=rerun.bin
 
   # Prepend curren working directory if relative file path.
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
@@ -105,20 +105,20 @@ buildbinarchive() {
   #
 
   # Iterate through the the specified modules and add them to payload
-  mkdir -p $PAYLOAD/rerun/modules 
+  mkdir -p $PAYLOAD/rerun/modules
   for module in $MODULES
   do
       # Check for a commands subdir to be sure it looks like a module
       if [ -d ${RERUN_MODULES}/${module}/commands ]
       then
-        pushd ${RERUN_MODULES} > /dev/null 
+        pushd ${RERUN_MODULES} > /dev/null
         tar -c ${TAREXCL} -f - ${module} | ( cd $PAYLOAD/rerun/modules; tar xpf - )
         popd >/dev/null
       fi
   done
 
   # Copy rerun itself to the payload
-  cp $RERUN $PAYLOAD/rerun 
+  cp $RERUN $PAYLOAD/rerun
 
   # Copy in the extract and launcher scripts used during execution
   for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
@@ -131,7 +131,7 @@ buildbinarchive() {
           -e "s/@VERSION@/$VERSION/" \
           -e "s/@RELEASE@/$RELEASE/" \
           -e "s/@DECODER@/$(decoder)/" \
-          $template > $PAYLOAD/$(basename $template) 
+          $template > $PAYLOAD/$(basename $template)
       # ... and save it to the payload --^
   done
 
@@ -141,7 +141,7 @@ buildbinarchive() {
   cd $PAYLOAD
 
   # make the payload.tar file
-  tar cf payload.tar launcher extract rerun 
+  tar cf payload.tar launcher extract rerun
 
   # compress and base64 encode the tar file
   if [[ -e "payload.tar" ]]
@@ -163,7 +163,7 @@ buildbinarchive() {
   #
   # Make the archive executable
   #
-  chmod +x ${FILE} 
+  chmod +x ${FILE}
   #
   # Clean up the temp directory
   #
@@ -175,6 +175,72 @@ buildbinarchive() {
   echo "Wrote self extracting archive script: ${FILE}"
 }
 
+builddebarchive() {
+
+  [[ -e /etc/debian_version ]] || rerun_die "need to build on a Debian machine"
+
+  for MODULE in ${MODULES}
+  do
+    MODULE_DIR=${RERUN_MODULES}/${MODULE}
+    if [[ -r ${MODULE_DIR}/metadata ]]
+    then
+      # Setup a temporary directory to build the deb:
+      DEBTOPDIR=$(mktemp -d /tmp/rerun.stubbs.deb.XXXXXX)
+
+      # Source the module metadata:
+      unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
+      . ${MODULE_DIR}/metadata
+
+      [[ -n ${NAME} ]] || rerun_die "no module name in \"${MODULE_DIR}/metadata\""
+      [[ -n ${DESCRIPTION} ]] || rerun_die "no description in \"${MODULE_DIR}/metadata\""
+
+      if [[ -z ${VERSION} ]]
+      then rerun_die "no version in \"${MODULE_DIR}/metadata\""
+      fi
+
+      # copy the source to the source tarball directory
+      mkdir -p ${DEBTOPDIR}/deb ${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}
+      pushd ${MODULE_DIR} > /dev/null
+      find . | cpio --quiet -pdm ${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}
+      popd > /dev/null
+
+      # build the release tarball filtering out any version control tracking files
+      pushd ${DEBTOPDIR}/stb > /dev/null
+      tar -c -z --exclude-vcs \
+        -f ${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz \
+        rerun-${NAME}-${VERSION}
+      popd > /dev/null
+
+      # unpack the source in the build directory
+      pushd ${DEBTOPDIR}/deb > /dev/null
+      tar -xzf ${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz ./
+      popd > /dev/null
+
+      pushd ${DEBTOPDIR}/deb/rerun-${NAME}-${VERSION} > /dev/null
+      DEBFULLNAME="rerun-discuss@googlegroups.com"; \
+      yes | dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com
+      sed -i  -e 's/ unknown$$/ shells/g' \
+        -e 's/ root / stagrlee /g' \
+        -e "s@^Homepage:.*\$@Homepage: http://github.com/rerun-modules/${NAME}@" \
+        -e "s/^Description:.*\$/Description: ${DESCRIPTION}/" \
+        -e 's/^Depends:.*$/Depends: rerun/' \
+        -e '$d' \
+        $(builddir)/deb/rerun-${VERSION}/debian/control
+      echo -e \
+      " ${NAME} is a Rerun Module extension.  ${DESCRIPTION}\c"
+      >> $(builddir)/deb/rerun-${VERSION}/debian/control
+      sed -i        -e 's@^Source:.*$$@Source: https://github.com/rerun/rerun@' \
+        -e "s/^Copyright:.*\$/Copyright: 2011-2013, Rerun Community ${DEBFULLNAME}/" \
+        -e '/likewise for another/d' \
+        -e '/^# /d' \
+        $(builddir)/deb/rerun-${VERSION}/debian/copyright
+      debuild -us -uc
+      popd > /dev/null
+    fi
+    mv $(builddir)/deb/rerun-${VERSION}/rerun-${NAME}_* ./
+  done
+}
+
 buildrpmarchive() {
 
   for MODULE in ${MODULES}
@@ -183,7 +249,7 @@ buildrpmarchive() {
     if [[ -r ${MODULE_DIR}/metadata ]]
     then
       # Setup a temporary directory to build the RPM:
-      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX) 
+      RPMTOPDIR=$(mktemp -d /tmp/rerun.stubbs.rpm.XXXXXX)
       mkdir $RPMTOPDIR/SOURCES
       mkdir $RPMTOPDIR/BUILD
       mkdir $RPMTOPDIR/RPMS
@@ -241,8 +307,8 @@ buildrpmarchive() {
       rm -f $MODULE_DIR/rerun-${NAME}*.noarch.rpm
 
       # Prepare the source archive hierarchy:
-      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION} 
-      mkdir $RPMTOPDIR/tmp 
+      mkdir $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
+      mkdir $RPMTOPDIR/tmp
       pushd $MODULE_DIR > /dev/null
       find . | cpio --quiet -pdm $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
@@ -277,7 +343,7 @@ buildrpmarchive() {
       || rerun_die "failed to build rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Move the RPM:
-      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm . 
+      /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm .
       echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
@@ -290,6 +356,9 @@ buildrpmarchive() {
 case $FORMAT in
   bin)
     buildbinarchive
+    ;;
+  deb)
+    builddebarchive
     ;;
   rpm)
     buildrpmarchive
