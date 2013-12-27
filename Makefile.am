@@ -258,7 +258,7 @@ deb: dist
 	" into modular automation. Rerun will help you organize your implementation\n" \
 	" into well defined command interfaces. Collections of management modules\n" \
 	" can be archived and delivered as a single executable to facilitate team\n" \
-	" hand offs. Using the "stubbs" module, rerun will even facilitate\n" \
+	" hand offs. Using the stubbs module, rerun will even facilitate\n" \
 	" developing modules using a test-driven development practice.\c" \
 	>> $(builddir)/deb/rerun-${VERSION}/debian/control
 	sed -i 	-e 's@^Source:.*$$@Source: https://github.com/rerun/rerun@' \
@@ -266,6 +266,8 @@ deb: dist
 		-e '/likewise for another/d' \
 		-e '/^# /d' \
 		$(builddir)/deb/rerun-${VERSION}/debian/copyright
+	rm -f $(builddir)/deb/rerun-${VERSION}/debian/*\.ex
+	rm -f $(builddir)/deb/rerun-${VERSION}/debian/*\.EX
 	cd $(builddir)/deb/rerun-${VERSION}; debuild -us -uc
 	mv $(builddir)/deb/rerun_* ./
 
