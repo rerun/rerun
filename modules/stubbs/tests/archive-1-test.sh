@@ -126,7 +126,34 @@ it_builds_a_list_of_rpms() {
     rpm2cpio ${RPM1} | cpio -t - | grep "\/\.git$" && exit 1
     rpm2cpio ${RPM1} | cpio -t - | grep "\/\.svn$" && exit 1
     popd
-    rm -rf ${TMPDIR}
+    rm -rf ${TMPDIR} $RERUN_MODULES/freddy $RERUN_MODULES/dance
+}
+
+it_builds_a_list_of_debs() {
+    [[ "$(uname -s)" = "Linux" && -e /etc/debian_version ]] || return 0
+
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command says --description "none"
+    rerun stubbs:add-option --module freddy --command says --option msg \
+        --description none --required true --export false --default nothing
+    rerun stubbs:add-module --module dance --description "none"
+    rerun stubbs:add-command --module dance --command says --description "none"
+    rerun stubbs:add-option --module dance --command says --option msg \
+        --description none --required true --export false --default nothing
+    mkdir $RERUN_MODULES/freddy/commands/.git $RERUN_MODULES/freddy/commands/.svn
+    TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
+    pushd $TMPDIR
+
+    rerun stubbs:archive --format deb --modules "freddy dance" --release 4 --version "1.2.0"
+
+    DEB1=rerun-freddy_1.2.0-4_all.deb
+    DEB2=rerun-dance_1.2.0-4_all.deb
+    dpkg-deb --info ${DEB1} | grep rerun-freddy
+    dpkg-deb --info ${DEB2} | grep rerun-dance
+    dpkg-deb --contents ${DEB1} | grep "\/\.git$" && exit 1
+    dpkg-deb --contents ${DEB1} | grep "\/\.svn$" && exit 1
+    popd
+    rm -rf ${TMPDIR} $RERUN_MODULES/freddy $RERUN_MODULES/dance
 }
 
 it_extracts_only_and_exits() {
@@ -148,8 +175,7 @@ it_extracts_only_and_exits() {
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.svn ]] && exit 1
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.git ]] && exit 1
 
-    rm -rf /tmp/myextract.$$
-    rm -rf /tmp/rerun.bin.$$
+    rm -rf /tmp/myextract.$$ /tmp/rerun.bin.$$ $RERUN_MODULES/freddy
 }
 
 
@@ -169,6 +195,7 @@ it_runs_from_specified_extract_dir() {
     OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
     test "$OUT" = "msg (hi)"
     rm /tmp/rerun.bin.$$
+    rm -rf $RERUN_MODULES/freddy
 }
 
 it_runs_archive_from_overridden_TMPDIR() {
@@ -202,6 +229,6 @@ it_errors_with_missing_extract_dir_arg(){
     ! /tmp/rerun.bin.$$ --extract-only 2> $ERR
     usage="usage: rerun.bin.$$ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [args]"
     test "${usage}" = "$(cat $ERR)"
-    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR
+    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR $RERUN_MODULES/freddy
 }
 
