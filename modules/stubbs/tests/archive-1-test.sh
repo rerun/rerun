@@ -195,7 +195,7 @@ it_runs_from_specified_extract_dir() {
     OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
     test "$OUT" = "msg (hi)"
     rm /tmp/rerun.bin.$$
-    rm -rf $RERUN_MODULES/freddy
+    rm -rf $RERUN_MODULES/freddy /tmp/myextract.$$
 }
 
 it_runs_archive_from_overridden_TMPDIR() {
