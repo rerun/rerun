@@ -84,7 +84,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	| '__/ _ \ '__| | | | '_ \ 
 	| | |  __/ |  | |_| | | | |
 	|_|  \___|_|   \__,_|_| |_|
-	Version: 1.0.3. License: Apache 2.0.
+	Version: 1.1.2. License: Apache 2.0.
 
 	Usage: rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
 
@@ -95,7 +95,7 @@ Without arguments, `rerun` will list existing modules and
 their description and version:
 
     $ rerun
-      stubbs: "Simple rerun module builder" - 1.0.3
+      stubbs: "Simple rerun module builder" - 1.1.2
 
 To list the commands available in a module specify the module
 name too. Here the commands are listed for the 'stubbs' module:
