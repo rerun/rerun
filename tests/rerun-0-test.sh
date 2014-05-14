@@ -191,16 +191,18 @@ it_performs_rerun_property_get_with_expand() {
     . $RERUN
     DIR=$(mktemp -d "/tmp/rerun.test.XXXXX")
 
+    # Declare variables in the environment
     URL="http://localhost:8080"
     DESCRIPTION="A whitespace separated string"
+
     cat > $DIR/metadata <<EOF
 NAME=url
-DESCRIPTION="$DESCRIPTION"
+DESCRIPTION=\$DESCRIPTION
 ARGUMENTS=true
 REQUIRED=true
 SHORT=
 LONG=url
-DEFAULT=$URL
+DEFAULT=\$URL
 EXPORT=false
 EOF
 
