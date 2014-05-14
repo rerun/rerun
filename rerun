@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.1.2
+RERUN_VERSION=1.2.0
 
 # The default system install directories.
 
