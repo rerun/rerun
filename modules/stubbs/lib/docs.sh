@@ -12,7 +12,7 @@ docs_option_summary() {
 	local opt_desc=$(rerun_property_get $opt_dir DESCRIPTION)
 	local opt_arg=$(rerun_property_get $opt_dir ARGUMENTS)
 	local opt_req=$(rerun_property_get $opt_dir REQUIRED)
-	local opt_def=$(rerun_property_get $opt_dir DEFAULT)
+	local opt_def=$(rerun_property_get $opt_dir DEFAULT false)
 	# option usage summary
 	local opt_usage=$(printf " --%s <%s>: %s" "${opt_name}" "${opt_def}" "${opt_desc}")
 	[ "true" != "${opt_req}" ] && {

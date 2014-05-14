@@ -179,11 +179,44 @@ it_performs_rerun_property_get() {
     test "$required" = "false"
 
     # Test negative results
+
+    # Should fail when getting a non existent metadata property
     ! rerun_property_get  $RERUN_MODULES/freddy BOGUS$$
 
+    # Should fail when accessing a missing metadata file
     ! rerun_property_get GARBAGEDIR 2>&1 |grep "metadata not found: GARBAGEDIR"
 }
 
+it_performs_rerun_property_get_with_expand() {
+    . $RERUN
+    DIR=$(mktemp -d "/tmp/rerun.test.XXXXX")
+
+    URL="http://localhost:8080"
+    DESCRIPTION="A whitespace separated string"
+    cat > $DIR/metadata <<EOF
+NAME=url
+DESCRIPTION="$DESCRIPTION"
+ARGUMENTS=true
+REQUIRED=true
+SHORT=
+LONG=url
+DEFAULT=$URL
+EXPORT=false
+EOF
+
+    # With expand=false should return the unexpanded variable
+    test "$(rerun_property_get $DIR DEFAULT false)" = '$URL'
+    test "$(rerun_property_get $DIR DEFAULT true)" = "http://localhost:8080"
+
+    test "$(rerun_property_get $DIR DESCRIPTION true)" = "A whitespace separated string"
+    test "$(rerun_property_get $DIR DESCRIPTION false)" = '$DESCRIPTION'
+
+    # Test the default behavior when no expand flag is passed.
+    test "$(rerun_property_get $DIR DEFAULT)" = 'http://localhost:8080'
+    ! test "$(rerun_property_get $DIR DEFAULT)" = '$URL'
+
+    rm -r $DIR
+}
 
 it_performs_rerun_property_set() {
     make_freddy $RERUN_MODULES

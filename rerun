@@ -672,27 +672,33 @@ rerun_path_absolute() {
 #
 # * directory:     Directory containing metadata.
 # * property:      Property name.
+# * expand:        Evaluate the property value in the environment. true|false (optional)
 #
 # Notes: 
 #
 # * Prints property value.
-# * Die if directory not found.
+# * Die, if directory not found.
 # * Conditions: If metadata not found, nothing is returned.
 #
+
 rerun_property_get() {
-    [[ ! $# -eq 2 ]] && { 
-        rerun_die 'wrong # args: should be: rerun_property_get directory property'
+    [[ ! $# -ge 2 ]] && {
+        rerun_die 'wrong # args: should be: rerun_property_get directory property ?expand?'
     }
-    local -r directory="$1" property="$2"
+    local -r directory="$1" property="$2" expand="${3:-true}"
     [[ ! -f ${directory}/metadata ]] && rerun_die "metadata not found: ${directory}/metadata"
-    grep "^$property=" ${directory}/metadata >/dev/null && {
-        set +u
-        ( . ${directory}/metadata ; 
-            eval echo \$${property:-} )
-        set -u
-        return 0
-    }
-    return $?
+
+    if ! prop=$(grep "^$property=" ${directory}/metadata)
+    then return 2; # Property does not exist in the metadata file.
+    fi
+
+    if [[ "$expand" == "true" ]]
+    then (set +u; . ${directory}/metadata; eval echo \$${property:-}; set -u)
+    else echo "${prop#*=}"
+    fi
+
+    return 0
+
 }
 
 #
@@ -1155,6 +1161,8 @@ _rerun_commands_summary() {
                        argstring=$(printf " --%s" "$NAME" )
                     }	  
                     [[ "$ARGUMENTS" == "true" ]] && {
+                        # Lookup the default but set expand=false to not evalute possible variable.
+                        DEFAULT=$(rerun_property_get "$module_dir/options/${opt}" DEFAULT false)
                         argstring=$(printf "%s <${ul}%s${_ul}>" "$argstring" "$DEFAULT")
                     }
                     [[ "$REQUIRED" != "true" ]] && {

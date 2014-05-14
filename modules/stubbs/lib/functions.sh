@@ -258,15 +258,17 @@ stubbs_command_usage() {
         [[ -f $moddir/options/${opt}/metadata ]] || continue
         (
             local usage=
-            source  $moddir/options/${opt}/metadata
-
+            set +u; source  $moddir/options/${opt}/metadata; set -u
             if [[ -n "${SHORT}" ]] 
             then  argstring=$(printf ' --%s|-%s' "${NAME}" "${SHORT}")
             else  argstring=$(printf " --%s" "${NAME}" )
             fi		  
 
             if [[ "true" == "${ARGUMENTS}" ]]
-            then   argstring=$(printf "%s <%s>" "$argstring" "${DEFAULT}")
+            then
+                # Lookup the default but set expand=false to not evalute env variable.
+                DEFAULT=$(rerun_property_get "$moddir/options/${opt}" DEFAULT false)
+                argstring=$(printf "%s <%s>" "$argstring" "${DEFAULT}")
             fi
 
             if [[ "true" != "${REQUIRED}" ]]
@@ -311,9 +313,9 @@ stubbs_script_header() {
     local usage=$(stubbs_command_usage $moddir $command) 
 
     sed "
-        s,#/ command: .*,#/ command: $module:$command: \"$description\",
-        s,#/ option-variables: .*,#/ option-variables: $variables,
-        s,#/ usage: .*,#/ usage: rerun $module:$command $usage,
+        s^#/ command: .*^#/ command: $module:$command: \"$description\"^
+        s^#/ option-variables: .*^#/ option-variables: $variables^
+        s^#/ usage: .*^#/ usage: rerun $module:$command $usage^
         " $command_script 
     # Generate output to stdout.
 }
