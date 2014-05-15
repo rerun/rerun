@@ -12,3 +12,4 @@ before_install:
  - sudo apt-get install -qq build-essential
  - sudo apt-get install -qq devscripts
  - sudo apt-get install -qq dh-make
+ - sudo apt-get install -qq rpm

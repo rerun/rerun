@@ -151,3 +151,28 @@ it_should_not_overquote_descriptions() {
         $RERUN_MODULES/freddy/options/jumps/metadata)
     test "$DESC" = '"jump #num times"'
 }
+
+it_fails_when_option_name_contains_whitespace() {
+
+    rerun stubbs:add-option --module freddy --command dance \
+        --option "jumps and skips" --description "bogus" --required true \
+        --default "bogus" --export true  2>&1 | grep "ERROR: option name cannot contain whitespace"
+}
+
+it_quotes_defaults_with_whitespace() {
+    # --jumps <skiddly doo dap dee>
+    rerun stubbs:add-option --module freddy --command dance \
+        --option jumps --description "jump #num times" --required true \
+        --default "skiddly doo dap dee" --export true
+
+    validate
+    # Check the command's option assignment
+    OPTIONS=( $(.  $RERUN_MODULES/freddy/commands/dance/metadata; echo $OPTIONS) )
+    test -n "$OPTIONS"
+    test ${#OPTIONS[*]} = 1
+    rerun_list_contains "jumps" "${OPTIONS[@]}"
+
+    # Check the option metadata
+    grep 'DEFAULT="skiddly doo dap dee"'  $RERUN_MODULES/freddy/options/jumps/metadata
+
+}
