@@ -215,6 +215,18 @@ test-stubbs:
 		chmod u-w $${RERUN_MODULES} $${RERUN_MODULES}/stubbs/tests; \
 	fi
 
+bin: dist
+	echo "Packaging rerun as a bin..."; \
+	if [[ "$${PWD}x" = "x" ]]; then export PWD="$(shell pwd)"; fi; \
+	if [[ "$(srcdir)" = "/*" ]]; then MYDIR="$(srcdir)"; else MYDIR="$${PWD}/$(srcdir)"; fi; \
+	export RERUN="$${MYDIR}/rerun"; \
+	export RERUN_MODULES="$${MYDIR}/modules"; \
+	export LC_ALL="C"; \
+	echo "    modules at $${RERUN_MODULES}"; \
+	set -e; \
+	$${RERUN} stubbs:archive --modules stubbs --version ${VERSION} --file rerun-${VERSION}.bin; \
+	./rerun-${VERSION}.bin;
+
 #unset RERUN_COLOR
 #
 # RPM packaging target (defaulting the release if none specified externally):
@@ -284,3 +296,12 @@ release: rpm
 	for h in ${PACKAGE}-${VERSION}-1*.rpm; do \
 	  curl -T $${h} https://$${name}:$${pwd}@$${MYSVR}/rpms/${PACKAGE}/ ; \
 	done
+
+release-bin: bin
+	echo "Releasing Rerun"
+	echo -n "Enter bintray username and press [ENTER]: "; \
+	read BINTRAY_USER; \
+	echo -n "Enter bintray apikey and press [ENTER]: "; \
+	read BINTRAY_APIKEY; \
+	./rerun bintray:package-upload --user $${BINTRAY_USER} --apikey $${BINTRAY_APIKEY} \
+    --org rerun --repo rerun-bin --package rerun --version ${VERSION} --file rerun-${VERSION}.bin

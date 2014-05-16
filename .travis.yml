@@ -13,3 +13,7 @@ before_install:
  - sudo apt-get install -qq devscripts
  - sudo apt-get install -qq dh-make
  - sudo apt-get install -qq rpm
+ - echo "deb http://dl.bintray.com/rerun/rerun-deb /" | sudo tee /etc/apt/sources.list 
+ - echo "deb-src http://dl.bintray.com/rerun/rerun-deb /" | sudo tee /etc/apt/sources.list
+env:
+  secure: "d+/B1oq6oNtDP2Ow4FJE2+JGfhN/r2e/M7RrQFlwPA6KVGkCFK5Gg4cXLjr2\ncGwuGhsjrT1fDkcv4VRZTOFhvT1i2GD8oUwnjmHI1Btj3obeSyCC2XiAHYRS\nvEAYDT/Snu/EeeqD84yxd3BMS4WpjLQxfiY6Xns5XC9HH3BXObI="
