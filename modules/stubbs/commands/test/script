@@ -81,9 +81,9 @@ then
     rerun_die "No tests" 
 fi
 
-echo "========================================================="
-echo " TESTING MODULE: $MODULE "
-echo "========================================================="
+echo $(rerun_color blue "=========================================================")
+echo $(rerun_color blue " TESTING MODULE: $MODULE ")
+echo $(rerun_color blue "=========================================================")
 (
     # Resolve relative path to rerun
     export RERUN=$(rerun_path_absolute $RERUN)
@@ -100,7 +100,7 @@ echo "========================================================="
 
     # Run the tests
     #
-    $ROUNDUP $PLAN-[0-9]*-test.sh
+    $ROUNDUP --color $PLAN-[0-9]*-test.sh
 ) 
 
 # Done

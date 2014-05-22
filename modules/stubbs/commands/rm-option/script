@@ -106,7 +106,7 @@ do
     # Verify this command exists
     #
     [ -d $RERUN_MODULES/$MODULE/commands/$cmd ] || {
-        echo >&2 "command not found: \""$MODULE:$cmd\""...skipping."
+        rerun_log warn "command not found: \""$MODULE:$cmd\""...skipping."
         continue
     }
     #
@@ -121,7 +121,7 @@ do
     stubbs_command_options_write \
         $RERUN_MODULES/$MODULE $cmd \
         "${command_options[*]:-}" || rerun_die "Failed generating command metadata"
-    echo "Updated command metadata:  $command_metadata"
+    rerun_log info "Updated command metadata:  $command_metadata"
     #
     # Check if this option is assigned to any commands.
     option_to_command_assignments=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $OPTION) )
@@ -135,7 +135,7 @@ do
             rm -rf "$RERUN_MODULES/$MODULE/options/$OPTION" || {
                 rerun_die "Error removing option: $OPTION"
             }
-            echo "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
+            rerun_log info "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
         fi
     fi
     #
@@ -154,7 +154,7 @@ do
     # Generate it
     $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
         $RERUN_MODULES $MODULE $cmd > $options_parser || rerun_die "Failed generating options parser."
-    echo "Wrote options script: $RERUN_MODULES/$MODULE/commands/$cmd/options.sh"
+    rerun_log info "Wrote options script: $RERUN_MODULES/$MODULE/commands/$cmd/options.sh"
     #
     # Update option variable summary in command script.
     #
@@ -168,7 +168,7 @@ do
         mv $command_script.$$ $command_script || {
             rerun_die "Error updating command script header"
         }
-        echo "Updated command script header: $command_script"
+        rerun_log info "Updated command script header: $command_script"
     fi
 done 
 # Done

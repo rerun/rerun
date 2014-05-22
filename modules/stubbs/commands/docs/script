@@ -217,13 +217,13 @@ MARKDOWN
 MANPAGE=$DIR/$MODULE.1
 VERSION="$(rerun_property_get $RERUN_MODULES/$MODULE VERSION)" || { VERSION=1 ; }
 docs_man_page "$VERSION" "$MODULE" > $MANPAGE
-echo "Unix manual: $MANPAGE"
+rerun_log info "Unix manual: $MANPAGE"
 
 
 #
 # Generate the HTML for the module page
 #
 markdown $DIR/index.md | docs_html_layout $MODULE docs.css > $DIR/index.html
-echo "HTML site: $DIR/index.html"
+rerun_log info "HTML site: $DIR/index.html"
 
 # Done

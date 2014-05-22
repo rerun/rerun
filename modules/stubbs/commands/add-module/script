@@ -135,9 +135,9 @@ then
     then TEMPLATE_DIR=$(rerun_path_absolute $TEMPLATE)
     else TEMPLATE_DIR=$RERUN_MODULES/$TEMPLATE
     fi
-    echo "Copying files from template: $TEMPLATE..."
+    rerun_log info "Copying files from template: $TEMPLATE..."
     stubbs_module_clone $RERUN_MODULES/$MODULE $TEMPLATE_DIR
 fi
 
 # Done
-echo "Created module structure: $RERUN_MODULES/$MODULE."
+rerun_log info "Created module structure: $RERUN_MODULES/$MODULE."

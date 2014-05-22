@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <1.0.0>]
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <>]
 
 
 # Load common functions
@@ -57,6 +57,17 @@ rerun_options_parse "$@"
 # Command implementation
 # ----------------------
 
+# Possibly default VERSION. 
+mods=( $MODULES )
+if [[ -z "${VERSION:-}" ]]
+then  
+  # if there is just one module specified, default it from that module metadata.
+  if [[ ${#mods[*]} -eq 1 ]]
+  then VERSION=$(rerun_property_get $RERUN_MODULE_DIR VERSION)
+  fi
+fi  
+[[ -z "${VERSION:-}" ]] && rerun_die 2 "version must be specified"
+
 decoder() {
     if command -v openssl >/dev/null
     then echo "openssl enc -base64 -d"
@@ -80,16 +91,16 @@ encode() {
     return $retval
 }
 
-buildbinarchive() {
+build_bin_archive() {
   CWD=$(pwd); #remember current working directory.
 
   # Check if file option was specified and if not set it to rerun.bin.
-  [ -z "${FILE:-}"  ] && FILE=rerun.bin
+  [[ -z "${FILE:-}"  ]] && FILE=rerun.bin
 
-  # Prepend curren working directory if relative file path.
+  # Prepend current working directory if relative file path.
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
-  [ ! -d $(dirname ${FILE}) ] && rerun_option_error "directory not found: $(dirname ${FILE})"
+  [[ ! -d $(dirname ${FILE}) ]] && rerun_option_error "directory not found: $(dirname ${FILE})"
 
   # create a work directory the archive content
   export PAYLOAD=`mktemp -d /tmp/rerun.stubbs.archive.XXXXXX` || rerun_die
@@ -100,6 +111,7 @@ buildbinarchive() {
   else
     TAREXCL="--exclude-vcs"
   fi
+
   #
   # Start preparing the payload content.
   #
@@ -172,10 +184,10 @@ buildbinarchive() {
   rm -rf $PAYLOAD
 
 
-  echo "Wrote self extracting archive script: ${FILE}"
+  rerun_log info "Wrote self extracting archive script: ${FILE}"
 }
 
-builddebarchive() {
+build_deb_archive() {
 
   [[ -e /etc/debian_version ]] || rerun_die "need to build on a Debian machine"
 
@@ -273,7 +285,7 @@ EOF
   done
 }
 
-buildrpmarchive() {
+build_rpm_archive() {
 
   for MODULE in ${MODULES}
   do
@@ -376,7 +388,7 @@ buildrpmarchive() {
 
       # Move the RPM:
       /bin/mv ${RPMTOPDIR}/RPMS/noarch/rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm .
-      echo "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
+      rerun_log info "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
       /bin/rm -rf ${RPMTOPDIR}
@@ -387,13 +399,13 @@ buildrpmarchive() {
 
 case $FORMAT in
   bin)
-    buildbinarchive
+    build_bin_archive
     ;;
   deb)
-    builddebarchive
+    build_deb_archive
     ;;
   rpm)
-    buildrpmarchive
+    build_rpm_archive
     ;;
   *)
     rerun_die "invalid archive format \"$FORMAT\""

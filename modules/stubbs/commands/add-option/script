@@ -236,7 +236,7 @@ EOF
 ) > $RERUN_MODULES/$MODULE/options/$OPTION/metadata || {
     rerun_die "Failed generating $OPTION option metadata"
 }
-echo "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
+rerun_log info "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
 
 COMMAND_LIST=( ${COMMAND//,/ } )
 for cmd in ${COMMAND_LIST[*]}
@@ -263,7 +263,7 @@ do
     stubbs_command_options_write \
         $RERUN_MODULES/$MODULE $cmd \
         "${command_options[*]}" || rerun_die "Failed generating command metadata"
-    echo "Updated command metadata:  $command_metadata"
+    rerun_log info "Updated command metadata:  $command_metadata"
     #
     # Generate option parser script.
     #
@@ -298,7 +298,7 @@ do
             rerun_die "Error updating command script header"
         }
         chmod +x $command_script || rerun_die "Failed setting execute bit on command script."
-        echo "Updated command script header: $command_script"
+        rerun_log info "Updated command script header: $command_script"
     fi
 done
 

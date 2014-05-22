@@ -130,7 +130,7 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
     -e "s/@VARIABLES@/$VARIABLES/g" \
 	$TEMPLATE > $CMD_SCRIPT || rerun_die "Failed generating stub comand script."
-    echo "Wrote command script: $CMD_SCRIPT"
+    rerun_log info "Wrote command script: $CMD_SCRIPT"
 }
 chmod +x $CMD_SCRIPT || rerun_die "Failed settng execute bit on command script."
 
@@ -142,7 +142,7 @@ mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests direct
 	-e "s;@RERUN@;${RERUN};g" \
 	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
 	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
-    echo "Wrote test script: $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh"
+    rerun_log info "Wrote test script: $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh"
 }
 [ ! -f $RERUN_MODULES/$MODULE/tests/functions.sh -o -n "${OVERWRITE:-}" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \

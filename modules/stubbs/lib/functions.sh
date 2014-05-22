@@ -6,12 +6,12 @@
 # Stubbs functions build on the rerun functions.
 #
 [ ! -f "$RERUN" ] && {
-    echo >&2 "ERROR: \$RERUN environment variable not set to rerun"
+    rerun_log error "\$RERUN environment variable not set to rerun"
     exit 1
 }
 
 . $RERUN || { 
-    echo >&2 "ERROR: Failed sourcing functions from rerun: $RERUN" 
+    rerun_log error "Failed sourcing functions from rerun: $RERUN" 
     exit 1 
 }
 

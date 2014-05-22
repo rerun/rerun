@@ -7,7 +7,7 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
-#/ usage: rerun [-h][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
+#/ usage: rerun [-h][-G][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
 #
 # __Install__
 # 
@@ -16,25 +16,14 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.2.1
+RERUN_VERSION=1.3.0
 
 # The default system install directories.
 
 DEFAULT_BINDIR="/usr/bin"
 DEFAULT_LIBDIR="/usr/lib"
 
-# To disable color effects: `unset RERUN_COLOR`.
 
-if [[ ! -z "${RERUN_COLOR:-}" && -t 1 ]]
-then
-    ul="\033[4m" ; _ul="\033[0m" ; # underline
-    gray="\033[38;5;238m" ; _gray="\033[0m" ; # gray
-    red="\033[31m" ; _red="\033[0m" ; # red
-    bold="\033[1m$*\033[0m" ; _bold="\033[0m" ; # bold
-else
-    ul="" _ul=""    gray="" _gray=""    red="" _red=""
-    bold="" ; _bold="" ; 
-fi
 
 # Public functions
 # ----------------------
@@ -45,6 +34,50 @@ fi
 # This rerun script can be sourced.
 #
 
+
+# rerun_color - Prints message in specified color using ansi codes.
+#
+#     rerun_color color message
+#
+# Arguments:
+#
+# * color:    The color to print (red|hred|blue|cyan|yellow|green|ul|bold)
+# * message:  The message to colorize.
+#
+# Notes: 
+#
+# * If RERUN_COLOR is unset, no text effect is applied.
+# * Unrecognized colors are defaulted to black.
+#
+rerun_color() {
+    (( $# <= 2 )) || {
+        printf >&2 'wrong # args: should be: rerun_color color message\n'
+        return 2
+    }
+    local reset="\033[0m" black="\033[0;30m" code=
+    case $1 in
+        red)    code="\033[31m"   ;;
+        hred)   code="\033[1;31m" ;;
+        blue)   code="\033[34m"   ;;
+        cyan)   code="\033[36m"   ;;
+        yellow) code="\033[33m"   ;;
+        green)  code="\033[32m"   ;;
+        # text effects
+        bold)   code="\033[1m"    ;;
+        ul)     code="\033[4m"    ;;
+        # default to black
+        *)      code="$black"     ;;
+    esac
+    shift;
+    if [[ -n "${RERUN_COLOR:-}" ]]
+    then echo -ne ${code}"${*}"${reset}
+    else printf -- "%s" "$*"
+    fi
+}    
+
+#
+# - - -
+#
 
 #
 # rerun_log_puts - Produce a log message
@@ -66,10 +99,19 @@ RERUN_LOG_LEVELS=([0]=debug [1]=info [2]=warn [3]=error [4]=fatal)
 : ${RERUN_LOG_LEVEL:=1}
 # * RERUN_LOG_ERR_LEVEL specifies the minimum level for messages printed to stderr.
 : ${RERUN_LOG_ERR_LEVEL:=3}
-# * RERUN_LOG_FMT_CONSOLE
-: ${RERUN_LOG_FMT_CONSOLE:="[%level%] %command%: %message%"}
-# * RERUN_LOG_FMT_LOGFILE
+# * Messages can be colored depending on level.
+RERUN_LOG_COLORS=([0]=cyan [1]=green [2]=yellow [3]=red [4]=hred)
+# * RERUN_LOG_FMT_CONSOLE specifies the format for messages printed to the console.
+if [[ -z ${RERUN_LOG_FMT_CONSOLE:-} ]]
+then 
+    if [[ -t 0 ]]
+    then RERUN_LOG_FMT_CONSOLE="%message%"
+    else RERUN_LOG_FMT_CONSOLE="[%level%] %command%: %message%"
+    fi
+fi    
+# * RERUN_LOG_FMT_LOGFILE specifies the format for log entries.
 : ${RERUN_LOG_FMT_LOGFILE:="[%tstamp%] [%level%] %command%: %message%"}
+
 #
 rerun_log_puts() {
     [[ $# == 4 ]] || {
@@ -91,13 +133,14 @@ rerun_log_puts() {
         -e "s^%level%^${RERUN_LOG_LEVELS[$level]}^g" \
         -e "s^%command%^$command^g" \
         -e "s^%message%^$message^g")
+    
     if (( $level >= $RERUN_LOG_ERR_LEVEL ))
     then
         # write message to stderr
-        printf >&2 -- "%s\n" "$output"
+        echo >&2 $(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")
     else
         # write message to stdout
-        printf -- "%s\n" "$output"
+        echo $(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")
     fi
 
     return 0
@@ -133,10 +176,10 @@ rerun_log_syslog() {
     # map rerun_log level to syslog priority.
     local pri=
     case "$level" in
-        4) pri="fatal"    ;;
-        3) pri="err"      ;;
-        2)  pri="warning" ;;
-        1|0) pri="$level" ;;
+        4)   pri="fatal"   ;;
+        3)   pri="err"     ;;
+        2)   pri="warning" ;;
+        1|0) pri="$level"  ;;
     esac
     logger -p "${facility}.${pri}" -t "${LOGNAME:-$USER} ($command)" -- "$message"
     return $?
@@ -286,10 +329,7 @@ rerun_die() {
         (( frame++ )) || :; #ignore increment errors (i.e., errexit is set)
     done
 
-    if [[ -n "${RERUN_COLOR:-}" ]]
-    then echo >&2 -e ${red}"ERROR: $*"${_red} 
-    else echo >&2 "ERROR: $*"
-    fi
+    echo >&2 $(rerun_log error "ERROR: $*")
     exit ${exit_status:-1}
 }
 
@@ -312,10 +352,7 @@ rerun_die() {
 # * Message format:     `"SYNTAX : ?message?"`
 # * Exit status returned to invoking command: 2
 rerun_syntax_error() {
-    if [[ -n "${RERUN_COLOR:-}" ]]
-    then echo >&2 -e ${red}"SYNTAX: $*"${_red} 
-    else echo >&2 "SYNTAX: $*" 
-    fi
+    echo $(rerun_log error "SYNTAX: $*")
     exit 2
 }
 
@@ -360,10 +397,11 @@ rerun_option_check() {
 # * Return 2
 # 
 rerun_option_usage() {
-    if [ -f $0 ]
-    then grep '^#/ usage:' <"$0" | cut -c4- >&2
-    else echo >&2 "usage: check command for usage." 
+    if [[ -f "$0" ]]
+    then message=$(grep '^#/ usage:' <"$0" | cut -c4-)
+    else message="usage: check command for usage." 
     fi
+    rerun_log error "$message"
     return 2
 }
 
@@ -879,7 +917,7 @@ rerun_module_exists() {
 # * Command options are not required.
 #
 # Command scripts see the following environment variables:
-#   RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#   RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR, RERUN_COMMAND_DIR
 #
 # User specified a command that did not exist in the RERUN_MODULES directory.
 #
@@ -910,7 +948,7 @@ rerun_command_execute() {
 
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
 
-    export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR RERUN_MODULE_VERSION RERUN_COMMAND_DIR
+    export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR RERUN_MODULE_VERSION RERUN_COMMAND_DIR RERUN_COLOR
     
     if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
@@ -994,7 +1032,7 @@ _rerun_options_populate() {
 #
 # * Prints ANSI color codes into your output
 _rerun_banner() {
-    if [[ -t 0 ]]
+    if [[ -n "${RERUN_COLOR:-}" ]]
     then
     echo $(tput setaf 1) " _ __ ___ _ __ _   _ _ __"
     echo $(tput setaf 2) "| '__/ _ \ '__| | | | '_ \ "
@@ -1020,16 +1058,14 @@ _rerun_examples() {
         rerun_die "wrong # args: should be: _rerun_examples prog" 
     }
     local -r prog=$1
-    if [[ "${RERUN_COLOR:-}" = "true" && -t 0 ]]
-    then echo >&2 $(tput sgr 0 1)"Examples:"$(tput sgr0)
-    else echo >&2 "Examples:"
-    fi
-echo "| \$ $prog
-| => List installed modules.
-| \$ $prog freddy
-| => List  commands.
-| \$ $prog freddy:dance --jumps 3
-| => Execute a command."
+    echo >&2 "Examples:"
+echo "
+| # List installed modules:
+| \$ $prog
+| # List  commands:
+| \$ $prog stubbs
+| # Execute a command:
+| \$ $prog stubbs:add-module --module freddy"
 }
 
 #
@@ -1073,7 +1109,8 @@ _rerun_module_summary() {
         local -r module_name=$(basename "$module_dir")
         local -r module_desc=$(rerun_property_get $module_dir DESCRIPTION)
         local -r module_vers=$(rerun_property_get $module_dir VERSION) || module_vers=""
-        echo "${PAD:-}${module_name}: \"${module_desc}\" - $module_vers" 
+        printf "%s%s: \"%s\" - %s\n" "${PAD:-}" \
+            "$(rerun_color bold $module_name)" "${module_desc}" "$module_vers"
     }
 }
 
@@ -1094,7 +1131,7 @@ _rerun_modules_summary() {
         rerun_die "wrong # args: should be: _rerun_modules_summary directory" 
     }
     local -r directory=$1
-    echo -e $gray"Available modules in \"${RERUN_MODULES:-}\":"$_gray
+    echo $(rerun_color blue "Available modules:")
     shopt -s nullglob # enable
     set +u
     for module in $directory/*
@@ -1105,7 +1142,7 @@ _rerun_modules_summary() {
                 && ${RERUN_MODULES:-} != "${DEFAULT_LIBDIR}/rerun/modules" ]]
     then
         echo
-        echo -e $gray"Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":"$_gray
+        echo $(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")
         for module in ${DEFAULT_LIBDIR}/rerun/modules/*
         do
            [[ -f $module/metadata ]] && _rerun_module_summary $module
@@ -1124,15 +1161,9 @@ _rerun_commands_summary() {
     }
     local -r directory=$1
     local -r module=$2
-    bold() { 
-        if [[ -t 0 ]]
-        then echo -e "\033[1m$*\033[0m" ; tput sgr0 ; 
-        else echo "$*"
-        fi
-    }
 
     module_dir=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
-    echo -e $gray"Available commands in module, \"$module_dir\":"$_gray
+    echo $(rerun_color blue "Available commands in module, \"$module\":")
     shopt -s nullglob # enable
 
     for cmd in $module_dir/commands/*/metadata
@@ -1140,7 +1171,7 @@ _rerun_commands_summary() {
         local cmd_name=$(basename $(dirname "$cmd"))
         local metadata=$module_dir/commands/${cmd_name}/metadata
         [[ -f "$metadata" ]] && cmd_desc=$(rerun_property_get $(dirname $cmd) DESCRIPTION)
-        bold "${cmd_name}: \"${cmd_desc}\""
+        echo $(rerun_color bold "${cmd_name}: \"${cmd_desc}\"")
         if [[ -d "$module_dir/commands/${cmd_name}" ]]
         then            
             #
@@ -1163,7 +1194,7 @@ _rerun_commands_summary() {
                     [[ "$ARGUMENTS" == "true" ]] && {
                         # Lookup the default but set expand=false to not evalute possible variable.
                         DEFAULT=$(rerun_property_get "$module_dir/options/${opt}" DEFAULT false)
-                        argstring=$(printf "%s <${ul}%s${_ul}>" "$argstring" "$DEFAULT")
+                        argstring=$(printf "%s <%s>" "$argstring" "$(rerun_color ul $DEFAULT)")
                     }
                     [[ "$REQUIRED" != "true" ]] && {
                         summary=$(printf "[%s]: \"%s\"" "${argstring}" "$DESCRIPTION") 
@@ -1197,13 +1228,16 @@ while [ "$#" -gt 0 ]; do
     case "$OPT" in
 	-h*|--h*)
         _rerun_banner
-        rerun_option_usage
+        ! rerun_option_usage
         _rerun_examples $(basename "$0")
         exit 0
 	    ;;
-  	-v)
-	    RERUN_VERBOSE="-vx"
+  	-G)
+	    export RERUN_COLOR="true"
 	    ;;
+    -v)
+        RERUN_VERBOSE="-vx"
+        ;;        
   	-V)
 	    RERUN_VERBOSE="-vx"
 	    set -vx
@@ -1361,4 +1395,4 @@ exit $?
 # More
 # ----
 
-# _(c) 2012 Alex Honor - Apache 2 License_
+# _(c) 2012-2014 Alex Honor - Apache 2 License_

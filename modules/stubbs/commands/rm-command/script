@@ -119,7 +119,7 @@ do
             rm -rf "$RERUN_MODULES/$MODULE/options/$opt" || {
                 rerun_die "Error removing option: $opt"
             }
-            echo "Removed $RERUN_MODULES/$MODULE/options/$opt"
+            rerun_log info "Removed $RERUN_MODULES/$MODULE/options/$opt"
         fi
     fi
 done
