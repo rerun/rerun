@@ -274,7 +274,7 @@ deb: dist
 	" developing modules using a test-driven development practice.\c" \
 	>> $(builddir)/deb/rerun-${VERSION}/debian/control
 	sed -i 	-e 's@^Source:.*$$@Source: https://github.com/rerun/rerun@' \
-		-e 's/^Copyright:.*$$/Copyright: 2011-2013, Alex Honor AlexHonor@yahoo.com/' \
+		-e 's/^Copyright:.*$$/Copyright: 2011-2014, Alex Honor AlexHonor@yahoo.com/' \
 		-e '/likewise for another/d' \
 		-e '/^# /d' \
 		$(builddir)/deb/rerun-${VERSION}/debian/copyright
