@@ -232,3 +232,24 @@ it_errors_with_missing_extract_dir_arg(){
     rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR $RERUN_MODULES/freddy
 }
 
+it_creates_archive_with_user_template() {
+    # Create a copy of the original template scripts
+    my_template=$(mktemp -d "/tmp/it_creates_archive_with_user_template.XXX")
+    cp -rv $RERUN_MODULES/stubbs/templates/{extract,launcher} $my_template
+    # Change the usage comment so we know it's our custom one.
+    sed -i -e "s^#/ usage:.*^#/ usage: custom stuff^" $my_template/extract
+
+    # Create a module to archive
+    rerun stubbs:add-module --module freddy --description "none"
+    rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
+    cat $RERUN_MODULES/freddy/commands/print_tmpdir/script |
+    sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
+    mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
+
+    # Archive it.
+    rerun stubbs:archive --template $my_template --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    grep '#/ usage: custom stuff' /tmp/rerun.bin.$$
+
+    rm -r ${my_template} /tmp/rerun.bin.$$
+
+}

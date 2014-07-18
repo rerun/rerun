@@ -67,7 +67,7 @@ export CWD=/tmp
 cat $0                            | 
 sed -e '1,/^__ARCHIVE_BELOW__/ d' | 
 @DECODER@                         | 
-(cd $EXTRACT_DIR && tar xzf -) || die "unarchiving of $0 failed."
+(cd $EXTRACT_DIR && tar xzf -) || die "Failed unarchiving $0."
 
 #
 # Exit, if the --extract-only flag was set.

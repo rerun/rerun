@@ -12,8 +12,8 @@
 die() { echo "ERROR: $* " >&2 ; exit 1 ; }
 
 # Check for required environment variables 
-[ -z "${CWD}" ] && die "CWD not set." ;# user's current working directory
-[ -z "${PAYLOAD}" ] && die "PAYLOAD directory not specified." ;# archive artifacts 
+[ -z "${CWD}" ] && die "CWD not set." ; # user's current working directory
+[ -z "${PAYLOAD}" ] && die "PAYLOAD directory not specified." ; # archive artifacts 
 
 # Verify the extracted artifact contents
 [ -d ./rerun ] || die "rerun subdirectory not found"

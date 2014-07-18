@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <>]
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <>] [ --template <>]
 
 
 # Load common functions
@@ -46,7 +46,7 @@ set -o nounset -o pipefail
 # declared by `rerun` or by the option parser function.
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: FILE FORMAT MODULES RELEASE VERSION
+#/ option-variables: FILE FORMAT MODULES RELEASE VERSION TEMPLATE
 
 # The `rerun_options_parse` function processes the command line
 # arguments. Each accepted command line flag results in setting
@@ -56,6 +56,9 @@ rerun_options_parse "$@"
 
 # Command implementation
 # ----------------------
+
+# Default the templates directory if unset.
+: ${TEMPLATE:=$RERUN_MODULE_DIR/templates}
 
 # Possibly default VERSION. 
 mods=( $MODULES )
@@ -133,7 +136,7 @@ build_bin_archive() {
   cp $RERUN $PAYLOAD/rerun
 
   # Copy in the extract and launcher scripts used during execution
-  for template in $RERUN_MODULE_DIR/templates/{extract,launcher}
+  for script in $TEMPLATE/{extract,launcher}
   do
       # replace the template substitution tokens ...
       sed -e "s/@GENERATOR@/stubbs:archive/" \
@@ -143,7 +146,7 @@ build_bin_archive() {
           -e "s/@VERSION@/$VERSION/" \
           -e "s/@RELEASE@/$RELEASE/" \
           -e "s/@DECODER@/$(decoder)/" \
-          $template > $PAYLOAD/$(basename $template)
+          $script > $PAYLOAD/$(basename $script)
       # ... and save it to the payload --^
   done
 
