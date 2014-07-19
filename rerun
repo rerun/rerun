@@ -1196,7 +1196,7 @@ _rerun_commands_summary() {
                     [[ "$ARGUMENTS" == "true" ]] && {
                         # Lookup the default but set expand=false to not evalute possible variable.
                         DEFAULT=$(rerun_property_get "$module_dir/options/${opt}" DEFAULT false)
-                        argstring=$(printf "%s <%s>" "$argstring" "$(rerun_color ul $DEFAULT)")
+                        argstring=$(printf "%s <%s>" "$argstring" "$(rerun_color ul "${DEFAULT}")")
                     }
                     [[ "$REQUIRED" != "true" ]] && {
                         summary=$(printf "[%s]: \"%s\"" "${argstring}" "$DESCRIPTION") 
