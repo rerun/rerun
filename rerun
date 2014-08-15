@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.3.1
+RERUN_VERSION=1.3.2
 
 # The default system install directories.
 
@@ -33,6 +33,22 @@ DEFAULT_LIBDIR="/usr/lib"
 # and executing rerun commands.
 # This rerun script can be sourced.
 #
+
+# rerun - Invoke the rerun command in the current environment.
+#
+#     rerun
+#
+# Arguments: None
+#
+# Environment variables:
+#
+# * RERUN: The path to the rerun executable
+# * RERUN_MODULES: The module directory path
+#
+
+rerun() {
+    command $RERUN -M $RERUN_MODULES "$@"
+}
 
 
 # rerun_color - Prints message in specified color using ansi codes.
