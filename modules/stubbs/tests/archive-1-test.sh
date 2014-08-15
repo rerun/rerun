@@ -23,7 +23,7 @@ validate() {
     grep "\-version" $archive
     # Check for decoder comment.
     grep '^# decoder:' $archive
-    # Test their is a payload
+    # Test their is a payload delimiter
     grep "^__ARCHIVE_BELOW__" $archive
 
 }
@@ -37,19 +37,19 @@ describe "archive"
 it_runs_without_options() {
     rerun stubbs:archive     
 
-    validate rerun.bin
-    rm rerun.bin
+    validate rerun.sh
+    rm rerun.sh
 }
 
 it_runs_fully_optioned() {
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules stubbs --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules stubbs --version 1.0
 
-    validate /tmp/rerun.bin.$$
+    validate /tmp/rerun.sh.$$
 
     # Test the version info exists
-    grep '^# archive-version: 1.0' /tmp/rerun.bin.$$
+    grep '^# archive-version: 1.0' /tmp/rerun.sh.$$
     
-    rm /tmp/rerun.bin.$$
+    rm /tmp/rerun.sh.$$
 }
 
 it_handles_comands_using_quoted_arguments() {
@@ -61,12 +61,12 @@ it_handles_comands_using_quoted_arguments() {
         sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/says/script
 
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
-    output=$(/tmp/rerun.bin.$$ freddy:says --msg "whats happening")
+    output=$(/tmp/rerun.sh.$$ freddy:says --msg "whats happening")
     test "$output" = "msg (whats happening)"
     
-    rm /tmp/rerun.bin.$$
+    rm /tmp/rerun.sh.$$
     rm -r $RERUN_MODULES/freddy
 }
 
@@ -163,9 +163,9 @@ it_extracts_only_and_exits() {
         --description none --required true --export false --default nothing
     mkdir $RERUN_MODULES/freddy/.svn
     mkdir $RERUN_MODULES/freddy/.git
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
-    /tmp/rerun.bin.$$ --extract-only /tmp/myextract.$$
+    /tmp/rerun.sh.$$ --extract-only /tmp/myextract.$$
     test -d /tmp/myextract.$$
     test -f /tmp/myextract.$$/launcher
     test -d /tmp/myextract.$$/rerun
@@ -175,7 +175,7 @@ it_extracts_only_and_exits() {
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.svn ]] && exit 1
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.git ]] && exit 1
 
-    rm -rf /tmp/myextract.$$ /tmp/rerun.bin.$$ $RERUN_MODULES/freddy
+    rm -rf /tmp/myextract.$$ /tmp/rerun.sh.$$ $RERUN_MODULES/freddy
 }
 
 
@@ -188,13 +188,13 @@ it_runs_from_specified_extract_dir() {
     sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/says/script
 
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
-    OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy)
+    OUT=$(/tmp/rerun.sh.$$ --extract-dir /tmp/myextract.$$ freddy)
     echo $OUT | grep "says: \"none\""
-    OUT=$(/tmp/rerun.bin.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
+    OUT=$(/tmp/rerun.sh.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
     test "$OUT" = "msg (hi)"
-    rm /tmp/rerun.bin.$$
+    rm /tmp/rerun.sh.$$
     rm -rf $RERUN_MODULES/freddy /tmp/myextract.$$
 }
 
@@ -209,12 +209,12 @@ it_runs_archive_from_overridden_TMPDIR() {
     sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
 
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
-    OUT=$(/tmp/rerun.bin.$$ freddy:print_tmpdir)
+    OUT=$(/tmp/rerun.sh.$$ freddy:print_tmpdir)
     test "$OUT" = "$TMPDIR"
     test -d $TMPDIR
-    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$
+    rm -rf /tmp/rerun.sh.$$ /tmp/stubbs.archive.$$
 }
 
 it_errors_with_missing_extract_dir_arg(){
@@ -224,12 +224,12 @@ it_errors_with_missing_extract_dir_arg(){
     sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
 
-    rerun stubbs:archive --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
+    rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
     ERR=$(mktemp /tmp/rerun.archive.err.$$.XXXX)
-    ! /tmp/rerun.bin.$$ --extract-only 2> $ERR
-    usage="usage: rerun.bin.$$ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [args]"
+    ! /tmp/rerun.sh.$$ --extract-only 2> $ERR
+    usage="usage: rerun.sh.$$ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [module]:[command] [options]"
     test "${usage}" = "$(cat $ERR)"
-    rm -rf /tmp/rerun.bin.$$ /tmp/stubbs.archive.$$ $ERR $RERUN_MODULES/freddy
+    rm -rf /tmp/rerun.sh.$$ /tmp/stubbs.archive.$$ $ERR $RERUN_MODULES/freddy
 }
 
 it_creates_archive_with_user_template() {
@@ -247,9 +247,9 @@ it_creates_archive_with_user_template() {
     mv /tmp/script.$$ $RERUN_MODULES/freddy/commands/print_tmpdir/script
 
     # Archive it.
-    rerun stubbs:archive --template $my_template --file /tmp/rerun.bin.$$ --modules freddy --version 1.0
-    grep '#/ usage: custom stuff' /tmp/rerun.bin.$$
+    rerun stubbs:archive --template $my_template --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
+    grep '#/ usage: custom stuff' /tmp/rerun.sh.$$
 
-    rm -r ${my_template} /tmp/rerun.bin.$$
+    rm -r ${my_template} /tmp/rerun.sh.$$
 
 }

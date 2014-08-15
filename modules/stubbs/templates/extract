@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# extract - this is a self contained self extracting rerun 
+# @FILE@ - This is a self extracting archive. 
+#
 #
 # generator: @GENERATOR@
 # decoder: @DECODER@
@@ -8,7 +9,7 @@
 # user: @USER@
 # archive-version: @VERSION@
 # archive-release: @RELEASE@
-#/ usage: @FILE@ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [args]
+#/ usage: @FILE@ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [module]:[command] [options]
 
 
 # Function to print error message and exit.
@@ -51,16 +52,16 @@ umask 0002
 # If it is unset, create a temporary directory.
 if [[ -z "${EXTRACT_DIR}" ]]
 then
-    SCRATCH_FILES[0]=`mktemp -d ${TMPDIR}/rerun.bin.XXXXXX` || die "failed creating temporary directory."
+    SCRATCH_FILES[0]=$(mktemp -d ${TMPDIR}/rerun.bin.XXXXXX) || die "failed creating temporary directory."
     EXTRACT_DIR=${SCRATCH_FILES[0]}
 else
     mkdir -p "$EXTRACT_DIR"
 fi
 export PAYLOAD=${EXTRACT_DIR}
 
-# CWD and oldCWD are passed to launcher as env variables.
-export oldCWD=$(pwd)
-export CWD=/tmp
+# CWD is passed to launcher as an environment variable.
+
+export CWD=$(pwd)
 
 # Extraction time!
 # - read lines from delimiter and pass to tar unarchive
@@ -76,16 +77,12 @@ if [[ -n "$EXTRACT_ONLY" ]]
 then exit $? 
 fi
 
-
-# Change directory to the payload directory.
-cd $EXTRACT_DIR || die "Could not change directory to payload."
-
+#
 # Run the launcher !
-bash ./launcher "$@"
+#
+bash $EXTRACT_DIR/launcher "$@"
 RETVAL=$?
 
-# Go back to original working directory
-cd $oldCWD
 
 # Stop this script from executing before we reach the binary archive!
 exit ${RETVAL:=0}

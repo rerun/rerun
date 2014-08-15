@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # command: stubbs:archive: "Build a self extracting archive"
-#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <bin>]  --modules <'*'> [ --release <1>] [ --version <>] [ --template <>]
+#/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <sh>]  --modules <'*'> [ --release <1>] [ --version <>] [ --template <>]
 
 
 # Load common functions
@@ -94,16 +94,16 @@ encode() {
     return $retval
 }
 
-build_bin_archive() {
+build_sh_archive() {
   CWD=$(pwd); #remember current working directory.
 
-  # Check if file option was specified and if not set it to rerun.bin.
-  [[ -z "${FILE:-}"  ]] && FILE=rerun.bin
+  # Check if file option was specified and if not set it to rerun.sh.
+  [[ -z "${FILE:-}"  ]] && FILE=rerun.sh
 
   # Prepend current working directory if relative file path.
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
-  [[ ! -d $(dirname ${FILE}) ]] && rerun_option_error "directory not found: $(dirname ${FILE})"
+  [[ ! -d $(dirname ${FILE}) ]] && { echo >&2 "directory not found: $(dirname ${FILE})"; exit 2; }
 
   # create a work directory the archive content
   export PAYLOAD=`mktemp -d /tmp/rerun.stubbs.archive.XXXXXX` || rerun_die
@@ -401,8 +401,8 @@ build_rpm_archive() {
 
 
 case $FORMAT in
-  bin)
-    build_bin_archive
+  bin|sh)
+    build_sh_archive
     ;;
   deb)
     build_deb_archive
