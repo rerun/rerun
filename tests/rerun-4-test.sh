@@ -3,7 +3,7 @@
 
 # Let's get started
 # -----------------
-unset RERUN_COLORS
+unset RERUN_COLOR
 unset RERUN_MODULES
 
 
