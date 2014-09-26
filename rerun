@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.3.2
+RERUN_VERSION=1.3.3
 
 # The default system install directories.
 
@@ -1296,8 +1296,7 @@ done
 # modules located in ${DEFAULT_LIBDIR}/rerun/modules are appended to the modules in RERUN_MODULES.
 RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
 # fix issue #206
-if [[ -x /usr/bin/readlink ]]
-then
+if [[ -x /usr/bin/readlink && "$(uname)" == 'Linux' ]]; then
     RERUN_LOCATION="$(/usr/bin/readlink -f ${RERUN_LOCATION})"
 fi
 
