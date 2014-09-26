@@ -1,7 +1,7 @@
-AC_INIT([rerun], [1.3.2], [rerun-discuss@googlegroups.com],
+AC_INIT([rerun], [1.3.3], [rerun-discuss@googlegroups.com],
              [rerun], [https://github.com/rerun/rerun/wiki])
 
-dnl Created by thompson@dtosolutions, 27SEP11
+dnl Created by stagr.lee@gmail.com, 27SEP11
 AC_PREREQ([2.59])
 AC_CONFIG_AUX_DIR([config])
 dnl AC_CONFIG_MACRO_DIR([m4])

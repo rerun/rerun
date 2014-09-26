@@ -1295,6 +1295,11 @@ done
 # Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
 # modules located in ${DEFAULT_LIBDIR}/rerun/modules are appended to the modules in RERUN_MODULES.
 RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
+# fix issue #206
+if [[ -x /usr/bin/readlink ]]
+then
+    RERUN_LOCATION="$(/usr/bin/readlink -f ${RERUN_LOCATION})"
+fi
 
 # Default the RERUN_MODULES environment variable.
 # If it is not set, then default it to either the system
