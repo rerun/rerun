@@ -30,8 +30,8 @@ For the module developer, rerun is a trivial framework following
 simple conventions that easily fit in a shell environment.
 Rerun includes a module development tool called "stubbs" that
 helps create and evolve rerun modules. Stubbs contains
-commands to automate option processing code, metadata definition
-and unit testing.
+commands to generate option processing code, metadata definition,
+execute unit tests and generate documentation.
 
 Internally, `rerun` implements a simple dispatching mechanism to look up named
 commands and execute them. *Commands* are logically named and
@@ -170,12 +170,12 @@ command and any command options. The basic usage form is
 To run the "archive" command in the stubbs module, type:
 
     $ rerun stubbs:archive
-    Wrote self extracting archive script: /tmp/rerun.bin
+    Wrote self extracting archive script: /tmp/rerun.sh
 
 Command options are passed after the "module:command" string. 
 Run the "stubbs:archive" command but specify where the archive file is written.
 
-    $ rerun stubbs:archive --modules waitfor --file $HOME/rerun.bin
+    $ rerun stubbs:archive --modules waitfor --file $HOME/rerun.sh
 
 If the 'stubbs' module is stored in `/var/rerun`, then the command usage
 would be:
@@ -190,7 +190,7 @@ the same exact interface as rerun,... all in one file!
 
 Specifically, an archive is a set of modules 
 and `rerun` itself packaged into a self extracting
-script (by default in a file named "rerun.bin"). 
+script (by default in a file named "rerun.sh"). 
 Archives can be useful if you want
 to share a single self contained executable that contains all the needed modules.
 
@@ -198,24 +198,24 @@ Run an archive script like you would run `rerun`.
 
 You can execute an archive via `bash` like so:
 
-    $ bash rerun.bin <module>:<command> --your options
+    $ bash rerun.sh <module>:<command> --your options
 
 If the execute bit is set, invoke the archive directly.
 
 Here the archive is executed without arguments which causes the archive
 to list the modules contained within it.
 
-    $ ./rerun.bin
+    $ ./rerun.sh
       waitfor: "utility commands that wait for a condition."
       .
       . listing output ommitted
 
-Note, ".bin" is just a suffix naming convention for a self-extracting script.
+Note, ".sh" is just a suffix naming convention for a self-extracting script.
 The archive file can be named anything you wish.
 
 Run the `waitfor:ping` command in the archive:
 
-	$ ./rerun.bin waitfor:ping --server remoteserver
+	$ ./rerun.sh waitfor:ping --server remoteserver
 
 *Archive special options*
 
