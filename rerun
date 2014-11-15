@@ -66,12 +66,12 @@ rerun() {
 # * Unrecognized colors are defaulted to black.
 #
 rerun_color() {
-    (( $# <= 2 )) || {
+    (( $# < 2 )) && {
         printf >&2 'wrong # args: should be: rerun_color color message\n'
         return 2
     }
-    local reset="\033[0m" black="\033[0;30m" code=
-    case $1 in
+    local color=$1 reset="\033[0m" black="\033[0;30m" code=
+    case $color in
         red)    code="\033[31m"   ;;
         hred)   code="\033[1;31m" ;;
         blue)   code="\033[34m"   ;;
@@ -85,9 +85,10 @@ rerun_color() {
         *)      code="$black"     ;;
     esac
     shift;
+    local message="$*"
     if [[ -n "${RERUN_COLOR:-}" ]]
-    then echo -ne ${code}"${*}"${reset}
-    else printf -- "%s" "$*"
+    then echo -ne ${code}${message:-}${reset}
+    else printf -- "%s" "${message:-}"
     fi
 }    
 
@@ -130,7 +131,7 @@ fi
 
 #
 rerun_log_puts() {
-    [[ $# == 4 ]] || {
+    (( $# != 4 )) && {
         printf >&2 'wrong # args: should be: rerun_log_puts format level command message\n'
         return 2
     }
@@ -153,10 +154,10 @@ rerun_log_puts() {
     if (( $level >= $RERUN_LOG_ERR_LEVEL ))
     then
         # write message to stderr
-        echo >&2 $(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")
+        printf >&2 -- "%s\n" "$(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")"
     else
         # write message to stdout
-        echo $(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")
+        printf -- "%s\n" "$(rerun_color ${RERUN_LOG_COLORS[$level]} "$output")"
     fi
 
     return 0
@@ -183,7 +184,7 @@ rerun_log_puts() {
 # * rerun_log levels are mapped to equivalent syslog priority.
 #
 rerun_log_syslog() {
-    [[ $# == 4 ]] || {
+    (( $# == 4 )) || {
         printf >&2 'wrong # args: should be: rerun_log_syslog facility level command message\n'
         return 2
     }
@@ -243,19 +244,19 @@ rerun_log() {
             return 0
             ;;
         level)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_LEVELS[$RERUN_LOG_LEVEL]}"
-            [[ $# == 2 ]] && { 
+            (( $# == 1 )) && printf "%s\n" "${RERUN_LOG_LEVELS[$RERUN_LOG_LEVEL]}"
+            (( $# == 2 )) && { 
                 local level=$(rerun_list_index $2 "${RERUN_LOG_LEVELS[*]}")
                 (( "$level" >= 0 && "$level" <= ${#RERUN_LOG_LEVELS[*]})) && RERUN_LOG_LEVEL=$level || { printf >&2 "rerun_log level: invalid level: $2\n"; return 2; }
             }
             return 0
             ;;
         logfile)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_FILE}"  || RERUN_LOG_FILE=$2
+            (( $# == 1 )) && printf "%s\n" "${RERUN_LOG_FILE}"  || RERUN_LOG_FILE=$2
             return 0
             ;;
         syslog)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_SYSLOG}" || {
+            (( $# == 1 )) && printf "%s\n" "${RERUN_LOG_SYSLOG}" || {
                 [[ "$2" =~ ^[[:alnum:]]+$ ]] || {
                     printf >&2 "rerun_log syslog: facility is not a valid name: '$2'\n"
                     return 2
@@ -265,11 +266,11 @@ rerun_log() {
             return 0
             ;;
         fmt-console)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_FMT_CONSOLE}"  || RERUN_LOG_FMT_CONSOLE=$2
+            (( $# == 1 )) && printf "%s\n" "${RERUN_LOG_FMT_CONSOLE}"  || RERUN_LOG_FMT_CONSOLE=$2
             return 0
             ;;
         fmt-logfile)
-            [[ $# == 1 ]] && printf "%s\n" "${RERUN_LOG_FMT_LOGFILE}"  || RERUN_LOG_FMT_LOGFILE=$2
+            (( $# == 1 )) && printf "%s\n" "${RERUN_LOG_FMT_LOGFILE}"  || RERUN_LOG_FMT_LOGFILE=$2
             return 0
             ;;
         debug|info|warn|error|fatal)
@@ -331,7 +332,7 @@ rerun_log() {
 # * Message format:     `"ERROR : ?message?"`
 # * Exit status returned to invoking command: 0
 rerun_die() {   
-   [[ $# -gt 1 ]] && { 
+   (( $# > 1 )) && { 
         local exit_status=$1
         shift        
     } 
@@ -339,7 +340,7 @@ rerun_die() {
     while info=$(caller $frame)
     do 
         local -a f=( $info )
-        [[ $frame -gt 0 ]] && {
+        (( $frame > 0 )) && {
             printf >&2 "ERROR in \"%s\" %s:%s\n" "${f[1]}" "${f[2]}" "${f[0]}"
         }
         (( frame++ )) || :; #ignore increment errors (i.e., errexit is set)
@@ -390,7 +391,7 @@ rerun_syntax_error() {
 # * Return 0 if there is an argument.
 # * Return 1 otherwise 
 rerun_option_check() {
-    if [[ "$1" -lt 2 ]]
+    if (( "$1" < 2 ))
     then rerun_syntax_error "option requires argument: ${2:-}"
     else return 0
     fi
@@ -445,7 +446,7 @@ rerun_option_usage() {
 # * Return 0 for successful option parse.
 #
 rerun_options_parse() {
-    while [ "$#" -gt 0 ]; do
+    while (( "$#" > 0 )); do
         OPT="$1"
         case "$OPT" in
             -?) rerun_option_usage
@@ -476,7 +477,7 @@ rerun_options_parse() {
 # * Returns a list of space separated module names.
 # 
 rerun_modules() {
-    [[ ! $# -eq 1 ]] && { 
+    (( ! $# == 1 )) && { 
 	    rerun_die 'wrong # args: should be: rerun_modules directory'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -509,7 +510,7 @@ rerun_modules() {
 # * Returns a list of space separated command names.
 # 
 rerun_commands() {
-   [[ ! $# -eq 2 ]] && { 
+   (( $# == 2 )) || { 
 	    rerun_die 'wrong # args: should be: rerun_commands directory module'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -546,7 +547,7 @@ rerun_commands() {
 # * Conditions: If metadata is not found, an empty list is returned.
 # 
 rerun_options() {
-    [[ ! $# -eq 3 ]] && { 
+    (( $# == 3 )) || { 
 	    rerun_die 'wrong # args: should be: rerun_options modules_dir module command'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -577,7 +578,7 @@ rerun_options() {
 # * Returns a list of space separated option names.
 # 
 rerun_module_options() {
-   [[ ! $# -eq 2 ]] && { 
+    (( $# == 2 )) || { 
 	    rerun_die 'wrong # args: should be: rerun_module_options directory module'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -613,7 +614,7 @@ rerun_module_options() {
 
 
 rerun_list_contains () {
-    [[ ! $# -ge 2 ]] && {
+    (( $# >= 2 )) || {
         rerun_die 'wrong # args: should be: rerun_list_contains element list'
     }
     local e
@@ -736,7 +737,7 @@ rerun_path_absolute() {
 #
 
 rerun_property_get() {
-    [[ ! $# -ge 2 ]] && {
+    (( $# >= 2 )) || {
         rerun_die 'wrong # args: should be: rerun_property_get directory property ?expand?'
     }
     local -r directory="$1" property="$2" expand="${3:-true}"
@@ -774,7 +775,7 @@ rerun_property_get() {
 # * Multiple property assignments are made by specifying additional property=value bindings.
 #
 rerun_property_set() {
-    [[ $# -lt 2 ]] && { 
+    (( $# < 2 )) && { 
         rerun_die 'wrong # args: should be: rerun_property_set directory property=value ?property=value?'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -782,7 +783,7 @@ rerun_property_set() {
     local -r directory="$1" 
     local -a sed_patts=()
     shift ;
-    while [ "$#" -gt 0 ]
+    while (( "$#" > 0 ))
     do
         local property=${1%=*} value=${1#*=}
 
@@ -796,7 +797,7 @@ rerun_property_set() {
         shift; # move to next property=value binding.
     done
 
-    if [[ ${#sed_patts[*]} > 0 ]]
+    if (( ${#sed_patts[*]} > 0 ))
     then
         sed "${sed_patts[@]}" $directory/metadata \
             > $directory/metadata.$$ || rerun_die  "Failed updating property data"
@@ -825,7 +826,7 @@ rerun_property_set() {
 # * Searches for files in directory named `script`.
 #   * Backwards compatability list: `default.sh` 
 rerun_script_lookup() {
-    [[ ! $# -eq 2 ]] && { 
+    (( $# != 2 )) && { 
         rerun_die 'wrong # args: should be: rerun_script_lookup directory command'
     }
     [[ ! -d $1 ]] && rerun_die "directory not found: $1"
@@ -864,7 +865,7 @@ rerun_script_lookup() {
 # * Return 1 otherwise.
 # 
 rerun_script_exists() {
-    [[ ! $# -eq 2 ]] && { 
+    (( $# != 2 )) && { 
         rerun_die 'wrong # args: should be: rerun_script_exists directory command'
     }
     local -r module_dir="$1" command="$2"
@@ -892,7 +893,7 @@ rerun_script_exists() {
 # * Give precedence to finding the module in $RERUN_MODULES.
 # * If running an installed version of Rerun check the system location for the module:
 rerun_module_exists() {
-    [[ ! $# -eq 1 ]] && { 
+    (( $# != 1 )) && { 
         rerun_die 'wrong # args: should be: rerun_module_exists module'
     }
     local -r module="$1"
@@ -944,7 +945,7 @@ rerun_module_exists() {
 # Return the command script's exit code as the result.
 #
 rerun_command_execute() {
-    [[ ! $# -ge 2 ]] && { 
+    (( $# >= 2 )) || { 
         rerun_die "wrong # args: should be: rerun_command_execute module command options" 
     }
     local -r module="$1"
@@ -1014,7 +1015,7 @@ set -e ; # Exit if command execution fails.
 #
 #
 _rerun_options_populate() {
-    [[ $# -lt 2 ]] && {
+    (( $# < 2 )) && {
         echo >&2 "usage: _rerun_options_populate: module command ?answers?" 
         return 2
     }
@@ -1072,7 +1073,7 @@ _rerun_banner() {
 #
 # 
 _rerun_examples() {
-    [[ ! $# = 1 ]] && { 
+    (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_examples prog" 
     }
     local -r prog=$1
@@ -1096,7 +1097,7 @@ echo "
 # already exist. Display the man page with `nroff`.
 
 _rerun_man_page() {
-    [[ ! $# = 1 ]] && { 
+    (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_man module" 
     }
     local -r module=$1
@@ -1119,7 +1120,7 @@ PAD="  "
 # * directory: Module directory
 #
 _rerun_module_summary() {
-    [[ ! $# = 1 ]] && { 
+    (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_module_summary module_dir" 
     }
     local -r module_dir=$1
@@ -1145,7 +1146,7 @@ _rerun_module_summary() {
 # then list the system installed ones separately.
 #
 _rerun_modules_summary() {
-    [[ ! $# = 1 ]] && { 
+    (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_modules_summary directory" 
     }
     local -r directory=$1
@@ -1174,7 +1175,7 @@ _rerun_modules_summary() {
 # 
 #
 _rerun_commands_summary() {
-    [[ ! $# = 2 ]] && { 
+    (( $# != 2 )) && { 
         rerun_die "wrong # args: should be: _rerun_commands_summary directory module" 
     }
     local -r directory=$1
@@ -1241,7 +1242,7 @@ export RERUN_VERBOSE=
 # There are two sets of options, `rerun` specific arguments 
 # and command options.
 
-while [ "$#" -gt 0 ]; do
+while (( "$#" > 0 )); do
     OPT="$1"
     case "$OPT" in
 	-h*|--h*)
@@ -1326,8 +1327,8 @@ MODULE="" COMMAND=""
 # Use regex to split up command strings.
 if [[ "$@" =~ ([^:]+)([:]?[ ]?)([-A-Za-z0-9_]*)([ ]*)(.*) ]]
 then
-    MODULE=${BASH_REMATCH[1]};    # module
-    [ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
+    MODULE=${BASH_REMATCH[1]};     # module
+    [ "${BASH_REMATCH[2]}" == ': ' ] && shift ; # eat the extra space char
     COMMAND=${BASH_REMATCH[3]/ /}; # command
     #- BASH_REMATCH[4] contains the whitespace separating command and options.
     #- BASH_REMATCH[5] contains command options.
@@ -1335,7 +1336,7 @@ else
     [[ -n "${1:-}" ]] && MODULE=${1/:/};   # module (minus colon)
 fi
 # Shift over so the remaining arguments are left to the command options.
-[[ "$#" -gt 0 ]] && shift; 
+(( "$#" > 0 )) && shift; 
 
 # Read answer file and set positional parameters from them.
 if [[ -n "${ANSWERS:-}" && -f "${ANSWERS:-}" ]]
