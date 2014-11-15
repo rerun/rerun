@@ -168,3 +168,9 @@ it_performs_rerun_log_with_syslog() {
     ! rerun_log syslog "total crap"
     rerun_log "test[#$$] it_performs_rerun_log_with_syslog"
 }
+
+it_prints_unexpanded_glob_string() {
+    . $RERUN
+    out=$(rerun_log info "*** hi ***")
+    test "$out" = '[info] : *** hi ***'
+}
