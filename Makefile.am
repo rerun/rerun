@@ -1,4 +1,4 @@
-# Create by thompson@dtosolutions.com 27SEP11
+# Create by stagr.lee@gmail.com 27SEP11
 # copyright DTOSOLUTIONS, 2011
 
 ## Process this file with automake to produce Makefile.in
