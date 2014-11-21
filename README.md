@@ -11,15 +11,15 @@ rerun - a modular shell automation framework to organize your keeper scripts.
 
 # DESCRIPTION
 
-Rerun is a simple command runner that turns loose shell scripts
+Rerun is a simple framework that turns loose shell scripts
 into modular automation. Rerun will help you
-organize your scripts into well defined command interfaces.
-Collections of management modules can be archived and delivered as
-a single executable to facilitate team hand offs.
-Using the "stubbs" module, rerun will even facilitate documentation
-and unit tests.
+organize your scripts into user friendly commands.
+Collections of rerun modules can be archived and delivered as
+a single executable or as RPMs or Debian packages to facilitate handoffs between teams.
+The included "stubbs" module, helps you develop your own rerun modules, 
+generating option parsing code, documentation even unit tests for each of your commands.
 
-Rerun provides two modes of operation:
+End users can browse and execute commands via its two modes of operation:
 
 1. *Listing*: Rerun lists modules and commands. Listing
 information includes name, description and command line usage syntax.
@@ -28,8 +28,8 @@ unspecified arguments) and executes a script for the specified module command.
 
 For the module developer, rerun is a trivial framework following
 simple conventions that easily fit in a shell environment.
-Rerun includes a module development tool called "stubbs" that
-helps create and evolve rerun modules. Stubbs contains
+The "stubbs"  module development tool
+helps create and enhance your rerun modules. Stubbs contains
 commands to generate option processing code, metadata definition,
 execute unit tests and generate documentation.
 
@@ -177,15 +177,18 @@ Run the "stubbs:archive" command but specify where the archive file is written.
 
     $ rerun stubbs:archive --modules waitfor --file $HOME/rerun.sh
 
-If the 'stubbs' module is stored in `/var/rerun`, then the command usage
+If modules are stored in `/var/rerun`, then the command usage
 would be:
 
     $ rerun -M /var/rerun stubbs:archive
 
+You can also declare the `RERUN_MODULES` environment variable to sepcify the modules directory.
+
 ### Archives
 
-An *archive* contains all the rerun modules you need
-(you might have a library of them) and gives you
+After arching your rerun modules, you get a single executable file
+containing a copy of rerun and one or more modules
+(you might have a library of them). The archive uses
 the same exact interface as rerun,... all in one file!
 
 Specifically, an archive is a set of modules 
@@ -198,12 +201,11 @@ Run an archive script like you would run `rerun`.
 
 You can execute an archive via `bash` like so:
 
-    $ bash rerun.sh <module>:<command> --your options
+    $ rerun.sh <module>:<command> --your options
 
-If the execute bit is set, invoke the archive directly.
+If the execute bit is not set, invoke the archive using bash (e.g., `bash rerun.sh <module>:<command>`).
 
-Here the archive is executed without arguments which causes the archive
-to list the modules contained within it.
+When the archive is executed without arguments you get module and command listings:
 
     $ ./rerun.sh
       waitfor: "utility commands that wait for a condition."
@@ -226,8 +228,7 @@ Below is a list of these optional arguments:
 * `--extract-only|-N <>`: Extract the archive to the specified directory and exit.
 * `--extract-dir|-D <>`: Extract the archive  to the specified directory and then execute the specified command. By default, the `TMPDIR` environment variable is used to create a directory to extract the archive.
 
-
-
+Besies the self extractive archive format, stubbs can also generate RPM and Debian packages.
 See `stubbs:archive` for further information about creating and 
 understanding rerun archives.
 
@@ -241,29 +242,29 @@ A rerun module assumes the following structure:
 
     <MODULE>
     |-- commands
-    |-- `-- cmdA (directory for cmdA files)
-    |--     |-- metadata (command metadata)
+    |-- `-- cmdA (each command gets its own subdirectory)
+    |--     |-- metadata   (command metadata containing name, description and options uses)
     |--     |-- options.sh (option parsing script)
-    |--     `-- script (command script)
+    |--     `-- script     (script implementing the command)
     |-- lib
     |-- `-- functions.sh (module function library)
     |-- metadata (module metadata)
-    |-- options (module options)
+    |-- options  (module options)
     |   `-- optyY ("optY" option)
     |       `-- metadata (declares metadata for "optY" option)
     `-- tests
         `-- cmdA-1-test.sh (unit tests for cmdA)
     
+The "stubbs" module creates this directory structure for you but once you know
+the conventions you can create and edit these files directly (if you prefer).
 
-## Command Scripts
+## Command Execution
 
-Rerun's internal dispatch logic uses the directory layout
+Rerun's internal dispatch logic uses the directory and file convention
 described above to find and execute scripts for each command.
 
-Rerun expects an implementation script for each command.
-
-* `script`: Script implementation.
-* `options.sh`: Script to parse options (generated by stubbs for "bash" modules).
+Once the user specifies the module and command to execute, rerun finds the 
+command's script and executes it.
 
 ## Metadata
 

@@ -193,9 +193,9 @@ stubbs_options_with_short() {
     for option in $(rerun_module_options $(dirname $moddir) $(basename $moddir))
     do
         local opt_short=$(stubbs_option_property $moddir $option SHORT)
-        [[ "$short" = "$opt_short" ]] && with_short=( ${with_short[*]} $option )
+        [[ "$short" = "${opt_short:-}" ]] && with_short=( ${with_short[*]:-} $option )
     done
-    echo ${with_short[*]}
+    echo ${with_short[*]:-}
 }
 
 #

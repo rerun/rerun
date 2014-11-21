@@ -2,6 +2,6 @@
 #/ rerun-metadata: module
 NAME=stubbs
 DESCRIPTION="Simple rerun module builder"
-VERSION=1.2.1
+VERSION=1.2.2
 REQUIRES=
 EXTERNALS=rpm-build

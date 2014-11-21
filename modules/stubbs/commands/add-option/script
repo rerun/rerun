@@ -211,7 +211,7 @@ fi
 # If short is specified, check it's not already used.
 [ -n "${SHORT:-}" ] && {
     options=$(stubbs_options_with_short "$RERUN_MODULES/$MODULE" $SHORT)
-    [ -n "$options" ] && {
+    [[ -n "${options:-}" && "$options" != $OPTION ]] && {
         rerun_die "-${SHORT} already used by option: $options"
     }
 }
