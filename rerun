@@ -90,7 +90,7 @@ rerun_color() {
     shift;
     local message="$*"
     if [[ -n "${RERUN_COLOR:-}" ]]
-    then echo -ne ${code}${message:-}${reset}
+    then echo -ne ${code}"${message:-}"${reset}
     else printf -- "%s" "${message:-}"
     fi
 }    
