@@ -85,7 +85,7 @@ rm -rf %{buildroot}
 # Staged install http://www.gnu.org/prep/standards/html_node/DESTDIR.html
 make DESTDIR=%{buildroot} install
 # TODO: remove after issue 147 fixed
-chmod 777 %{buildroot}%{_prefix}/lib/rerun/modules %{buildroot}%{moddir}/tests
+chmod 775 %{buildroot}%{_prefix}/lib/rerun/modules
 
 %clean
 # Needed only for RH5
