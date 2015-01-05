@@ -243,13 +243,12 @@ it_creates_archive_with_user_template() {
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
     cat ${RERUN_MODULES}/freddy/commands/print_tmpdir/script |
-    sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
+      sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
     mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/print_tmpdir/script
 
     # Archive it.
     rerun stubbs:archive --template $my_template --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
     grep '#/ usage: custom stuff' /tmp/rerun.sh.$$
 
-    rm -r ${my_template} /tmp/rerun.sh.$$
-
+    rm -rf ${my_template} /tmp/rerun.sh.$$
 }
