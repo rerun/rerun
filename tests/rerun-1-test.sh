@@ -5,6 +5,7 @@
 # -----------------
 unset RERUN_COLOR
 
+
 # Helpers
 # ------------
 for i in ./functions.sh ../tests/functions.sh `dirname $1`/functions.sh `dirname $0`/functions.sh
@@ -37,15 +38,15 @@ it_displays_help() {
 
 it_displays_usage() {
     usage=$(rerun -help 2>&1 |grep '^usage:')
-    test "$usage" = 'usage: rerun [-h][-v][-V][--version] [-M <dir>] [--answer <file>] [module:[command [options]]]'
+    test "$usage" = 'usage: rerun [-h][-G][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]'
 }
 
 it_displays_version_and_license() {
-    rinfo=( $(rerun -help|grep Version:) )
-    test "${rinfo[1]}" = "Version:"
-    test "${rinfo[2]}" = "1.0.2."
-    test "${rinfo[3]}" = "License:"
-    test "${rinfo[4]}" = "Apache"
+    rinfo=( $(rerun -help 2>&1 | grep Version:) )
+    test "${rinfo[0]}" = "Version:"
+    test "${rinfo[1]}" = "1.3.6."
+    test "${rinfo[2]}" = "License:"
+    test "${rinfo[3]}" = "Apache"
 }
 
 it_displays_modules_when_no_arguments() {

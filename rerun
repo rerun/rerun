@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.3.5
+RERUN_VERSION=1.3.6
 
 # The default system install directories.
 
@@ -880,6 +880,32 @@ rerun_script_exists() {
 }
 
 #
+# ---
+#
+
+# _rerun_module_path_elements_
+#
+#     rerun_module_path_elements 
+#
+# Arguments: none.
+#
+rerun_module_path_elements() {
+    (( $# != 0 )) && {
+        rerun_die 'wrong # args: should be: rerun_module_path_elements'
+    }
+    echo "$RERUN_MODULES" | sed ':loop
+{h
+s/:.*//
+p      
+g
+s/[^:]*://
+t loop
+d     
+}'
+
+}
+
+#
 # - - -
 #
 
@@ -902,11 +928,14 @@ rerun_module_exists() {
     }
     local -r module="$1"
 
-    if [[ -f "${RERUN_MODULES:-}/$module/metadata" ]]
-    then
-       echo $RERUN_MODULES/$module
-       return 0
-    fi
+    for path_element in `rerun_module_path_elements`
+    do
+        if [[ -f "$path_element/$module/metadata" ]]
+        then
+           echo $path_element/$module
+           return 0
+        fi
+    done
 
     if [[ "${RERUN_LOCATION:-}" = "${DEFAULT_BINDIR}" \
         && -f "${DEFAULT_LIBDIR}/rerun/modules/$module/metadata" ]]
@@ -1105,14 +1134,17 @@ _rerun_man_page() {
         rerun_die "wrong # args: should be: _rerun_man module" 
     }
     local -r module=$1
-    if [[ ! -f "${RERUN_MODULES:-}/$module/$module.1" 
-                && -f "$RERUN_MODULES/stubbs/commands/docs/script" ]]
-    then ${RERUN:-rerun} stubbs:docs --module $module 
-    fi
-    if [[ -f "$RERUN_MODULES/$module/$module.1" ]]
-    then nroff -man "$RERUN_MODULES/$module/$module.1" | ${PAGER:-more}
-    else echo >&2 "Manual could not be generated." 
-    fi
+    for path_element in `rerun_module_path_elements`
+    do
+        if [[ ! -f "$path_element/$module/$module.1" 
+                && -f "$path_element/stubbs/commands/docs/script" ]]
+        then ${RERUN:-rerun} stubbs:docs --module $module 
+        fi
+        if [[ -f "$path_element/$module/$module.1" ]]
+        then nroff -man "$path_element/$module/$module.1" | ${PAGER:-more}
+        else echo >&2 "Manual could not be generated." 
+        fi
+    done
 }
 
 PAD="  "
@@ -1161,16 +1193,20 @@ _rerun_modules_summary() {
     do
         [[ -f $module/metadata ]] && _rerun_module_summary $module
     done
-    if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
-                && ${RERUN_MODULES:-} != "${DEFAULT_LIBDIR}/rerun/modules" ]]
-    then
-        echo
-        echo $(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")
-        for module in ${DEFAULT_LIBDIR}/rerun/modules/*
-        do
-           [[ -f $module/metadata ]] && _rerun_module_summary $module
-        done
-    fi
+    for path_element in `rerun_module_path_elements`
+    do
+        if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
+                && $path_element != "${DEFAULT_LIBDIR}/rerun/modules" ]]
+        then
+            echo
+            echo $(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")
+            for module in ${DEFAULT_LIBDIR}/rerun/modules/*
+            do
+               [[ -f $module/metadata ]] && _rerun_module_summary $module
+            done
+            break
+        fi
+    done
     set -u
 }
 
@@ -1321,10 +1357,22 @@ then
 fi
 
 
-# Ensure the modules directory path is defined and is a directory.
+# Ensure the modules directory path is defined and at least one element is a directory.
 #
-[[ -n "${RERUN_MODULES:-}" && -d "${RERUN_MODULES:-}" ]] || {
-    rerun_die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
+[[ -n "${RERUN_MODULES:-}" ]] || {
+    rerun_die "RERUN_MODULES is not defined"
+}
+__rerun_module_has_valid_dir__=1
+for path_element in `rerun_module_path_elements`
+do
+    if [[ -d "$path_element" ]]
+    then
+        __rerun_module_has_valid_dir__=0
+        break
+    fi
+done
+[[ $__rerun_module_has_valid_dir__ = 0 ]] || {
+    rerun_die "RERUN_MODULES does not contain any valid directories: $RERUN_MODULES"
 }
 
 # Clear MODULE and COMMAND in case they were incidentally declared in the environment.
