@@ -109,19 +109,39 @@ it_performs_rerun_list_index() {
 }
 
 it_performs_rerun_modules() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
     modules=( $(rerun_modules $RERUN_MODULES) )
     test -n "$modules"
     rerun_list_contains "freddy" "${modules[@]}"
     containsElement "stubbs" "${modules[@]}"
 }
 
-it_performs_rerun_module_options() {
-    make_freddy $RERUN_MODULES
-
+it_performs_get_module_home_dir_in_path() {
+    modules1=$(mktemp -d "/tmp/rerun.modules.XXXXX")
+    modules2=$(mktemp -d "/tmp/rerun.modules.XXXXX")
+    make_freddy $modules1
+    mv $modules1/freddy $modules1/berrie
+    make_freddy $modules2
+    RERUN_MODULES=$modules1:$modules2
+    
     . $RERUN
+    home_dir=$(rerun_get_module_home_dir_in_path $RERUN_MODULES freddy)
+    test $home_dir = $modules2/freddy
+    home_dir=$(rerun_get_module_home_dir_in_path $RERUN_MODULES berrie)
+    test $home_dir = $modules1/berrie
+    rm -rf ${modules1}/berrie
+    ! rerun_get_module_home_dir_in_path $RERUN_MODULES berrie
+    rmdir ${modules1}
+    rm -rf ${modules2}/freddy
+    rmdir ${modules2}
+
+}
+
+
+it_performs_rerun_module_options() {
+    . $RERUN
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
     options=( $(rerun_module_options $RERUN_MODULES freddy) )
     test -n "$options"
     test "${#options[*]}" = 2
@@ -129,9 +149,8 @@ it_performs_rerun_module_options() {
 }
 
 it_performs_rerun_commands() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
     commands=( $(rerun_commands $RERUN_MODULES freddy) )
     test -n "$commands"
     test "${#commands[*]}" = 2
@@ -140,9 +159,8 @@ it_performs_rerun_commands() {
 
 
 it_performs_rerun_options() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
     options=( $(rerun_options $RERUN_MODULES freddy dance) )
     test -n "$options"
     test "${#options[*]}" = 1
@@ -151,37 +169,37 @@ it_performs_rerun_options() {
 
 
 it_performs_rerun_property_get() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    MODULE_PATH="$(rerun_module_path_elements $RERUN_MODULES | head -1)"
+    make_freddy $MODULE_PATH
 
     # Get metadata property from module
-    name=$(rerun_property_get $RERUN_MODULES/freddy NAME)
+    name=$(rerun_property_get $MODULE_PATH/freddy NAME)
     test -n "$name"
     test "$name" = "freddy"
 
     # Get metadata property for a command.
-    name=$(rerun_property_get $RERUN_MODULES/freddy/commands/dance NAME)
+    name=$(rerun_property_get $MODULE_PATH/freddy/commands/dance NAME)
     test -n "$name"
     test "$name" = "dance"
 
     # Get option metadata property
-    name=$(rerun_property_get $RERUN_MODULES/freddy/options/jumps NAME)
+    name=$(rerun_property_get $MODULE_PATH/freddy/options/jumps NAME)
     test -n "$name"
     test "$name" = "jumps"
 
-    args=$(rerun_property_get $RERUN_MODULES/freddy/options/jumps ARGUMENTS)
+    args=$(rerun_property_get $MODULE_PATH/freddy/options/jumps ARGUMENTS)
     test -n "$args"
     test "$args" = "true"
 
-    required=$(rerun_property_get $RERUN_MODULES/freddy/options/jumps REQUIRED)
+    required=$(rerun_property_get $MODULE_PATH/freddy/options/jumps REQUIRED)
     test -n "$required"
     test "$required" = "false"
 
     # Test negative results
 
     # Should fail when getting a non existent metadata property
-    ! rerun_property_get  $RERUN_MODULES/freddy BOGUS$$
+    ! rerun_property_get  $MODULE_PATH/freddy BOGUS$$
 
     # Should fail when accessing a missing metadata file
     ! rerun_property_get GARBAGEDIR 2>&1 |grep "metadata not found: GARBAGEDIR"
@@ -221,73 +239,94 @@ EOF
 }
 
 it_performs_rerun_property_set() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    MODULE_DIR="$(rerun_module_path_elements $RERUN_MODULES | head -1)"
+    make_freddy $MODULE_DIR
 
-    desc=$(rerun_property_get $RERUN_MODULES/freddy DESCRIPTION)
+    desc=$(rerun_property_get $MODULE_DIR/freddy DESCRIPTION)
     test "$desc" = "A dancer in a red beret and matching suspenders"
 
-    rerun_property_set $RERUN_MODULES/freddy DESCRIPTION=nothing
-    desc=$(rerun_property_get $RERUN_MODULES/freddy DESCRIPTION)
+    rerun_property_set $MODULE_DIR/freddy DESCRIPTION=nothing
+    desc=$(rerun_property_get $MODULE_DIR/freddy DESCRIPTION)
     test "$desc" = "nothing"
 
-    rerun_property_set $RERUN_MODULES/freddy DESCRIPTION="the poppin dancer"
-    desc=$(rerun_property_get $RERUN_MODULES/freddy DESCRIPTION)
+    rerun_property_set $MODULE_DIR/freddy DESCRIPTION="the poppin dancer"
+    desc=$(rerun_property_get $MODULE_DIR/freddy DESCRIPTION)
     test "$desc" = "the poppin dancer"
 
 
-    rerun_property_set $RERUN_MODULES/freddy ONE=1 TWO=2 THREE=3
-    one=$(rerun_property_get $RERUN_MODULES/freddy ONE)
+    rerun_property_set $MODULE_DIR/freddy ONE=1 TWO=2 THREE=3
+    one=$(rerun_property_get $MODULE_DIR/freddy ONE)
     test "$one" = "1"
 
-    two=$(rerun_property_get $RERUN_MODULES/freddy TWO)
+    two=$(rerun_property_get $MODULE_DIR/freddy TWO)
     test "$two" = "2"
 
-    three=$(rerun_property_get $RERUN_MODULES/freddy THREE)
+    three=$(rerun_property_get $MODULE_DIR/freddy THREE)
     test "$three" = "3"
 
-    rerun_property_set $RERUN_MODULES/freddy DEFAULT="'${USER}'"
-    def=$(rerun_property_get $RERUN_MODULES/freddy DEFAULT)
+    rerun_property_set $MODULE_DIR/freddy DEFAULT="'${USER}'"
+    def=$(rerun_property_get $MODULE_DIR/freddy DEFAULT)
     test "$def" = "'${USER}'"
 }
 
-it_performs_rerun_script_lookup() {
-    make_freddy $RERUN_MODULES
 
+it_performs_rerun_module_exists_multiple() {
+    modules1=$(mktemp -d "/tmp/rerun.modules.XXXXX")
+    modules2=$(mktemp -d "/tmp/rerun.modules.XXXXX")
+    make_freddy $modules1
+    make_freddy $modules2
+    RERUN_MODULES=$modules1:$modules2
+    
     . $RERUN
-    commandScript=$(rerun_script_lookup $RERUN_MODULES/freddy dance)
+    home_dir=$(rerun_module_exists freddy)
+    test $home_dir = $modules1/freddy
+    rm -rf ${modules1}/freddy
+    home_dir=$(rerun_module_exists freddy)
+    test $home_dir = $modules2/freddy
+    rmdir ${modules1}
+    rm -rf ${modules2}/freddy
+    rmdir ${modules2}
+}
+
+
+it_performs_rerun_script_lookup() {
+    . $RERUN
+    MODULE_DIR="$(rerun_module_path_elements $RERUN_MODULES | head -1)"
+    make_freddy $MODULE_DIR
+    
+    commandScript=$(rerun_script_lookup $MODULE_DIR/freddy dance)
     test -n "$commandScript"
     test -f "$commandScript"
-    test "$RERUN_MODULES/freddy/commands/dance/script" = $commandScript
+    test "$MODULE_DIR/freddy/commands/dance/script" = $commandScript
 }
 
 
 it_performs_rerun_script_exists() {
-    make_freddy $RERUN_MODULES
+    . $RERUN 
+    MODULE_DIR="$(rerun_module_path_elements $RERUN_MODULES | head -1)"
+    make_freddy $MODULE_DIR
 
-    . $RERUN
-    rerun_script_exists $RERUN_MODULES/freddy dance    
+    rerun_script_exists $MODULE_DIR/freddy dance    
     
-    ! rerun_script_exists $RERUN_MODULES/freddy bogus
+    ! rerun_script_exists $MODULE_DIR/freddy bogus
 }
 
 
 
 it_performs_rerun_module_exists() {
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
     rerun_module_exists freddy
     
     ! rerun_module_exists bogus
 }
 
 it_performs_rerun_command_execute() {
-    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
-    make_freddy $RERUN_MODULES
-
     . $RERUN
+
+    OUT=$(mktemp "/tmp/rerun.test.XXXXX")
+    make_freddy $(rerun_module_path_elements $RERUN_MODULES | head -1)
 
     rerun_command_execute freddy dance > $OUT
     read output < $OUT
