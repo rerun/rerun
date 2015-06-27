@@ -1195,8 +1195,8 @@ _rerun_module_summary() {
     local -r module_name=$(basename "$module_dir")
     local -r module_desc=$(rerun_property_get $module_dir DESCRIPTION)
     local -r module_vers=$(rerun_property_get $module_dir VERSION) || module_vers=""
-    printf "%s%s: \"%s\" - %s\n" "${PAD:-}" \
-        "$(rerun_color bold $module_name)" "${module_desc}" "$module_vers"
+    printf "%s%s: \"%s\" - %s (%s)\n" "${PAD:-}" \
+        "$(rerun_color bold $module_name)" "${module_desc}" "$module_vers" "$module_dir"
     }
 }
 
@@ -1216,16 +1216,15 @@ _rerun_modules_summary() {
     (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_modules_summary directory" 
     }
-    local -r directory=$1
     echo $(rerun_color blue "Available modules:")
     shopt -s nullglob # enable
     set +u
-    for module in $directory/*
+    for directory in $(rerun_module_path_elements $1)
     do
-        [[ -f $module/metadata ]] && _rerun_module_summary $module
-    done
-    for path_element in $(rerun_module_path_elements $RERUN_MODULES)
-    do
+        for module in $directory/*
+        do
+            [[ -f $module/metadata ]] && _rerun_module_summary $module
+        done
         if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
                 && $path_element != "${DEFAULT_LIBDIR}/rerun/modules" ]]
         then
@@ -1235,7 +1234,6 @@ _rerun_modules_summary() {
             do
                [[ -f $module/metadata ]] && _rerun_module_summary $module
             done
-            break
         fi
     done
     set -u
