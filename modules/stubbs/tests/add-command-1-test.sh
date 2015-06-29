@@ -12,28 +12,31 @@ rerun() {
 }
 
 before() {
-    mkdir -p $RERUN_MODULES/freddy
-    cat > $RERUN_MODULES/freddy/metadata <<EOF
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+    mkdir -p $first_rerun_module_dir/freddy
+    cat > $first_rerun_module_dir/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION=
 EOF
 }
 
 after() {
-    rm -r $RERUN_MODULES/freddy
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+    rm -r $first_rerun_module_dir/freddy
 }
 
 validate() {
-    test -d $RERUN_MODULES/freddy/commands/dance
-    test -f $RERUN_MODULES/freddy/commands/dance/metadata
-    .  $RERUN_MODULES/freddy/commands/dance/metadata
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+    test -d $first_rerun_module_dir/freddy/commands/dance
+    test -f $first_rerun_module_dir/freddy/commands/dance/metadata
+    .  $first_rerun_module_dir/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
-    test -f $RERUN_MODULES/freddy/commands/dance/script
-    test -f $RERUN_MODULES/freddy/tests/functions.sh
-    test -f $RERUN_MODULES/freddy/tests/dance-1-test.sh
+    test -f $first_rerun_module_dir/freddy/commands/dance/script
+    test -f $first_rerun_module_dir/freddy/tests/functions.sh
+    test -f $first_rerun_module_dir/freddy/tests/dance-1-test.sh
     grep '[[ -f ./functions.sh ]] && . ./functions.sh' \
-        $RERUN_MODULES/freddy/tests/dance-1-test.sh
+        $first_rerun_module_dir/freddy/tests/dance-1-test.sh
 }
 
 

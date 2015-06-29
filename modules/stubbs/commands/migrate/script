@@ -41,7 +41,7 @@ set -o nounset -o pipefail
 # ----------------------
 
 
-MODULE_DIR=$RERUN_MODULES/$MODULE
+MODULE_DIR=$(rerun_module_exists $MODULE)
 
 [[ ! -d "$MODULE_DIR" ]] && {
     die "module directory not found: $MODULE_DIR"

@@ -12,7 +12,9 @@ rerun() {
 }
 
 after() {
-   rm -rf $RERUN_MODULES/freddy
+   first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+   rm -rf $first_rerun_module_dir/freddy
 }
 
 # The Plan
@@ -29,7 +31,9 @@ it_builds_a_functional_module() {
     rerun stubbs:add-command --module "freddy" \
         --command dance --description "tell freddy to dance"
 
-    command_script=$RERUN_MODULES/freddy/commands/dance/script
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    command_script=$first_rerun_module_dir/freddy/commands/dance/script
     # Be sure the command script has execute bit set 
     test -x $command_script
     

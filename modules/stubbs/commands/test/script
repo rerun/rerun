@@ -75,7 +75,8 @@ done
 [ -z "${MODULE:-}" ] &&  { rerun_syntax_error "missing required option: --module"; }
 [ -z "${PLAN:-}" ] && PLAN="*"
 
-if [ ! -d "$RERUN_MODULES/$MODULE/tests" ]
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+if [ ! -d "$RERUN_MODULE_HOME_DIR/tests" ]
 then
     # there should always be at least one test!
     rerun_die "No tests" 
@@ -96,7 +97,7 @@ echo $(rerun_color blue "=======================================================
     export ANSWERS=${ANSWERS:-}
 
     # Roundup likes to run relative
-    cd $RERUN_MODULES/$MODULE/tests
+    cd $RERUN_MODULE_HOME_DIR/tests
 
     # Run the tests
     #

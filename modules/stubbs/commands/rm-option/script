@@ -99,13 +99,15 @@ done
     read OPTION
 }
 
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+
 COMMAND_LIST=( ${COMMAND//,/ } )
 for cmd in ${COMMAND_LIST[*]}
 do
     #
     # Verify this command exists
     #
-    [ -d $RERUN_MODULES/$MODULE/commands/$cmd ] || {
+    [ -d $RERUN_MODULE_HOME_DIR/commands/$cmd ] || {
         rerun_log warn "command not found: \""$MODULE:$cmd\""...skipping."
         continue
     }
@@ -113,29 +115,29 @@ do
     # Unassign this command from the option
     #
     # Update the command metadata.
-    command_metadata=$RERUN_MODULES/$MODULE/commands/$cmd/metadata
+    command_metadata=$RERUN_MODULE_HOME_DIR/commands/$cmd/metadata
     command_options_assignments=$(rerun_options $RERUN_MODULES $MODULE $cmd)
     # Subtract option from the list
     command_options=( $(rerun_list_remove $OPTION $command_options_assignments) )
 
     stubbs_command_options_write \
-        $RERUN_MODULES/$MODULE $cmd \
+        $RERUN_MODULE_HOME_DIR $cmd \
         "${command_options[*]:-}" || rerun_die "Failed generating command metadata"
     rerun_log info "Updated command metadata:  $command_metadata"
     #
     # Check if this option is assigned to any commands.
-    option_to_command_assignments=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $OPTION) )
+    option_to_command_assignments=( $(stubbs_option_commands $RERUN_MODULE_HOME_DIR $OPTION) )
     #
     # Remove the option directory, if no commands are assigned to it.
     #
     if [ ${#option_to_command_assignments[*]} = 0 ]
     then
-        if [[ -d  "$RERUN_MODULES/$MODULE/options/$OPTION" ]]
+        if [[ -d  "$RERUN_MODULE_HOME_DIR/options/$OPTION" ]]
         then
-            rm -rf "$RERUN_MODULES/$MODULE/options/$OPTION" || {
+            rm -rf "$RERUN_MODULE_HOME_DIR/options/$OPTION" || {
                 rerun_die "Error removing option: $OPTION"
             }
-            rerun_log info "Removed $RERUN_MODULES/$MODULE/options/$OPTION"
+            rerun_log info "Removed $RERUN_MODULE_HOME_DIR/options/$OPTION"
         fi
     fi
     #
@@ -150,19 +152,19 @@ do
     [ -z "$OPTIONS_SCRIPT" ] && {
         rerun_die "required metadata not found: OPTIONS_SCRIPT"
     }
-    options_parser=$RERUN_MODULES/$MODULE/commands/$cmd/$OPTIONS_SCRIPT
+    options_parser=$RERUN_MODULE_HOME_DIR/commands/$cmd/$OPTIONS_SCRIPT
     # Generate it
     $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
         $RERUN_MODULES $MODULE $cmd > $options_parser || rerun_die "Failed generating options parser."
-    rerun_log info "Wrote options script: $RERUN_MODULES/$MODULE/commands/$cmd/options.sh"
+    rerun_log info "Wrote options script: $RERUN_MODULE_HOME_DIR/commands/$cmd/options.sh"
     #
     # Update option variable summary in command script.
     #
-    command_script=$RERUN_MODULES/$MODULE/commands/$cmd/script
+    command_script=$RERUN_MODULE_HOME_DIR/commands/$cmd/script
     if [ -f "$command_script" ]
     then
         stubbs_script_header \
-            $RERUN_MODULES/$MODULE $cmd > ${command_script}.$$ || {
+            $RERUN_MODULE_HOME_DIR $cmd > ${command_script}.$$ || {
             rerun_die "Error updating command script header"
         }
         mv $command_script.$$ $command_script || {

@@ -89,17 +89,19 @@ done
     done
 }
 
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+
 #
 # Verify specified command exists.
 #
-[[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ]] || {
+[[ -d $RERUN_MODULE_HOME_DIR/commands/$COMMAND ]] || {
     exit 0
 }
 
 #
 # Remove tests for this command.
 #
-rm -f $RERUN_MODULES/$MODULE/tests/$COMMAND-*-test.sh
+rm -f $RERUN_MODULE_HOME_DIR/tests/$COMMAND-*-test.sh
 
 #
 # Look up the options used by this command and remove any would be unused option.
@@ -108,18 +110,18 @@ command_options=( $(rerun_options $RERUN_MODULES $MODULE $COMMAND) )
 for opt in ${command_options[*]:-}
 do  
     # Check if this option is only assigned to this command.
-    commands_assigned_to_option=( $(stubbs_option_commands $RERUN_MODULES/$MODULE $opt) )
+    commands_assigned_to_option=( $(stubbs_option_commands $RERUN_MODULE_HOME_DIR $opt) )
     if [[ ${#commands_assigned_to_option[*]} == 1 && $commands_assigned_to_option == $COMMAND ]]
     then
         #
         # Remove the option since only this command was assigned to it.
         #
-        if [[ -d  "$RERUN_MODULES/$MODULE/options/$opt" ]]
+        if [[ -d  "$RERUN_MODULE_HOME_DIR/options/$opt" ]]
         then
-            rm -rf "$RERUN_MODULES/$MODULE/options/$opt" || {
+            rm -rf "$RERUN_MODULE_HOME_DIR/options/$opt" || {
                 rerun_die "Error removing option: $opt"
             }
-            rerun_log info "Removed $RERUN_MODULES/$MODULE/options/$opt"
+            rerun_log info "Removed $RERUN_MODULE_HOME_DIR/options/$opt"
         fi
     fi
 done
@@ -127,7 +129,7 @@ done
 #
 # Remove the command directory from the module.
 #
-rm -rf $RERUN_MODULES/$MODULE/commands/$COMMAND
+rm -rf $RERUN_MODULE_HOME_DIR/commands/$COMMAND
 
 # Done
 exit $?

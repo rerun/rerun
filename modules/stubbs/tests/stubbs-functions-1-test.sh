@@ -6,7 +6,9 @@
 
 # Helpers
 # ------------
-. $RERUN_MODULES/stubbs/lib/functions.sh || exit 1
+first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+. $first_rerun_module_dir/stubbs/lib/functions.sh || exit 1
 
 rerun() {
     command $RERUN -M $RERUN_MODULES "$@"
@@ -14,28 +16,28 @@ rerun() {
 
 before() {
     # Mock a module and command
-    mkdir -p $RERUN_MODULES/freddy
-    cat > $RERUN_MODULES/freddy/metadata <<EOF
+    mkdir -p $first_rerun_module_dir/freddy
+    cat > $first_rerun_module_dir/freddy/metadata <<EOF
 NAME=freddy
 EOF
-    mkdir -p $RERUN_MODULES/freddy/commands/dance
-    cat > $RERUN_MODULES/freddy/commands/dance/metadata <<EOF
+    mkdir -p $first_rerun_module_dir/freddy/commands/dance
+    cat > $first_rerun_module_dir/freddy/commands/dance/metadata <<EOF
 NAME=dance
 OPTIONS=
 EOF
 
-    cat > $RERUN_MODULES/freddy/commands/dance/script <<EOF
+    cat > $first_rerun_module_dir/freddy/commands/dance/script <<EOF
 #!/bin/bash
 #/ command: freddy:dance "watch freddy dance"
 #/ usage: rerun freddy:dance 
 trap 'rerun_die $? "*** command failed: freddy:dance. ***"' ERR
 EOF
-    mkdir -p $RERUN_MODULES/freddy/commands/study
-    cat > $RERUN_MODULES/freddy/commands/study/metadata <<EOF
+    mkdir -p $first_rerun_module_dir/freddy/commands/study
+    cat > $first_rerun_module_dir/freddy/commands/study/metadata <<EOF
 NAME=study
 OPTIONS=
 EOF
-    cat > $RERUN_MODULES/freddy/commands/study/script <<EOF
+    cat > $first_rerun_module_dir/freddy/commands/study/script <<EOF
 #!/bin/bash
 #/ command: freddy:study "watch freddy study"
 #/ usage: rerun freddy:study 
@@ -45,7 +47,7 @@ EOF
 
 after() {
     # clean up the mock module
-    rm -r $RERUN_MODULES/freddy
+    rm -r $first_rerun_module_dir/freddy
 }
 
 
@@ -70,7 +72,7 @@ it_performs_stubbs_option_commands() {
         --required true --export true --default true
 
     # Check the option-to-command assignments
-    local -a commands=( $(stubbs_option_commands $RERUN_MODULES/freddy jumps) )
+    local -a commands=( $(stubbs_option_commands $first_rerun_module_dir/freddy jumps) )
     
     rerun_list_contains dance "${commands[@]}" 
     ! rerun_list_contains study "${commands[@]}" 
@@ -80,7 +82,7 @@ it_performs_stubbs_option_commands() {
         --option jumps --description "jump #num times" \
         --required true --export true --default 3
     # Check the option-to-command assignments
-    local -a commands=( $(stubbs_option_commands $RERUN_MODULES/freddy jumps) )
+    local -a commands=( $(stubbs_option_commands $first_rerun_module_dir/freddy jumps) )
 
     test ${#commands[*]} = 2
     rerun_list_contains dance "${commands[@]}" 
@@ -90,7 +92,7 @@ it_performs_stubbs_option_commands() {
     rerun stubbs:rm-option --module freddy --command dance \
         --option jumps 
 
-    local -a commands=( $(stubbs_option_commands $RERUN_MODULES/freddy jumps) )
+    local -a commands=( $(stubbs_option_commands $first_rerun_module_dir/freddy jumps) )
 
     test ${#commands[*]} = 1
     ! rerun_list_contains dance "${commands[@]}" 
@@ -125,7 +127,7 @@ it_should_clone_a_module() {
 NAME=cloney
 DESCRIPTION="i am a clone"
 EOF
-    templatedir=$RERUN_MODULES/freddy
+    templatedir=$first_rerun_module_dir/freddy
     stubbs_module_clone $moduledir $templatedir
 
     test "$(rerun_property_get $moduledir NAME)" = "cloney"
