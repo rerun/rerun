@@ -105,13 +105,15 @@ STUB=$RERUN_MODULE_DIR/lib/stub/bash
 
 OPTIONS_SCRIPT=$(rerun_property_get $STUB OPTIONS_SCRIPT)
 
-OPTIONS_PARSER_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$OPTIONS_SCRIPT
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+
+OPTIONS_PARSER_SCRIPT=$RERUN_MODULE_HOME_DIR/commands/$COMMAND/$OPTIONS_SCRIPT
 
 
 # Create command structure
-mkdir -p $RERUN_MODULES/$MODULE/commands/$COMMAND || rerun_die "Failed creating command structure"
+mkdir -p $RERUN_MODULE_HOME_DIR/commands/$COMMAND || rerun_die "Failed creating command structure"
 
-VARIABLES=$(stubbs_option_variables $RERUN_MODULES/$MODULE $COMMAND)
+VARIABLES=$(stubbs_option_variables $RERUN_MODULE_HOME_DIR $COMMAND)
 
 TEMPLATE_COMMAND_SCRIPT=$(rerun_property_get $STUB TEMPLATE_COMMAND_SCRIPT)
 
@@ -121,7 +123,7 @@ TEMPLATE=$STUB/$TEMPLATE_COMMAND_SCRIPT
 }
 
 
-CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND_SCRIPT)
+CMD_SCRIPT=$RERUN_MODULE_HOME_DIR/commands/$COMMAND/$(basename $TEMPLATE_COMMAND_SCRIPT)
 
 # Generate a boiler plate implementation
 [ ! -f $CMD_SCRIPT -o -n "${OVERWRITE:-}" ] && {
@@ -135,18 +137,18 @@ CMD_SCRIPT=$RERUN_MODULES/$MODULE/commands/$COMMAND/$(basename $TEMPLATE_COMMAND
 chmod +x $CMD_SCRIPT || rerun_die "Failed settng execute bit on command script."
 
 # Generate a unit test script
-mkdir -p $RERUN_MODULES/$MODULE/tests || rerun_die "failed creating tests directory"
-[ ! -f $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh -o -n "${OVERWRITE:-}" ] && {
+mkdir -p $RERUN_MODULE_HOME_DIR/tests || rerun_die "failed creating tests directory"
+[ ! -f $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh -o -n "${OVERWRITE:-}" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
 	-e "s;@RERUN@;${RERUN};g" \
 	-e "s;@RERUN_MODULES@;${RERUN_MODULES};g" \
-	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh || rerun_die
-    rerun_log info "Wrote test script: $RERUN_MODULES/$MODULE/tests/$COMMAND-1-test.sh"
+	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh || rerun_die
+    rerun_log info "Wrote test script: $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh"
 }
-[ ! -f $RERUN_MODULES/$MODULE/tests/functions.sh -o -n "${OVERWRITE:-}" ] && {
+[ ! -f $RERUN_MODULE_HOME_DIR/tests/functions.sh -o -n "${OVERWRITE:-}" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \
-	$RERUN_MODULE_DIR/templates/test.functions.sh > $RERUN_MODULES/$MODULE/tests/functions.sh || rerun_die "Failed generating test functions library."
+	$RERUN_MODULE_DIR/templates/test.functions.sh > $RERUN_MODULE_HOME_DIR/tests/functions.sh || rerun_die "Failed generating test functions library."
 }
 
 # Generate command metadata
@@ -160,7 +162,7 @@ DESCRIPTION="$DESCRIPTION"
 OPTIONS=
 EOF
 
-) > $RERUN_MODULES/$MODULE/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata."
+) > $RERUN_MODULE_HOME_DIR/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata."
 
 
 # Done.

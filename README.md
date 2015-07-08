@@ -84,7 +84,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	| '__/ _ \ '__| | | | '_ \ 
 	| | |  __/ |  | |_| | | | |
 	|_|  \___|_|   \__,_|_| |_|
-	Version: 1.3.5. License: Apache 2.0.
+	Version: 1.3.6. License: Apache 2.0.
 
 	Usage: rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
 
@@ -125,7 +125,7 @@ The "false" is the default value assigned to the "--overwrite" option.
 
 See the "Environment" section below to learn about the
 `RERUN_MODULES` environment variable. This variable
-specifies the directory where rerun modules exist.
+specifies the directory/ies where rerun modules exist.
 
 ### Bash completion
 
@@ -182,7 +182,7 @@ would be:
 
     $ rerun -M /var/rerun stubbs:archive
 
-You can also declare the `RERUN_MODULES` environment variable to sepcify the modules directory.
+You can also declare the `RERUN_MODULES` environment variable to sepcify the modules directory path.
 
 ### Archives
 
@@ -471,9 +471,10 @@ The user would see the following message on the console:
 # ENVIRONMENT
 
 `RERUN_MODULES`
-: Path to directory containing rerun modules.
+: Path to directories containing rerun modules.
 If RERUN_MODULES is not set, it is defaulted
 relative to the location of the rerun executable.
+Multiple directories can be specified separated by a ':' (like $PATH).
 
 `RERUN_COLOR`
 : Set 'true' if you want ANSI text effects. Makes

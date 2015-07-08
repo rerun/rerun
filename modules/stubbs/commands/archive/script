@@ -123,10 +123,11 @@ build_sh_archive() {
   mkdir -p $PAYLOAD/rerun/modules
   for module in $MODULES
   do
+      rerun_module_home_dir=$(rerun_module_exists $module)
       # Check for a commands subdir to be sure it looks like a module
-      if [ -d ${RERUN_MODULES}/${module}/commands ]
+      if [ -d $rerun_module_home_dir/commands ]
       then
-        pushd ${RERUN_MODULES} > /dev/null
+        pushd $rerun_module_home_dir/.. /dev/null
         tar -c ${TAREXCL} -f - ${module} | ( cd $PAYLOAD/rerun/modules; tar xpf - )
         popd >/dev/null
       fi
@@ -196,7 +197,7 @@ build_deb_archive() {
 
   for MODULE in ${MODULES}
   do
-    MODULE_DIR=${RERUN_MODULES}/${MODULE}
+    MODULE_DIR=$(rerun_module_exists $MODULE)
     [[ -r ${MODULE_DIR}/metadata ]] || rerun_die "Can not find module ${MODULE}"
 
     # Setup a temporary directory to build the deb:
@@ -292,7 +293,7 @@ build_rpm_archive() {
 
   for MODULE in ${MODULES}
   do
-    MODULE_DIR=${RERUN_MODULES}/${MODULE}
+    MODULE_DIR=$(rerun_module_exists $MODULE)
     if [[ -r ${MODULE_DIR}/metadata ]]
     then
       # Setup a temporary directory to build the RPM:

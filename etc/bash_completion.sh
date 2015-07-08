@@ -1,4 +1,3 @@
-
 #
 # rerun command completion script.
 #  **rerun** is a simple, small modular automation
@@ -70,24 +69,61 @@ list:subtract()
     echo $retlist    
 }
 
+# path_components - return a newline-separated list of components in a colon-separated path
+path_components()
+{
+    local path=$1
+    echo "$path" | sed ':loop
+    {h
+    s/:.*//
+    p
+    g
+    s/[^:]*://
+    t loop
+    d
+    }'
+}
 
 # rerun:modules - list all rerun modules
 rerun:modules()
 {
-    local  modules=""
-    for mod in $RERUN_MODULES/*
-    do 
-	    [ -f "$mod/metadata" ] && modules="$modules $(basename $mod)"
+    local modules=""
+    for dir in $(path_components $RERUN_MODULES)
+    do
+        for mod in $dir/*
+        do 
+            if [[ -f "$mod/metadata" ]]
+            then
+                list:member $(basename $mod) $modules || modules="$modules $(basename $mod)"
+            fi
+        done
     done
     echo $modules
 }
 
+# get home dir of the module
+rerun:module_home_dir()
+{
+   
+    local module=$1
+    local home_dir=""
+    for dir in $(path_components $RERUN_MODULES)
+    do
+        if [[ -f "$dir/$module/metadata" ]]
+        then
+            home_dir=$dir/$module
+            break
+        fi
+    done
+    echo $home_dir
+}
 
 # rerun:module:list - list all the commands for the module
 rerun:module:commands()
 {
-    local  module=$1 commands=""
-    for hdlr in $RERUN_MODULES/$module/commands/*/metadata; do
+    local module=$1 commands=""
+    local module_home_dir=$(rerun:module_home_dir $module)
+    for hdlr in $module_home_dir/commands/*/metadata; do
 	[ -f $hdlr ] && {
 	    cmd_name=$(basename $(dirname $hdlr))
 	    commands="$commands $cmd_name"	
@@ -100,7 +136,8 @@ rerun:module:commands()
 rerun:command:options() 
 {
     local module=$1 command=$2 prefix=$3 options=""
-    for opt in $(. $RERUN_MODULES/$module/commands/$command/metadata; echo $OPTIONS)
+    local module_home_dir=$(rerun:module_home_dir $module)
+    for opt in $(. $module_home_dir/commands/$command/metadata; echo $OPTIONS)
     do
         options="$options ${prefix}${opt}"
     done
@@ -112,7 +149,8 @@ rerun:command:options()
 rerun:option:default()
 {
     local module=$1 command=$2 opt=$3 
-    local opt_metadata=$RERUN_MODULES/$module/options/${opt##*-}/metadata
+    local module_home_dir=$(rerun:module_home_dir $module)
+    local opt_metadata=$module_home_dir/options/${opt##*-}/metadata
     [ -f "$opt_metadata" ] && {
         awk -F= '/^DEFAULT/ {print $2}' "$opt_metadata"
 	}
@@ -122,7 +160,8 @@ rerun:option:default()
 rerun:option:has-argument()
 {
     local module=$1 command=$2 opt=$3
-    local opt_metadata=$RERUN_MODULES/$module/options/${opt##*-}/metadata
+    local module_home_dir=$(rerun:module_home_dir $module)
+    local opt_metadata=$module_home_dir/options/${opt##*-}/metadata
     [ -f "$opt_metadata" ] && {
         args=$(awk -F= '/^ARGUMENTS/ {print $2}' $opt_metadata )
         [ "$args" = "true" ] && return 0 
@@ -156,10 +195,11 @@ rerun:parse:module()
 # _rerun - program completion for the `rerun` command.
 #
 _rerun() {
-    [ -z "${RERUN_MODULES}" -o ! \( -d "${RERUN_MODULES}" \) ] && { 
+    [ -z "${RERUN_MODULES}" -o ! \( -d "$(echo $RERUN_MODULES|cut -d: -f1)" \) ] && { 
         return 0 ; 
     }
     local cur prev cntx_module cntx_command cntx_options options
+    local module_home_dir
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
@@ -173,10 +213,11 @@ _rerun() {
 	if [[ "$@" =~ $regex ]]
 	then
         # module context
-        [ -d "$RERUN_MODULES/${BASH_REMATCH[1]}" ] && cntx_module=${BASH_REMATCH[1]};
+        module_home_dir=$(rerun:module_home_dir "${BASH_REMATCH[1]}")
+        [ -n "$module_home_dir" ] && cntx_module=${BASH_REMATCH[1]};
         [ "${BASH_REMATCH[2]}" == ': ' ] && shift ;# eat the extra space char
         # command context
-	    [ -d "$RERUN_MODULES/$cntx_module/commands/${BASH_REMATCH[3]/ /}" ] && {
+	    [ -d "$module_home_dir/commands/${BASH_REMATCH[3]/ /}" ] && {
 	    	cntx_command=${BASH_REMATCH[3]/ /}
         }
         # BASH_REMATCH[4] contains the whitespace between command and options

@@ -143,8 +143,10 @@ done
     done
 }
 
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+
 # check the chosen module exists
-[[ ! -f $RERUN_MODULES/$MODULE/metadata ]] && rerun_option_error "module not found: $MODULE"
+[[ ! -f $RERUN_MODULE_HOME_DIR/metadata ]] && rerun_option_error "module not found: $MODULE"
 
 [[ -z "${COMMAND:-}" ]] && {
     commands=( $(rerun_commands $RERUN_MODULES $MODULE) )
@@ -168,15 +170,15 @@ done
 
 # This option might already be declared.
 # Confirm the option declaration settings.
-if [[ -f $RERUN_MODULES/$MODULE/options/$OPTION/metadata ]]
+if [[ -f $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata ]]
 then
-    CURR_DESC=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION DESCRIPTION)
-    CURR_REQ=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION REQUIRED)
-    CURR_EXPORT=$(rerun_property_get $RERUN_MODULES/$MODULE/options/$OPTION EXPORT) || CURR_EXPORT=false
+    CURR_DESC=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION DESCRIPTION)
+    CURR_REQ=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION REQUIRED)
+    CURR_EXPORT=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION EXPORT) || CURR_EXPORT=false
     # Crap hack to avoid quote stripping or eval expansions. 
     # Use awk to parse the property values.
     CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
-        $RERUN_MODULES/$MODULE/options/$OPTION/metadata)
+        $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata)
 fi
 # Confirm the description.
 [ -z "${DESCRIPTION:-}" ] && {
@@ -210,14 +212,14 @@ fi
 
 # If short is specified, check it's not already used.
 [ -n "${SHORT:-}" ] && {
-    options=$(stubbs_options_with_short "$RERUN_MODULES/$MODULE" $SHORT)
+    options=$(stubbs_options_with_short "$RERUN_MODULE_HOME_DIR" $SHORT)
     [[ -n "${options:-}" && "$options" != $OPTION ]] && {
         rerun_die "-${SHORT} already used by option: $options"
     }
 }
 
 # Generate metadata for new option
-mkdir -p  $RERUN_MODULES/$MODULE/options/$OPTION
+mkdir -p  $RERUN_MODULE_HOME_DIR/options/$OPTION
 (
     cat <<EOF
 # option metadata
@@ -233,10 +235,10 @@ DEFAULT=$(quote_if_whitespace_string $DEFAULT)
 EXPORT=$EXPORT
 
 EOF
-) > $RERUN_MODULES/$MODULE/options/$OPTION/metadata || {
+) > $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata || {
     rerun_die "Failed generating $OPTION option metadata"
 }
-rerun_log info "Wrote option metadata: $RERUN_MODULES/$MODULE/options/$OPTION/metadata"
+rerun_log info "Wrote option metadata: $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata"
 
 COMMAND_LIST=( ${COMMAND//,/ } )
 for cmd in ${COMMAND_LIST[*]}
@@ -244,7 +246,7 @@ do
     #
     # Verify this command exists
     #
-    [ ! -d $RERUN_MODULES/$MODULE/commands/$cmd ] && {
+    [ ! -d $RERUN_MODULE_HOME_DIR/commands/$cmd ] && {
         echo >&2 "command not found: \"$MODULE:$cmd\".... skipping."
         continue
     }
@@ -259,9 +261,9 @@ do
         else command_options=( ${command_options[*]} $OPTION )
         fi
     }
-    command_metadata=$RERUN_MODULES/$MODULE/commands/$cmd/metadata
+    command_metadata=$RERUN_MODULE_HOME_DIR/commands/$cmd/metadata
     stubbs_command_options_write \
-        $RERUN_MODULES/$MODULE $cmd \
+        $RERUN_MODULE_HOME_DIR $cmd \
         "${command_options[*]}" || rerun_die "Failed generating command metadata"
     rerun_log info "Updated command metadata:  $command_metadata"
     #
@@ -276,9 +278,9 @@ do
     [ -z "$OPTIONS_SCRIPT" ] && {
        rerun_die "required metadata not found: OPTIONS_SCRIPT"
     }
-    options_parser=$RERUN_MODULES/$MODULE/commands/$cmd/$OPTIONS_SCRIPT
+    options_parser=$RERUN_MODULE_HOME_DIR/commands/$cmd/$OPTIONS_SCRIPT
     $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
-        $RERUN_MODULES $MODULE $cmd > $options_parser || {
+        $(dirname $RERUN_MODULE_HOME_DIR) $MODULE $cmd > $options_parser || {
         rerun_die "Failed generating options parser."
     }
     #
@@ -287,11 +289,11 @@ do
     [ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
         rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
     }
-    command_script=$RERUN_MODULES/$MODULE/commands/$cmd/$(basename $TEMPLATE_COMMAND_SCRIPT)
+    command_script=$RERUN_MODULE_HOME_DIR/commands/$cmd/$(basename $TEMPLATE_COMMAND_SCRIPT)
     if [ -f "$command_script" ]
     then
         stubbs_script_header \
-            $RERUN_MODULES/$MODULE $cmd > ${command_script}.$$ || {
+            $RERUN_MODULE_HOME_DIR $cmd > ${command_script}.$$ || {
             rerun_die "Error updating command script header"
         }
         mv $command_script.$$ $command_script || {

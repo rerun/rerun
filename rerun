@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.3.5
+RERUN_VERSION=1.3.6
 
 # The default system install directories.
 
@@ -470,11 +470,11 @@ rerun_options_parse() {
 
 # _rerun_modules_ - List the modules by name.
 #
-#     rerun_modules directory 
+#     rerun_modules path 
 #
 # Arguments:
 #
-# * directory:     Directory containing modules.
+# * path:     Path to directories containing modules.
 #
 # Notes: 
 #
@@ -482,20 +482,52 @@ rerun_options_parse() {
 # 
 rerun_modules() {
     (( ! $# == 1 )) && { 
-	    rerun_die 'wrong # args: should be: rerun_modules directory'
+	    rerun_die 'wrong # args: should be: rerun_modules path'
     }
-    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
     local -a modules
-    for f in $1/*/metadata
+    for dir in $(rerun_module_path_elements $1)
     do
-       if [[ -f $f ]]
-        then 
-            local module="$(basename $(dirname $f))" 
-            [[ -z "${modules:-}" ]] && modules=( $module ) || modules=( ${modules[*]} $module )
-        fi 
+        [[ ! -d $dir ]] && rerun_die "directory not found: $dir"
+        for f in $dir/*/metadata
+        do
+            if [[ -f $f ]]
+            then 
+                local module="$(basename $(dirname $f))" 
+                [[ -z "${modules:-}" ]] && modules=( $module ) || modules=( ${modules[*]} $module )
+            fi 
+        done
     done
-    echo ${modules[*]}
+    echo ${modules[*]} | sort | uniq
 }
+
+#
+# - - -
+#
+
+# _rerun_get_module_home_dir_in_path_ - Get the directory for the module in the path
+#
+#     rerun_get_module_home_dir_in_path path module
+#
+# Arguments:
+#
+# * path:     Path to directories containing modules.
+# * module:        Module name.
+#
+rerun_get_module_home_dir_in_path() {
+    (( $# == 2 )) || { 
+	    rerun_die 'wrong # args: should be: rerun_get_module_home_dir_in_path path module'
+    }
+    for dir in $(rerun_module_path_elements $1)
+    do
+        if [[ -f $dir/$2/metadata ]]
+        then
+            echo $dir/$2
+            return 0
+        fi
+    done
+    return 2
+}
+
 
 #
 # - - -
@@ -507,26 +539,27 @@ rerun_modules() {
 #
 # Arguments:
 #
-# * directory:     Directory containing modules.
+# * path:     Path to directories containing modules.
 # * module:        Module name.
 # Notes: 
 #
 # * Returns a list of space separated command names.
 # 
 rerun_commands() {
-   (( $# == 2 )) || { 
-	    rerun_die 'wrong # args: should be: rerun_commands directory module'
+    (( $# == 2 )) || { 
+	    rerun_die 'wrong # args: should be: rerun_commands path module'
     }
-    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
+    local module_home="$(rerun_get_module_home_dir_in_path $1 $2)"
+    [[ -n $module_home ]] || rerun_die "module not found in path: $2 $1"
     local -a commands=()
-    for c in $1/$2/commands/*/metadata
-    do
-        if [[ -f $c ]]
-        then 
-            local command="$(basename $(dirname $c))" 
-            [[ -z "${commands:-}" ]] && commands=( $command ) || commands=( ${commands[*]} $command )
-        fi 
-    done
+	for c in $module_home/commands/*/metadata
+	do
+		if [[ -f $c ]]
+		then 
+			local command="$(basename $(dirname $c))" 
+			[[ -z "${commands:-}" ]] && commands=( $command ) || commands=( ${commands[*]} $command )
+		fi 
+	done
     echo ${commands[*]:-}
 }
 
@@ -541,7 +574,7 @@ rerun_commands() {
 #
 # Arguments:
 #
-# * directory:     Directory containing modules.
+# * path:     Path to directories containing modules.
 # * module:        Module name.
 # * command:       Command name.
 #
@@ -552,17 +585,16 @@ rerun_commands() {
 # 
 rerun_options() {
     (( $# == 3 )) || { 
-	    rerun_die 'wrong # args: should be: rerun_options modules_dir module command'
+	    rerun_die 'wrong # args: should be: rerun_options path module command'
     }
-    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
-
-    local -r modules_dir="$1" module=$2 command=$3
-    if [[ -f $modules_dir/$module/commands/$command/metadata ]] 
-    then
-        ( .  $modules_dir/$module/commands/$command/metadata ; echo ${OPTIONS:-} )
-    else
-        echo ""
-    fi
+    local module_home="$(rerun_get_module_home_dir_in_path $1 $2)"
+    [[ -n $module_home ]] || rerun_die "module not found in path: $2 $1"
+	if [[ -f $module_home/commands/$3/metadata ]] 
+	then
+		( .  $module_home/commands/$3/metadata ; echo ${OPTIONS:-} )
+	else
+		echo ""
+	fi
 }
 
 #
@@ -575,7 +607,7 @@ rerun_options() {
 #
 # Arguments:
 #
-# * directory:     Directory containing modules.
+# * path:     Path to directories containing modules.
 # * module:        Module name.
 # Notes: 
 #
@@ -583,18 +615,19 @@ rerun_options() {
 # 
 rerun_module_options() {
     (( $# == 2 )) || { 
-	    rerun_die 'wrong # args: should be: rerun_module_options directory module'
+	    rerun_die 'wrong # args: should be: rerun_module_options path module'
     }
-    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
+    local module_home="$(rerun_get_module_home_dir_in_path $1 $2)"
+    [[ -n $module_home ]] || rerun_die "module not found in path: $2 $1"
     local -a options=()
-    for o in $1/$2/options/*/metadata
-    do
-        if [[ -f $o ]]
-        then 
-            local option="$(basename $(dirname $o))" 
-            [[ -z "${options:-}" ]] && options=( $option ) || options=( ${options[*]} $option )
-        fi 
-    done
+	for o in $module_home/options/*/metadata
+	do
+		if [[ -f $o ]]
+		then 
+			local option="$(basename $(dirname $o))" 
+			[[ -z "${options:-}" ]] && options=( $option ) || options=( ${options[*]} $option )
+		fi 
+	done
     echo ${options[*]:-}
 }
 
@@ -725,7 +758,7 @@ rerun_path_absolute() {
 
 # _rerun_property_get_ - Print the value for the specified metadata property.
 #
-#     rerun_property_get directory  property
+#     rerun_property_get path  property
 #
 # Arguments:
 #
@@ -742,7 +775,7 @@ rerun_path_absolute() {
 
 rerun_property_get() {
     (( $# >= 2 )) || {
-        rerun_die 'wrong # args: should be: rerun_property_get directory property ?expand?'
+        rerun_die 'wrong # args: should be: rerun_property_get path property ?expand?'
     }
     local -r directory="$1" property="$2" expand="${3:-true}"
     [[ ! -f ${directory}/metadata ]] && rerun_die "metadata not found: ${directory}/metadata"
@@ -755,9 +788,8 @@ rerun_property_get() {
     then (set +u; . ${directory}/metadata; eval echo \$${property:-}; set -u)
     else echo "${prop#*=}"
     fi
-
+    
     return 0
-
 }
 
 #
@@ -782,9 +814,7 @@ rerun_property_set() {
     (( $# < 2 )) && { 
         rerun_die 'wrong # args: should be: rerun_property_set directory property=value ?property=value?'
     }
-    [[ ! -d $1 ]] && rerun_die "directory not found: $1"
-
-    local -r directory="$1" 
+    local -r directory=$1
     local -a sed_patts=()
     shift ;
     while (( "$#" > 0 ))
@@ -880,6 +910,33 @@ rerun_script_exists() {
 }
 
 #
+# ---
+#
+
+# _rerun_module_path_elements_
+#
+#     rerun_module_path_elements 
+#
+# Arguments: Colon-separated directory search path.
+#
+rerun_module_path_elements() {
+    (( $# != 1 )) && {
+        rerun_die 'wrong # args: should be: rerun_module_path_elements path'
+    }
+    local path=${1}
+    echo "$path" | sed ':loop
+{h
+s/:.*//
+p      
+g
+s/[^:]*://
+t loop
+d     
+}'
+
+}
+
+#
 # - - -
 #
 
@@ -902,11 +959,14 @@ rerun_module_exists() {
     }
     local -r module="$1"
 
-    if [[ -f "${RERUN_MODULES:-}/$module/metadata" ]]
-    then
-       echo $RERUN_MODULES/$module
-       return 0
-    fi
+    for path_element in $(rerun_module_path_elements $RERUN_MODULES)
+    do
+        if [[ -f "$path_element/$module/metadata" ]]
+        then
+           echo $path_element/$module
+           return 0
+        fi
+    done
 
     if [[ "${RERUN_LOCATION:-}" = "${DEFAULT_BINDIR}" \
         && -f "${DEFAULT_LIBDIR}/rerun/modules/$module/metadata" ]]
@@ -1105,14 +1165,17 @@ _rerun_man_page() {
         rerun_die "wrong # args: should be: _rerun_man module" 
     }
     local -r module=$1
-    if [[ ! -f "${RERUN_MODULES:-}/$module/$module.1" 
-                && -f "$RERUN_MODULES/stubbs/commands/docs/script" ]]
-    then ${RERUN:-rerun} stubbs:docs --module $module 
-    fi
-    if [[ -f "$RERUN_MODULES/$module/$module.1" ]]
-    then nroff -man "$RERUN_MODULES/$module/$module.1" | ${PAGER:-more}
-    else echo >&2 "Manual could not be generated." 
-    fi
+    for path_element in $(rerun_module_path_elements $RERUN_MODULES)
+    do
+        if [[ ! -f "$path_element/$module/$module.1" 
+                && -f "$path_element/stubbs/commands/docs/script" ]]
+        then ${RERUN:-rerun} stubbs:docs --module $module 
+        fi
+        if [[ -f "$path_element/$module/$module.1" ]]
+        then nroff -man "$path_element/$module/$module.1" | ${PAGER:-more}
+        else echo >&2 "Manual could not be generated." 
+        fi
+    done
 }
 
 PAD="  "
@@ -1132,8 +1195,8 @@ _rerun_module_summary() {
     local -r module_name=$(basename "$module_dir")
     local -r module_desc=$(rerun_property_get $module_dir DESCRIPTION)
     local -r module_vers=$(rerun_property_get $module_dir VERSION) || module_vers=""
-    printf "%s%s: \"%s\" - %s\n" "${PAD:-}" \
-        "$(rerun_color bold $module_name)" "${module_desc}" "$module_vers"
+    printf "%s%s: \"%s\" - %s (%s)\n" "${PAD:-}" \
+        "$(rerun_color bold $module_name)" "${module_desc}" "$module_vers" "$module_dir"
     }
 }
 
@@ -1141,7 +1204,7 @@ _rerun_module_summary() {
 #
 # Arguments
 # 
-# * directory: Directory containing modules
+# * path: Path to directories containing modules
 #
 # Notes:
 #
@@ -1153,24 +1216,26 @@ _rerun_modules_summary() {
     (( $# != 1 )) && { 
         rerun_die "wrong # args: should be: _rerun_modules_summary directory" 
     }
-    local -r directory=$1
     echo $(rerun_color blue "Available modules:")
     shopt -s nullglob # enable
     set +u
-    for module in $directory/*
+    for directory in $(rerun_module_path_elements $1)
     do
-        [[ -f $module/metadata ]] && _rerun_module_summary $module
-    done
-    if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
-                && ${RERUN_MODULES:-} != "${DEFAULT_LIBDIR}/rerun/modules" ]]
-    then
-        echo
-        echo $(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")
-        for module in ${DEFAULT_LIBDIR}/rerun/modules/*
+        for module in $directory/*
         do
-           [[ -f $module/metadata ]] && _rerun_module_summary $module
+            [[ -f $module/metadata ]] && _rerun_module_summary $module
         done
-    fi
+        if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
+                && $path_element != "${DEFAULT_LIBDIR}/rerun/modules" ]]
+        then
+            echo
+            echo $(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")
+            for module in ${DEFAULT_LIBDIR}/rerun/modules/*
+            do
+               [[ -f $module/metadata ]] && _rerun_module_summary $module
+            done
+        fi
+    done
     set -u
 }
 
@@ -1321,10 +1386,22 @@ then
 fi
 
 
-# Ensure the modules directory path is defined and is a directory.
+# Ensure the modules directory path is defined and at least one element is a directory.
 #
-[[ -n "${RERUN_MODULES:-}" && -d "${RERUN_MODULES:-}" ]] || {
-    rerun_die "RERUN_MODULES directory not found or does not exist: $RERUN_MODULES"
+[[ -n "${RERUN_MODULES:-}" ]] || {
+    rerun_die "RERUN_MODULES is not defined"
+}
+__rerun_module_has_valid_dir__=1
+for path_element in $(rerun_module_path_elements $RERUN_MODULES)
+do
+    if [[ -d "$path_element" ]]
+    then
+        __rerun_module_has_valid_dir__=0
+        break
+    fi
+done
+[[ $__rerun_module_has_valid_dir__ = 0 ]] || {
+    rerun_die "RERUN_MODULES does not contain any valid directories: $RERUN_MODULES"
 }
 
 # Clear MODULE and COMMAND in case they were incidentally declared in the environment.

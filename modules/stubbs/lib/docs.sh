@@ -23,9 +23,10 @@ docs_option_summary() {
 
 docs_command_summary() {
 	local -a summary=()
-    options=( $(. $RERUN_MODULES/$1/commands/$2/metadata; echo $OPTIONS) )
+    local rerun_module_home_dir=$(rerun_module_exists $1)
+    options=( $(. $rerun_module_home_dir/commands/$2/metadata; echo $OPTIONS) )
 	for option in ${options[*]:-}; do
-        optdir=$RERUN_MODULES/$1/options/$option
+        optdir=$rerun_module_home_dir/options/$option
 		local -a arr=( "$(docs_option_summary $optdir)" )
 		param="${arr[@]:0:1}"
 		summary=( ${summary[@]:-} ${param%:*} )
@@ -131,6 +132,7 @@ docs_option_to_md() {
     local -r opt_dir=$(dirname $metadata)
     local -r opt_name=$(basename $opt_dir)
     local -r opt_summary=$(docs_option_summary $opt_dir)
+    local -r rerun_module_home_dir=$(rerun_module_exists $module)
     
     cat <<MARKDOWN
 [$module](../../index.html)
@@ -151,7 +153,7 @@ $(test -f $opt_dir/README.md && cat $opt_dir/README.md)
 
 The following commands use this option.
 
-$(for command in $(stubbs_option_commands $RERUN_MODULES/$module $opt_name)
+$(for command in $(stubbs_option_commands $rerun_module_home_dir $opt_name)
 do
 printf '* [%s](../../commands/%s/index.html)\n' $command $command
 done)
@@ -263,6 +265,7 @@ docs_command_to_md() {
     local -r com_dir=$(dirname $metadata)
     local -r com_name=$(basename $com_dir)
     local -r com_summary=$(docs_option_summary $com_dir)
+    local -r rerun_module_home_dir=$(rerun_module_exists $module)
 
     cat <<MARKDOWN
 [$module](../../index.html)
@@ -278,7 +281,7 @@ $(rerun_property_get $com_dir DESCRIPTION)
 
 $(for option in $(rerun_options $RERUN_MODULES $module $com_name)
 do
-echo "* [$(docs_option_summary $RERUN_MODULES/$module/options/$option)](../../options/$option/index.html)"
+echo "* [$(docs_option_summary $rerun_module_home_dir/options/$option)](../../options/$option/index.html)"
 done)
 
 ## README
@@ -293,7 +296,7 @@ Use the \`stubbs:test\` command to to run test plans.
 
 *Test plan sources*
 
-$(for test in $(find $RERUN_MODULES/$module/tests -name $com_name\*-test.sh)
+$(for test in $(find $rerun_module_home_dir/tests -name $com_name\*-test.sh)
 do
    test_file=$(basename $test)
    test_name=${test_file%*-test.sh}
@@ -334,11 +337,12 @@ docs_man_page() {
 	    rerun_die "usage: docs_man_page version module: $@"
     }    
     local -r version=$1 module=$2
+    local -r rerun_module_home_dir=$(rerun_module_exists $module)
 (
 cat <<ROFF
 .TH $module 1 "$(date)" "Version ${version}" "RERUN User Manual" 
 .SH NAME
-$module \- $(rerun_property_get $RERUN_MODULES/$module DESCRIPTION)
+$module \- $(rerun_property_get $rerun_module_home_dir DESCRIPTION)
 .PP
 .SH SYNOPSIS
 .PP
@@ -352,12 +356,12 @@ do
 cat <<EOF
 .SH $module:$command \f[]$(docs_command_summary $module $command)
 
-$(rerun_property_get $RERUN_MODULES/$module/commands/$command DESCRIPTION)
+$(rerun_property_get $rerun_module_home_dir/commands/$command DESCRIPTION)
 .PP
 \f[I]OPTIONS\f[]
 $(for option in $(rerun_options $RERUN_MODULES $module $command)
 do
-optdir=$RERUN_MODULES/$module/options/$option
+optdir=$rerun_module_home_dir/options/$option
 description=$(rerun_property_get $optdir DESCRIPTION)
 arguments=$(rerun_property_get $optdir ARGUMENTS)
 default=$(rerun_property_get $optdir DEFAULT)

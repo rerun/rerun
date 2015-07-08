@@ -57,9 +57,11 @@ it_handles_comands_using_quoted_arguments() {
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
-    cat ${RERUN_MODULES}/freddy/commands/says/script |
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cat ${first_rerun_module_dir}/freddy/commands/says/script |
         sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
-    mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/says/script
+    mv /tmp/script.$$ ${first_rerun_module_dir}/freddy/commands/says/script
 
     rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
@@ -67,7 +69,7 @@ it_handles_comands_using_quoted_arguments() {
     test "$output" = "msg (whats happening)"
     
     rm /tmp/rerun.sh.$$
-    rm -r ${RERUN_MODULES}/freddy
+    rm -r ${first_rerun_module_dir}/freddy
 }
 
 it_builds_the_stubbs_module_rpm() {
@@ -87,7 +89,9 @@ it_builds_the_stubbs_module_rpm() {
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
     rerun stubbs:archive --format rpm --modules stubbs --release 1
-    RPM1=rerun-stubbs-$(grep ^VERSION=  ${RERUN_MODULES}/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    RPM1=rerun-stubbs-$(grep ^VERSION=  ${first_rerun_module_dir}/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
     rpm -qi -p ${RPM1} | grep stubbs
     popd
     rm -rf ${TMPDIR}
@@ -113,20 +117,22 @@ it_builds_a_list_of_rpms() {
     rerun stubbs:add-command --module dance --command says --description "none"
     rerun stubbs:add-option --module dance --command says --option msg \
         --description none --required true --export false --default nothing
-    mkdir ${RERUN_MODULES}/freddy/commands/.git ${RERUN_MODULES}/freddy/commands/.svn
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    mkdir ${first_rerun_module_dir}/freddy/commands/.git ${first_rerun_module_dir}/freddy/commands/.svn
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
 
     rerun stubbs:archive --format rpm --modules "freddy dance" --release 1 --version "1.2.3"
 
-    RPM1=rerun-freddy-$(grep ^VERSION=  ${RERUN_MODULES}/freddy/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
-    RPM2=rerun-dance-$(grep ^VERSION=  ${RERUN_MODULES}/dance/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM1=rerun-freddy-$(grep ^VERSION=  ${first_rerun_module_dir}/freddy/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM2=rerun-dance-$(grep ^VERSION=  ${first_rerun_module_dir}/dance/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
     rpm -qi -p ${RPM1} | grep freddy
     rpm -qi -p ${RPM2} | grep dance
     rpm2cpio ${RPM1} | cpio -t - | grep "\/\.git$" && exit 1
     rpm2cpio ${RPM1} | cpio -t - | grep "\/\.svn$" && exit 1
     popd
-    rm -rf ${TMPDIR} ${RERUN_MODULES}/freddy ${RERUN_MODULES}/dance
+    rm -rf ${TMPDIR} ${first_rerun_module_dir}/freddy ${first_rerun_module_dir}/dance
 }
 
 it_builds_a_list_of_debs() {
@@ -140,7 +146,9 @@ it_builds_a_list_of_debs() {
     rerun stubbs:add-command --module dance --command says --description "none"
     rerun stubbs:add-option --module dance --command says --option msg \
         --description none --required true --export false --default nothing
-    mkdir ${RERUN_MODULES}/freddy/commands/.git ${RERUN_MODULES}/freddy/commands/.svn
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    mkdir ${first_rerun_module_dir}/freddy/commands/.git ${first_rerun_module_dir}/freddy/commands/.svn
     TMPDIR=$(mktemp -d "/tmp/rerun.test.XXXX")
     pushd $TMPDIR
 
@@ -153,7 +161,7 @@ it_builds_a_list_of_debs() {
     dpkg-deb --contents ${DEB1} | grep "\/\.git$" && exit 1
     dpkg-deb --contents ${DEB1} | grep "\/\.svn$" && exit 1
     popd
-    rm -rf ${TMPDIR} ${RERUN_MODULES}/freddy ${RERUN_MODULES}/dance
+    rm -rf ${TMPDIR} ${first_rerun_module_dir}/freddy ${first_rerun_module_dir}/dance
 }
 
 it_extracts_only_and_exits() {
@@ -161,8 +169,10 @@ it_extracts_only_and_exits() {
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
-    mkdir ${RERUN_MODULES}/freddy/.svn
-    mkdir ${RERUN_MODULES}/freddy/.git
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    mkdir ${first_rerun_module_dir}/freddy/.svn
+    mkdir ${first_rerun_module_dir}/freddy/.git
     rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
     /tmp/rerun.sh.$$ --extract-only /tmp/myextract.$$
@@ -175,7 +185,7 @@ it_extracts_only_and_exits() {
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.svn ]] && exit 1
     [[ -e /tmp/myextract.$$/rerun/modules/freddy/.git ]] && exit 1
 
-    rm -rf /tmp/myextract.$$ /tmp/rerun.sh.$$ ${RERUN_MODULES}/freddy
+    rm -rf /tmp/myextract.$$ /tmp/rerun.sh.$$ ${first_rerun_module_dir}/freddy
 }
 
 
@@ -184,9 +194,11 @@ it_runs_from_specified_extract_dir() {
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \
         --description none --required true --export false --default nothing
-    cat ${RERUN_MODULES}/freddy/commands/says/script |
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cat ${first_rerun_module_dir}/freddy/commands/says/script |
     sed 's/# Put the command implementation here./echo "msg ($MSG)"/g' > /tmp/script.$$
-    mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/says/script
+    mv /tmp/script.$$ ${first_rerun_module_dir}/freddy/commands/says/script
 
     rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
@@ -195,7 +207,7 @@ it_runs_from_specified_extract_dir() {
     OUT=$(/tmp/rerun.sh.$$ --extract-dir /tmp/myextract.$$ freddy:says --msg hi)
     test "$OUT" = "msg (hi)"
     rm /tmp/rerun.sh.$$
-    rm -rf ${RERUN_MODULES}/freddy /tmp/myextract.$$
+    rm -rf ${first_rerun_module_dir}/freddy /tmp/myextract.$$
 }
 
 it_runs_archive_from_overridden_TMPDIR() {
@@ -205,9 +217,11 @@ it_runs_archive_from_overridden_TMPDIR() {
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
 
-    cat ${RERUN_MODULES}/freddy/commands/print_tmpdir/script |
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cat ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script |
     sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
-    mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/print_tmpdir/script
+    mv /tmp/script.$$ ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script
 
     rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
 
@@ -220,31 +234,37 @@ it_runs_archive_from_overridden_TMPDIR() {
 it_errors_with_missing_extract_dir_arg(){
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
-    cat ${RERUN_MODULES}/freddy/commands/print_tmpdir/script |
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cat ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script |
     sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
-    mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/print_tmpdir/script
+    mv /tmp/script.$$ ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script
 
     rerun stubbs:archive --file /tmp/rerun.sh.$$ --modules freddy --version 1.0
     ERR=$(mktemp /tmp/rerun.archive.err.$$.XXXX)
     ! /tmp/rerun.sh.$$ --extract-only 2> $ERR
     usage="usage: rerun.sh.$$ [--archive-version-release] [--extract-only|-N <>] [--extract-dir|-D <>] [module]:[command] [options]"
     test "${usage}" = "$(cat $ERR)"
-    rm -rf /tmp/rerun.sh.$$ /tmp/stubbs.archive.$$ $ERR ${RERUN_MODULES}/freddy
+    rm -rf /tmp/rerun.sh.$$ /tmp/stubbs.archive.$$ $ERR ${first_rerun_module_dir}/freddy
 }
 
 it_creates_archive_with_user_template() {
     # Create a copy of the original template scripts
     my_template=$(mktemp -d "/tmp/it_creates_archive_with_user_template.XXX")
-    cp -rv ${RERUN_MODULES}/stubbs/templates/{extract,launcher} $my_template
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cp -rv ${first_rerun_module_dir}/stubbs/templates/{extract,launcher} $my_template
     # Change the usage comment so we know it's our custom one.
     sed -i -e "s^#/ usage:.*^#/ usage: custom stuff^" $my_template/extract
 
     # Create a module to archive
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command print_tmpdir --description "none"
-    cat ${RERUN_MODULES}/freddy/commands/print_tmpdir/script |
+    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+
+    cat ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script |
       sed 's,# Put the command implementation here.,echo "$TMPDIR",g' > /tmp/script.$$
-    mv /tmp/script.$$ ${RERUN_MODULES}/freddy/commands/print_tmpdir/script
+    mv /tmp/script.$$ ${first_rerun_module_dir}/freddy/commands/print_tmpdir/script
 
     # Archive it.
     rerun stubbs:archive --template $my_template --file /tmp/rerun.sh.$$ --modules freddy --version 1.0

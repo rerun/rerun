@@ -92,13 +92,15 @@ done
     done
 }
 
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+
 # Verify this command exists
 #
-[ -d $RERUN_MODULES/$MODULE/commands/$COMMAND ] || {
+[ -d $RERUN_MODULE_HOME_DIR/commands/$COMMAND ] || {
     rerun_die "command not found: \""$MODULE:$COMMAND\"""
 }
 
-[ ! -f $RERUN_MODULES/$MODULE/commands/$COMMAND/script ] && {
+[ ! -f $RERUN_MODULE_HOME_DIR/commands/$COMMAND/script ] && {
     rerun_die "command script not found for $MODULE:$COMMAND. Create one with stubbs:add-command."
 }
 
@@ -106,7 +108,7 @@ done
 
 : ${EDITOR:=vi}
 
-exec $EDITOR $RERUN_MODULES/$MODULE/commands/$COMMAND/script
+exec $EDITOR $RERUN_MODULE_HOME_DIR/commands/$COMMAND/script
 
 # Done
 

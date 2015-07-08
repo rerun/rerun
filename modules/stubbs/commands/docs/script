@@ -59,7 +59,8 @@ set -o nounset -o pipefail
 # -----------------
 
 # Change directory to be relative to what would be RERUN_MODULE_DIR.
-cd $RERUN_MODULES/$MODULE
+RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+cd $RERUN_MODULE_HOME_DIR
 
 # Check the specified directory and default it if necessary.
 # 
@@ -69,7 +70,7 @@ if [[ -n "${DIR:-}" ]]
 then
     DIR=$(rerun_path_absolute "$DIR")
 else
-    DIR="$RERUN_MODULES/$MODULE/docs"
+    DIR="$RERUN_MODULE_HOME_DIR/docs"
 fi
 
 # Create the documentation directory.
@@ -175,7 +176,7 @@ done
 cat >$DIR/index.md <<MARKDOWN
 # $MODULE
 
-$(rerun_property_get $RERUN_MODULES/$MODULE DESCRIPTION)
+$(rerun_property_get $RERUN_MODULE_HOME_DIR DESCRIPTION)
 
 ## SYNOPSIS
 
@@ -215,7 +216,7 @@ MARKDOWN
 
 # Path to the unix manual page. 
 MANPAGE=$DIR/$MODULE.1
-VERSION="$(rerun_property_get $RERUN_MODULES/$MODULE VERSION)" || { VERSION=1 ; }
+VERSION="$(rerun_property_get $RERUN_MODULE_HOME_DIR VERSION)" || { VERSION=1 ; }
 docs_man_page "$VERSION" "$MODULE" > $MANPAGE
 rerun_log info "Unix manual: $MANPAGE"
 

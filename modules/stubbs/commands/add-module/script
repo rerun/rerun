@@ -96,11 +96,13 @@ COMMAND_SHELL=$(rerun_property_get $STUB COMMAND_SHELL)
 
 # Create module structure
 
-mkdir -p $RERUN_MODULES/$MODULE || rerun_die "Failed creating module structure."
+RERUN_MODULE_HOME_DIR=$(echo "$RERUN_MODULES" | cut -d: -f1)/$MODULE
+
+mkdir -p $RERUN_MODULE_HOME_DIR || rerun_die "Failed creating module structure."
 # Create commands/ subdirectory
-mkdir -p $RERUN_MODULES/$MODULE/commands || rerun_die "Failed creating module structure."
+mkdir -p $RERUN_MODULE_HOME_DIR/commands || rerun_die "Failed creating module structure."
 # Create lib/ subdirectory
-mkdir -p $RERUN_MODULES/$MODULE/lib || rerun_die "Failed creating module structure."
+mkdir -p $RERUN_MODULE_HOME_DIR/lib || rerun_die "Failed creating module structure."
 
 # Generate a profile for metadata
 (
@@ -115,7 +117,7 @@ REQUIRES=
 EXTERNALS=
 LICENSE=
 EOF
-) > $RERUN_MODULES/$MODULE/metadata || rerun_die "Failed generating metadata."
+) > $RERUN_MODULE_HOME_DIR/metadata || rerun_die "Failed generating metadata."
 
 # Give it the beginnings of a function library.
 # Replace the word "@MODULE@" with the module's given name.
@@ -123,7 +125,7 @@ sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
 	-e "s,@SHELL@,$COMMAND_SHELL,g" \
     "$STUB/$TEMPLATE_FUNCTION_LIB" \
-    > "$RERUN_MODULES/$MODULE/lib/$(basename $TEMPLATE_FUNCTION_LIB)" || {
+    > "$RERUN_MODULE_HOME_DIR/lib/$(basename $TEMPLATE_FUNCTION_LIB)" || {
     rerun_die "Failed creating function library for \"$MODULE\"."
 }
 
@@ -133,11 +135,11 @@ if [[ -n "${TEMPLATE:-}" ]]
 then
     if [[ "$TEMPLATE" =~ [/]+ ]]
     then TEMPLATE_DIR=$(rerun_path_absolute $TEMPLATE)
-    else TEMPLATE_DIR=$RERUN_MODULES/$TEMPLATE
+    else TEMPLATE_DIR=$(rerun_module_exists $TEMPLATE)
     fi
     rerun_log info "Copying files from template: $TEMPLATE..."
-    stubbs_module_clone $RERUN_MODULES/$MODULE $TEMPLATE_DIR
+    stubbs_module_clone $RERUN_MODULE_HOME_DIR $TEMPLATE_DIR
 fi
 
 # Done
-rerun_log info "Created module structure: $RERUN_MODULES/$MODULE."
+rerun_log info "Created module structure: $RERUN_MODULE_HOME_DIR."
