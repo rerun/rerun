@@ -1093,7 +1093,7 @@ _rerun_options_populate() {
         local option=$(
             . $metadata; # source the option metadata
             [[ -n "$LONG" ]] && flag="$LONG" || flag="$NAME"
-            if [[ "$ARGUMENTS" = "true" && -r "$answers" ]]
+            if [[ -r "$answers" ]]
             then 
                 varname=$(echo $NAME | tr "[a-z]" "[A-Z]" | tr "-" "_")
                 arg=$(grep ^$varname "$answers")
@@ -1320,6 +1320,8 @@ while (( "$#" > 0 )); do
         _rerun_examples $(basename "$0")
         exit 0
 	    ;;
+    --banner)  _rerun_banner ; exit 0
+	    ;;
   	-G)
 	    export RERUN_COLOR="true"
 	    ;;
@@ -1426,7 +1428,7 @@ fi
 # Read answer file and set positional parameters from them.
 if [[ -n "${ANSWERS:-}" && -f "${ANSWERS:-}" ]]
 then
-    set -- $@ $(_rerun_options_populate $MODULE $COMMAND "$ANSWERS")
+    eval set -- $@ $(_rerun_options_populate $MODULE $COMMAND "$ANSWERS")
 fi
 
 
