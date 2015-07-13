@@ -38,7 +38,8 @@ generate_option_parser() {
     fi
 	if [ "$ARGUMENTS" == "false" ]
 	then
-		printf " %s) %s=true ;;\n" "${argstring}" "$optVarname"
+        # boolean flag. Check if the arg is "true" because the answers population process declares it.
+		printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
 	else
     	printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
 			"$argstring" "$optVarname"
