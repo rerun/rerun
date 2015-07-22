@@ -220,16 +220,16 @@ command and possibly options. The basic usage form is
 OK: localhost is pingable.
 </code></pre>
 
-<p>The outputed string "studying (math)" is the printed result. 
-In this example, "math" is the subject option's default value
+<p>The outputed string "OK: localhost is pingable." is the printed result. 
+In this example, "30" is the interval option's default value
 as defined in the module metadata.</p>
 
 <p>Command options are passed after the "module:command" string. 
-Tell waitfor to study the subject, "biology" by specifying 
-the <code>--subject &lt;&gt;</code> option:</p>
+Tell waitfor to wait for the url, "http://google.com" by specifying 
+the <code>--url &lt;&gt;</code> option:</p>
 
-<pre><code>$ rerun waitfor:study --subject biology
-OK: localhost is pingable.
+<pre><code>$ rerun waitfor:http --url http://google.com
+OK
 </code></pre>
 
 <p>If the 'waitfor' module is stored in <code>/var/rerun</code>, then the command usage
