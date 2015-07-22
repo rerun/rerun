@@ -152,37 +152,17 @@ Examples:
 <p>Without arguments, <code>rerun</code> will list existing modules:</p>
 
 <pre><code>$ rerun
-  waitfor: "wait for the specified URL to be accessible."
+  waitfor: "wait for condition."
 </code></pre>
 
-<p>To list the commands available from the 'waitfor' module run:</p>
+<p>To list the commands available from the 'waitfor' module:</p>
 
 <pre><code>$ rerun waitfor
-dir-exists: "wait for the directory to exist"
-    --interval &lt;30&gt;: "the time interval"
-    --maxtry &lt;10&gt;: "max number of tries"
-    --dir &lt;&gt;: "the directory path"
-file-contains: "wait for the file to contain message"
-    --interval &lt;30&gt;: "the time interval"
-    --maxtry &lt;10&gt;: "max number of tries"
-    --file &lt;&gt;: "the file path"
-    --string &lt;&gt;: "the string to find"
-file-exists: "wait for the file to exist"
-    --file &lt;&gt;: "the file path"
-    --interval &lt;30&gt;: "the time interval"
-    --maxtry &lt;10&gt;: "max number of tries"
 http: "wait for url to become available"
     --url &lt;&gt;: "the url to check"
-log: "wait for patterns in log file"
+    --interval &lt;30&gt;: "the time interval"
 ping: "wait for ping response from host"
     --host &lt;""&gt;: "host to check"
-    --interval &lt;30&gt;: "the time interval"
-port-open: "wait for network port to be open for connections"
-    --interval &lt;30&gt;: "the time interval"
-    --host &lt;""&gt;: "host to check"
-    --port &lt;&gt;: "the port to check"
-port: "wait for port to reach listen state"
-seconds: "wait for specified seconds"
     --interval &lt;30&gt;: "the time interval"
 </code></pre>
 
