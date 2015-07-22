@@ -139,12 +139,12 @@ Usage: rerun [-h][-v][-V][--version] [-M &lt;dir&gt;] [module:[command [options]
 Examples:
 | $ rerun 
 | =&gt; List all modules.
-| $ rerun freddy
-| =&gt; List all freddy commands.
-| $ rerun freddy:dance --jumps 3
-| =&gt; Execute the freddy:dance command.
-| $ rerun -M /var/rerun freddy:dance
-| =&gt; Execute the freddy:dance command found in /var/rerun
+| $ rerun waitfor
+| =&gt; List all waitfor commands.
+| $ rerun waitfor:http --url http://google.com
+| =&gt; Execute the waitfor:http command.
+| $ rerun -M /var/rerun waitfor:http
+| =&gt; Execute the waitfor:http command found in /var/rerun
 </code></pre>
 
 <h2>Listing</h2>
@@ -152,16 +152,38 @@ Examples:
 <p>Without arguments, <code>rerun</code> will list existing modules:</p>
 
 <pre><code>$ rerun
-  freddy: "A dancer in a red beret and matching suspenders"
+  waitfor: "wait for the specified URL to be accessible."
 </code></pre>
 
-<p>To list the commands available from the 'freddy' module run:</p>
+<p>To list the commands available from the 'waitfor' module run:</p>
 
-<pre><code>$ rerun freddy
- study: "tell freddy to study" 
-   --subject &lt;math&gt;: "the summer school subject"
- dance: "tell freddy to dance"
-   --jumps &lt;1&gt;: "jump #num times"
+<pre><code>$ rerun waitfor
+dir-exists: "wait for the directory to exist"
+    --interval &lt;30&gt;: "the time interval"
+    --maxtry &lt;10&gt;: "max number of tries"
+    --dir &lt;&gt;: "the directory path"
+file-contains: "wait for the file to contain message"
+    --interval &lt;30&gt;: "the time interval"
+    --maxtry &lt;10&gt;: "max number of tries"
+    --file &lt;&gt;: "the file path"
+    --string &lt;&gt;: "the string to find"
+file-exists: "wait for the file to exist"
+    --file &lt;&gt;: "the file path"
+    --interval &lt;30&gt;: "the time interval"
+    --maxtry &lt;10&gt;: "max number of tries"
+http: "wait for url to become available"
+    --url &lt;&gt;: "the url to check"
+log: "wait for patterns in log file"
+ping: "wait for ping response from host"
+    --host &lt;""&gt;: "host to check"
+    --interval &lt;30&gt;: "the time interval"
+port-open: "wait for network port to be open for connections"
+    --interval &lt;30&gt;: "the time interval"
+    --host &lt;""&gt;: "host to check"
+    --port &lt;&gt;: "the port to check"
+port: "wait for port to reach listen state"
+seconds: "wait for specified seconds"
+    --interval &lt;30&gt;: "the time interval"
 </code></pre>
 
 <p>The listing consists of info about command options 
@@ -170,8 +192,8 @@ including default values if they were described with option metadata.</p>
 <p>Options that declare a default value are shown
 with a string between the "&lt;&gt;" characters.</p>
 
-<p>For example, notice how "--jumps" option shows <code>&lt;1&gt;</code>.
-The "1" is the default value assigned to the "--jumps" option.</p>
+<p>For example, notice how "--interval" option shows <code>&lt;30&gt;</code>.
+The "30" is the default value assigned to the "--interval" option.</p>
 
 <p>See the "Environment" section below to learn about the
 <code>RERUN_MODULES</code> environment variable. This variable
@@ -186,26 +208,26 @@ It provides listing via the tab key.</p>
 a list of existing modules.</p>
 
 <pre><code>$ rerun[TAB][TAB]
-freddy
+waitfor
 </code></pre>
 
-<p>Rerun shows there is a module named "freddy" installed.</p>
+<p>Rerun shows there is a module named "waitfor" installed.</p>
 
-<p>Typing the tab key again will show the commands inside the "freddy" module:</p>
+<p>Typing the tab key again will show the commands inside the "waitfor" module:</p>
 
-<pre><code>$ rerun freddy: [TAB]
-dance  study     
-</code></pre>
+<pre><code>$ rerun waitfor: [TAB]
+dir-exists     file-exists    log            port           seconds        
+file-contains  http           ping           port-open     </code></pre>
 
-<p>In this case, two commands are found and listed. Press tab again
+<p>In this case, several commands are found and listed. Press tab again
 and choose a command.
 After accepting a command, typing the tab key will show arguments.</p>
 
-<pre><code>$ rerun freddy:study -[TAB]
---subject
+<pre><code>$ rerun waitfor:ping -[TAB]
+--host      --interval  
 </code></pre>
 
-<p>The <code>freddy:study</code> command accepts one option (--subject &lt;&gt;).</p>
+<p>The <code>waitfor:ping</code> command accepts options (--host &lt;&gt; --interval &lt;&gt;).</p>
 
 <h2>Command execution</h2>
 
@@ -213,9 +235,9 @@ After accepting a command, typing the tab key will show arguments.</p>
 command and possibly options. The basic usage form is
 "<code>rerun</code> <em>module</em>:<em>command</em> [<em>options</em>]".</p>
 
-<p>To run the "study" command in the freddy module, type:</p>
+<p>To run the "ping" command in the waitfor module, type:</p>
 
-<pre><code>$ rerun freddy:study
+<pre><code>$ rerun waitfor:ping --host localhost
 studying (math)
 </code></pre>
 
@@ -224,18 +246,18 @@ In this example, "math" is the subject option's default value
 as defined in the module metadata.</p>
 
 <p>Command options are passed after the "module:command" string. 
-Tell freddy to study the subject, "biology" by specifying 
+Tell waitfor to study the subject, "biology" by specifying 
 the <code>--subject &lt;&gt;</code> option:</p>
 
-<pre><code>$ rerun freddy:study --subject biology
-studying (biology)
+<pre><code>$ rerun waitfor:study --subject biology
+OK: localhost is pingable.
 </code></pre>
 
-<p>If the 'freddy' module is stored in <code>/var/rerun</code>, then the command usage
+<p>If the 'waitfor' module is stored in <code>/var/rerun</code>, then the command usage
 would be:</p>
 
-<pre><code>$ rerun -M /var/rerun freddy:study
-studying (math)
+<pre><code>$ rerun -M /var/rerun waitfor:ping
+OK: localhost is pingable.
 </code></pre>
 
 <h3>Archives</h3>
@@ -246,7 +268,7 @@ the same exact interface as rerun,... all in one file!</p>
 
 <p>Specifically, an archive is a set of modules 
 and <code>rerun</code> itself packaged into a self extracting
-script (by default in a file named "rerun.bin"). 
+script (by default in a file named "rerun.sh"). 
 Archives can be useful if you want
 to share a single self contained executable that contains all the needed modules.</p>
 
@@ -254,7 +276,7 @@ to share a single self contained executable that contains all the needed modules
 
 <p>You can execute an archive via <code>bash</code> like so:</p>
 
-<pre><code>$ bash rerun.bin &lt;module&gt;:&lt;command&gt; --your options
+<pre><code>$ bash rerun.sh &lt;module&gt;:&lt;command&gt; --your options
 </code></pre>
 
 <p>If the execute bit is set, invoke the archive directly.</p>
@@ -262,19 +284,20 @@ to share a single self contained executable that contains all the needed modules
 <p>Here the archive is executed without arguments which causes the archive
 to list the modules contained within it.</p>
 
-<pre><code>$ ./rerun.bin
-  freddy: "A dancer in a red beret and matching suspenders" - 1.0.0
+<pre><code>$ ./rerun.sh
+  waitfor: "wait for a condition" - 1.0.0
   .
   . listing output ommitted
 </code></pre>
 
-<p>Note, ".bin" is just a suffix naming convention for a self-extracting script.
+<p>Note, ".sh" is just a suffix naming convention for a self-extracting script.
 The archive file can be named anything you wish.</p>
 
-<p>Run the <code>freddy:dance</code> command in the archive:</p>
+<p>Run the <code>waitfor:http</code> command in the archive:</p>
 
-<pre><code>$ ./rerun.bin freddy:dance --jumps 3
-jumps (3)
+<pre><code>$ ./rerun.sh waitfor:ping --host somehostbooting
+.
+.
 </code></pre>
 
 <p>See <code>stubbs:archive</code> for further information about creating and 
@@ -315,19 +338,19 @@ file declares two properties:</p>
 <ul>
 <li>NAME: Declare name displayed to user.</li>
 <li>DESCRIPTION: Brief explanation of use.</li>
-</ul><p>For example, a module named <code>freddy</code> is named
-and described in a file called <code>RERUN_MODULES/freddy/metadata</code>:</p>
+</ul><p>For example, a module named <code>waitfor</code> is named
+and described in a file called <code>RERUN_MODULES/waitfor/metadata</code>:</p>
 
-<pre><code>NAME="freddy"
-DESCRIPTION="A dancer in a red beret and matching suspenders"
+<pre><code>NAME="waitfor"
+DESCRIPTION="wait for a condition"
 </code></pre>
 
 <p>Command metadata is described in a file called
 <code>RERUN_MODULES/&lt;module&gt;/commands/&lt;command&gt;/metadata</code>.
-Here's the command metadata for the "study" command:</p>
+Here's the command metadata for the "ping" command:</p>
 
-<pre><code>NAME="study"
-DESCRIPTION="tell freddy to study"
+<pre><code>NAME="ping"
+DESCRIPTION="wait for ping response from host"
 </code></pre>
 
 <p>Options are described in a file called 
@@ -340,20 +363,28 @@ Beyond just NAME and DESCRIPTION, options can also declare:</p>
 <li>DEFAULT: Sensible value for an option default </li>
 </ul><p>Here's <code>subject.option</code> describing an option named "subject":</p>
 
-<pre><code>NAME=subject
-DESCRIPTION="the summer school subject"
+<pre><code>NAME=host
+DESCRIPTION="the host to ping"
 ARGUMENTS=true
 REQUIRED=true
-DEFAULT=math
+DEFAULT=
+</code></pre>
+
+<p>And for the --interval option</p>
+<pre><code>NAME=interval
+DESCRIPTION="the interval to wait in seconds"
+ARGUMENTS=true
+REQUIRED=true
+DEFAULT=30
 </code></pre>
 
 <p>Combining the examples above into the layout described earlier
-the "freddy" module along with its commands "dance" and "study"
+the "waitfor" module along with its commands "http" and "ping"
 are illustrated here:</p>
 
-<pre><code>freddy
+<pre><code>waitfor
 ├── commands
-│   └── dance (directory for dance command files)
+│   └── http (directory for http command files)
 │       ├── metadata (command metadata)
 │       ├── options.sh (option parsing script)
 │       └── script (command script)
@@ -361,10 +392,10 @@ are illustrated here:</p>
 │   └── functions.sh (module function library)
 ├── metadata (module metadata)
 ├── options (module options)
-│   └── jumps ("jumps" command option)
-│       └── metadata (declares metadata for "jumps" option)
+│   └── url ("url" command option)
+│       └── metadata (declares metadata for "url" option)
 └── tests
-    └── dance-1-test.sh (unit tests for dance)
+    └── http-1-test.sh (unit tests for http)
 </code></pre>
 
 <h1>ENVIRONMENT</h1>
