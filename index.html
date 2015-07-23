@@ -99,7 +99,6 @@ are summarized for end users.</p>
 for additional documentation including:</p>
 
 <ul>
-<li><a href="https://github.com/rerun/rerun/wiki">Getting started</a></li>
 <li><a href="https://github.com/rerun/rerun/wiki/Installation">Installation</a></li>
 <li><a href="https://github.com/rerun/rerun/wiki/Tutorial">Tutorial</a></li>
 <li><a href="https://github.com/rerun/rerun/tree/master/modules/stubbs">Stubbs module tool</a></li>
@@ -336,14 +335,14 @@ DESCRIPTION="wait for ping response from host"
 </code></pre>
 
 <p>Options are described in a file called 
-<code>RERUN_MODULES/&lt;module&gt;/commands/&lt;command&gt;/&lt;option&gt;.option</code>.
+<code>RERUN_MODULES/&lt;module&gt;/options/&lt;option&gt;/metadata</code>.
 Beyond just NAME and DESCRIPTION, options can also declare:</p>
 
 <ul>
 <li>ARGUMENTS: Does the option take an argument.</li>
 <li>REQUIRED: Is the option required.</li>
 <li>DEFAULT: Sensible value for an option default </li>
-</ul><p>Here's <code>subject.option</code> describing an option named "subject":</p>
+</ul><p>Here's the metadata describing the option named "host":</p>
 
 <pre><code>NAME=host
 DESCRIPTION="the host to ping"
@@ -374,8 +373,10 @@ are illustrated here:</p>
 │   └── functions.sh (module function library)
 ├── metadata (module metadata)
 ├── options (module options)
-│   └── url ("url" command option)
-│       └── metadata (declares metadata for "url" option)
+│   ├── url (--url option)
+│   │   └── metadata (declares metadata for "url" option)
+│   └── interval (--interval option)
+│       └── metadata (declares metadata for "interval" option)
 └── tests
     └── http-1-test.sh (unit tests for http)
 </code></pre>
