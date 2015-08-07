@@ -1096,7 +1096,7 @@ _rerun_options_populate() {
             if [[ -r "$answers" ]]
             then 
                 varname=$(echo $NAME | tr "[a-z]" "[A-Z]" | tr "-" "_")
-                arg=$(grep ^$varname "$answers")
+                arg=$(grep ^${varname}= "$answers")
                 argval=${arg#*=}
             fi
             [[ -n "$arg" ]] && printf -- "--%s %s" "$flag" "${argval}"
