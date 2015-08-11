@@ -180,7 +180,7 @@ $(rerun_property_get $RERUN_MODULE_HOME_DIR DESCRIPTION)
 
 ## SYNOPSIS
 
-    $(basename ${RERUN}) [ARGS] $(docs_module_synopsys $MODULE) [OPTIONS]
+    $(basename ${RERUN}) [ARGS] $(docs_module_synopsis $MODULE) [OPTIONS]
 
 ## README
 
