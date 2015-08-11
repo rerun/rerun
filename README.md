@@ -5,7 +5,7 @@
 
 rerun - a modular shell automation framework to organize your keeper scripts.
 
-# SYNOPSYS
+# SYNOPSIS
 
 	rerun [-h][-v][-V] [-M <dir>] [--loglevel <>] [module:[command [options]]]
 
