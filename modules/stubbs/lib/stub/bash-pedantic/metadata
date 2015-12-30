@@ -1,0 +1,9 @@
+#/ metadata: stub
+NAME=bash-pedantic
+
+# These are relative to the lib dir
+TEMPLATE_FUNCTION_LIB=templates/functions.sh
+TEMPLATE_COMMAND_SCRIPT=templates/script
+COMMAND_SHELL=bash
+OPTIONS_GENERATOR=generate-options
+OPTIONS_SCRIPT=options.sh

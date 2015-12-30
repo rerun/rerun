@@ -36,7 +36,7 @@ set -o nounset -o pipefail
 # ----------------------
 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: MODULE DESCRIPTION
+#/ option-variables: MODULE DESCRIPTION TEMPLATE
 
 
 # Get the options
@@ -83,7 +83,15 @@ done
     read DESCRIPTION
 }
 
-STUB=$RERUN_MODULE_DIR/lib/stub/bash
+STUB=
+if [[ -n "${TEMPLATE:-}" ]]
+then
+	[[ ${TEMPLATE} == "pedantic" ]] && STUB=$RERUN_MODULE_DIR/lib/stub/bash-pedantic
+	[[ -d "${TEMPLATE}" ]] && STUB=${TEMPLATE}
+else
+	STUB=$RERUN_MODULE_DIR/lib/stub/bash
+fi
+
 [[ ! -d "$STUB" ]] && rerun_die "module stub not found: $STUB"
 
 TEMPLATE_FUNCTION_LIB=$(rerun_property_get $STUB TEMPLATE_FUNCTION_LIB)
