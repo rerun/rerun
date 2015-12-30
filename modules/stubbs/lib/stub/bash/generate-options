@@ -79,14 +79,15 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 #
 rerun_options_parse() {
 
-    while [ "\$#" -gt 0 ]; do
+    while (( "\$#" > 0 ))
+    do
         OPT="\$1"
         case "\$OPT" in
 $(for option in $(rerun_options $moddir $module $command); do 
 printf "          %s\n" "$(generate_option_parser $option)"; 
 done)
             # help option
-            -|--*?)
+            -|--*?) echo >&2 "unrecognized option: \$OPT"
                 rerun_option_usage
                 exit 2
                 ;;
@@ -100,13 +101,13 @@ done)
     # Set defaultable options.
 $(for opt in $(echo $options_defaulted|sort); do
 optvar=$(stubbs_option_variable $opt)
-printf "    [ -z \"$%s\" ] && %s=\"%s\"\n" \
+printf "    [[ -z \"$%s\" ]] && %s=\"%s\"\n" \
     $optvar $optvar \
     "\$(rerun_property_get \$RERUN_MODULE_DIR/options/$opt DEFAULT)"
 done)
     # Check required options are set
 $(for opt in $(echo $options_required|sort); do
-printf "    [ -z \"$%s\" ] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" \
+printf "    [[ -z \"$%s\" ]] && { echo >&2 \"missing required option: --%s\" ; return 2 ; }\n" \
       $(stubbs_option_variable $opt) $opt
 done)
     # If option variables are declared exportable, export them.
