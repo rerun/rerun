@@ -7,7 +7,7 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
-#/ usage: rerun [-h][-G][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [module:[command [options]]]
+#/ usage: rerun [-h][-G][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [--sudo-user|-S <user>] [module:[command [options]]]
 #
 # __Install__
 # 
@@ -16,7 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.3.6
+RERUN_VERSION=1.3.7
 
 # The default system install directories.
 
@@ -1008,6 +1008,7 @@ rerun_module_exists() {
 # otherwise run it using the same shell as rerun.
 # Return the command script's exit code as the result.
 #
+
 rerun_command_execute() {
     (( $# >= 2 )) || { 
         rerun_die "wrong # args: should be: rerun_command_execute module command options" 
@@ -1015,6 +1016,10 @@ rerun_command_execute() {
     local -r module="$1"
     local -r command="$2"
     shift; shift; # options are the remaining positional parameters.
+    # Default the sudo command string
+    local SUDO_COMMAND="sudo --preserve-env"; # Needed for RERUN context variables and perhaps user's too.
+                                              # The security policy may return an error if the user does 
+                                              # not have permission to preserve the environment.
 
     RERUN_MODULE_DIR=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
     RERUN_COMMAND_DIR=$RERUN_MODULE_DIR/commands/$COMMAND
@@ -1025,6 +1030,11 @@ rerun_command_execute() {
     local -r RERUN_SHELL=$SHELL
     local COMMAND_SHELL=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
     : ${COMMAND_SHELL:=$RERUN_SHELL}; # default it.
+
+    if [[ -n "${SUDO_USER:-}" ]]
+    then
+        COMMAND_SHELL="$SUDO_COMMAND -u $SUDO_USER $COMMAND_SHELL"
+    fi
     local RERUN_MODULE_VERSION=$(rerun_property_get "$RERUN_MODULE_DIR" VERSION)
 
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
@@ -1037,8 +1047,16 @@ rerun_command_execute() {
         RERUN_EXITSTATUS=$?
     elif [[ -x "$script" ]]
     then
-        "$script" "$@"
-        RERUN_EXITSTATUS=$?
+
+        if [[ -n ${SUDO_USER:-} ]]
+        then
+            $SUDO_COMMAND -u $SUDO_USER "$script" "$@"
+            rc=$?
+        else
+            "$script" "$@"
+            rc=$?
+        fi
+        RERUN_EXITSTATUS=$rc
     else
         $COMMAND_SHELL "$script" "$@"
         RERUN_EXITSTATUS=$?
@@ -1083,9 +1101,9 @@ _rerun_options_populate() {
         echo >&2 "usage: _rerun_options_populate: module command ?answers?" 
         return 2
     }
-    local -r module=$1 command=$2 answers=$3
+    local -r module=$1 command=$2 answers=${3:-}
     local module_dir=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
-    local argline=
+    local argline=()
     for cmd_option in $(rerun_options $(dirname $module_dir) $module $command)
     do        
         local metadata=$(dirname $module_dir)/$module/options/$cmd_option/metadata
@@ -1101,9 +1119,9 @@ _rerun_options_populate() {
             fi
             [[ -n "$arg" ]] && printf -- "--%s %s" "$flag" "${argval}"
         )
-        argline="$argline $option"
+        argline+=("$option")
     done
-    echo "$argline"
+    echo "${argline[@]:-}"
 }
 
 
@@ -1356,7 +1374,12 @@ while (( "$#" > 0 )); do
 	    ANSWERS="$2"
         [[ ! -f $ANSWERS ]] && rerun_syntax_error "answers file not found: $ANSWERS"
 	    shift
-	    ;;		  
+	    ;;
+    -S|--sudo-user)
+        rerun_option_check "$#" "$1"
+        SUDO_USER="$2"
+        shift
+        ;;
 	*)
 	    break;# Ignore remaining arguments as they are for the module.
     esac
