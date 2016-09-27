@@ -75,7 +75,7 @@ done
 [ -z "${MODULE:-}" ] &&  { rerun_syntax_error "missing required option: --module"; }
 [ -z "${PLAN:-}" ] && PLAN="*"
 
-RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
+export RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
 if [ ! -d "$RERUN_MODULE_HOME_DIR/tests" ]
 then
     # there should always be at least one test!
