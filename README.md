@@ -16,7 +16,7 @@ into modular automation. Rerun will help you
 organize your scripts into user friendly commands.
 Collections of rerun modules can be archived and delivered as
 a single executable or as RPMs or Debian packages to facilitate handoffs between teams.
-The included "stubbs" module, helps you develop your own rerun modules, 
+The included "stubbs" module, helps you develop your own rerun modules,
 generating option parsing code, documentation even unit tests for each of your commands.
 
 End users can browse and execute commands via its two modes of operation:
@@ -37,9 +37,9 @@ Internally, `rerun` implements a simple dispatching mechanism to look up named
 commands and execute them. *Commands* are logically named and
 have a corresponding script.
 
-Commands reside in a module and can have named 
+Commands reside in a module and can have named
 parameters called *options*. Each option is named,
-described and can also be defined to use a default value 
+described and can also be defined to use a default value
 or say whether it is required or not.
 
 Rerun modules can also declare metadata describing name, description
@@ -66,11 +66,11 @@ for additional documentation including:
 `-M` *DIRECTORY*
 : Module library directory path.
 
-`-v` 
-: Execute _command_ in verbose mode. 
+`-v`
+: Execute _command_ in verbose mode.
 
-`-V` 
-: Execute `rerun` and _command_ in verbose mode. 
+`-V`
+: Execute `rerun` and _command_ in verbose mode.
 
 
 # USING
@@ -81,7 +81,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 
 	$ ./rerun --help
 	 _ __ ___ _ __ _   _ _ __
-	| '__/ _ \ '__| | | | '_ \ 
+	| '__/ _ \ '__| | | | '_ \
 	| | |  __/ |  | |_| | | | |
 	|_|  \___|_|   \__,_|_| |_|
 	Version: 1.3.6. License: Apache 2.0.
@@ -91,7 +91,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 
 ## Listing
 
-Without arguments, `rerun` will list existing modules and 
+Without arguments, `rerun` will list existing modules and
 their description and version:
 
     $ rerun
@@ -111,11 +111,11 @@ name too. Here the commands are listed for the 'stubbs' module:
          --module|-m <>: "the module name"
         [ --template <>]: "the template name or path"
         .
-        . 
         .
-        
+        .
+
 The command listing includes the command description and
-any options assigned to the command. 
+any options assigned to the command.
 
 Options that declare a default value are shown
 with a string between the "<>" characters.
@@ -129,18 +129,18 @@ specifies the directory/ies where rerun modules exist.
 
 ### Bash completion
 
-If you are a Bash shell user, be sure to source the `bash_completion.sh` file. 
+If you are a Bash shell user, be sure to source the `bash_completion.sh` file.
 It provides listing via the tab key.
 
 Type `rerun` and then the tab key. The shell will generate
 a list of existing modules.
 
     $ rerun[TAB][TAB]
-    stubbs: 
+    stubbs:
 
 Rerun shows the module "stubbs".
 
-Typing the `s` character and the tab key again 
+Typing the `s` character and the tab key again
 will show the commands inside the "stubbs" module:
 
     $ rerun stubbs: [TAB]
@@ -155,12 +155,12 @@ After accepting a command, typing the tab key will list the command options.
     $ rerun stubbs: add-module -[TAB]
     --description  --module  --template
 
-The `stubbs:add-module` command accepts three options 
+The `stubbs:add-module` command accepts three options
 (--description <> --module <> --template <>).
-    
+
 You can continue using command completion to cycle through
-the remaining options. 
-    
+the remaining options.
+
 ## Command execution
 
 Commands are executed by stating the module,
@@ -172,7 +172,7 @@ To run the "archive" command in the stubbs module, type:
     $ rerun stubbs:archive
     Wrote self extracting archive script: /tmp/rerun.sh
 
-Command options are passed after the "module:command" string. 
+Command options are passed after the "module:command" string.
 Run the "stubbs:archive" command but specify where the archive file is written.
 
     $ rerun stubbs:archive --modules waitfor --file $HOME/rerun.sh
@@ -191,9 +191,9 @@ containing a copy of rerun and one or more modules
 (you might have a library of them). The archive uses
 the same exact interface as rerun,... all in one file!
 
-Specifically, an archive is a set of modules 
+Specifically, an archive is a set of modules
 and `rerun` itself packaged into a self extracting
-script (by default in a file named "rerun.sh"). 
+script (by default in a file named "rerun.sh").
 Archives can be useful if you want
 to share a single self contained executable that contains all the needed modules.
 
@@ -224,12 +224,12 @@ Run the `waitfor:ping` command in the archive:
 Shell archives can be executed using special parameters of its own.
 Below is a list of these optional arguments:
 
-* `--archive-version-release`: Print the archive version and release info and exit. 
+* `--archive-version-release`: Print the archive version and release info and exit.
 * `--extract-only|-N <>`: Extract the archive to the specified directory and exit.
 * `--extract-dir|-D <>`: Extract the archive  to the specified directory and then execute the specified command. By default, the `TMPDIR` environment variable is used to create a directory to extract the archive.
 
 Besies the self extractive archive format, stubbs can also generate RPM and Debian packages.
-See `stubbs:archive` for further information about creating and 
+See `stubbs:archive` for further information about creating and
 understanding rerun archives.
 
 
@@ -254,7 +254,7 @@ A rerun module assumes the following structure:
     |       `-- metadata (declares metadata for "optY" option)
     `-- tests
         `-- cmdA-1-test.sh (unit tests for cmdA)
-    
+
 The "stubbs" module creates this directory structure for you but once you know
 the conventions you can create and edit these files directly (if you prefer).
 
@@ -263,8 +263,32 @@ the conventions you can create and edit these files directly (if you prefer).
 Rerun's internal dispatch logic uses the directory and file convention
 described above to find and execute scripts for each command.
 
-Once the user specifies the module and command to execute, rerun finds the 
+Once the user specifies the module and command to execute, rerun finds the
 command's script and executes it.
+
+## Command Line Arguments
+
+Optionally, additional the remaining command line may be accessed via the `_CMD_LINE` environment variable.  This may be used in the command's script if required.
+
+For example, assume you have a command which sets up and runs an ubuntu Docker image and maps `./subdirectory` in as the `/opt` directory within the container.  Your module name is `docker` and your command is `run-ubuntu`.  You have defined a required option named `dir` that specifies which directory to map into the container.
+
+In your `modules/docker/commands/run-ubuntu/script`, you implement your script as follows:
+
+    CMD_LINE=${_CMD_LINE:-bash}
+    IMAGE="ubuntu:16.04"
+    HOME="-v $(pwd)/$DIR:/opt"
+    PARAMS="-it -a stdin -a stdout -u 1000"
+    docker run $PARAMS $HOME $IMAGE $CMD_LINE
+
+If your rerun command line were:
+
+    rerun docker:run-ubuntu --dir subdirectory/ ls -l
+
+This will effectively run:
+
+    docker run -it -a stdin -a stdout -u 1000 -v /home/me/subdirectory:/opt ubuntu:16.04 ls -l
+
+(assuming you are currently in the /home/me directory)
 
 ## Metadata
 
@@ -305,7 +329,7 @@ Beyond just `NAME` and `DESCRIPTION`, options can also declare:
 
 * `ARGUMENTS`: Does the option take an argument.
 * `REQUIRED`: Is the option required.
-* `DEFAULT`: Sensible value for an option default 
+* `DEFAULT`: Sensible value for an option default
 
 Here's the metadata describing an option named "host":
 
@@ -350,7 +374,7 @@ To source rerun yourself, simply "dot" the file:
 
 ## Exit on error
 
-The `rerun_die` function will print a message and exit. 
+The `rerun_die` function will print a message and exit.
 
     rerun_die "hit a nasty problem."
 
@@ -362,18 +386,18 @@ The default exit code is "1". You can specify another code:
 
 A number of functions are useful for listing modules, commands and options.
 
-* `rerun_modules directory` - list the modules in the directory    
+* `rerun_modules directory` - list the modules in the directory
 * `rerun_commands directory module` - List the commands for the specified module.
 * `rerun_options directory module command` - List the options assigned to command.
 * `rerun_module_options directory module` - List the options for the specified module
 
 ## Logging
 
-The `rerun_log` function provides an API to standard logging functions. 
+The `rerun_log` function provides an API to standard logging functions.
 If you would like to standardize how you write messages to the console or
 to a logfile (or syslog), consider `rerun_log`.
 
-The `rerun_log` function can perform a variety of actions but the default 
+The `rerun_log` function can perform a variety of actions but the default
 one is to log a message to the configured (or default) log level.
 
     rerun_log "this is my message text"
@@ -382,7 +406,7 @@ On the console, the user would see:
 
     [info] : this is my message text
 
-The default message level is "info". 
+The default message level is "info".
 
 The rerun_log function can perform a number of actions:
 
@@ -426,7 +450,7 @@ To write an error level message, use "error" action:
 
 Messages of error or fatal level are written to stderr.
 
-Log messages can also be written to a log file by specifying one via 
+Log messages can also be written to a log file by specifying one via
 the `logfile` action.
 
     rerun_log logfile my.log
@@ -506,16 +530,16 @@ To create modules, see
 
 # LICENSE
 
-Licensed under the Apache License, Version 2.0 (the "License"); 
-you may not use this file except in compliance with the License. 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
 http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, 
-software distributed under the License is distributed on an 
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, 
-either express or implied. See the License for the specific 
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
 
 The rerun source code and all documentation may be downloaded from
