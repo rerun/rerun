@@ -1,5 +1,5 @@
 
-docs_module_synopsys() {
+docs_module_synopsis() {
 	local -r module=$1
 	local commands=( $(rerun_commands $RERUN_MODULES $module) )
 	local list=$(printf "| %s " "${commands[@]}")
@@ -347,7 +347,7 @@ $module \- $(rerun_property_get $rerun_module_home_dir DESCRIPTION)
 .SH SYNOPSIS
 .PP
 \f[CR] 
-$(basename ${RERUN}) [ARGS] $(docs_module_synopsys $module) [OPTIONS]
+$(basename ${RERUN}) [ARGS] $(docs_module_synopsis $module) [OPTIONS]
 \f[]
 
 .SH COMMANDS
