@@ -72,8 +72,8 @@ list:subtract()
 # path_components - return a newline-separated list of components in a colon-separated path
 path_components()
 {
-    local path=$1
-    echo "$path" | sed ':loop
+    local pathvar=$1
+    echo "$pathvar" | sed ':loop
     {h
     s/:.*//
     p
