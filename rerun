@@ -1027,7 +1027,7 @@ rerun_command_execute() {
     rerun_script_exists "${RERUN_MODULE_DIR:-}" $command || {
         rerun_syntax_error "command not found: \"$module:$command\""
     }
-    local -r RERUN_SHELL=$SHELL
+    local -r RERUN_SHELL=$(which bash)
     local COMMAND_SHELL=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
     : ${COMMAND_SHELL:=$RERUN_SHELL}; # default it.
 
