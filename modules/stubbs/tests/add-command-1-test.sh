@@ -17,6 +17,7 @@ before() {
     cat > $first_rerun_module_dir/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION=
+STRICT=
 EOF
 }
 
@@ -32,6 +33,7 @@ validate() {
     .  $first_rerun_module_dir/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance 
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
+    test -n "$STRICT" -a "$STRICT" = "true"
     test -f $first_rerun_module_dir/freddy/commands/dance/script
     test -f $first_rerun_module_dir/freddy/tests/functions.sh
     test -f $first_rerun_module_dir/freddy/tests/dance-1-test.sh
@@ -57,8 +59,8 @@ EOF
 
 it_runs_fully_optioned() {
     rerun stubbs:add-command --module "freddy" \
-        --command dance --description "tell freddy to dance"
+        --command dance --description "tell freddy to dance" \
+        --strict "true"
 
     validate
 }
-
