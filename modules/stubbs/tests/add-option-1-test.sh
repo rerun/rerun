@@ -56,11 +56,11 @@ validate() {
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
     # Check the option parser
     test -f $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '\--jumps) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '[ -z "$JUMPS" ]' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '"missing required option: --jumps"' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '^#/ usage: '  $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '^#/ option-variables:' $first_rerun_module_dir/freddy/commands/dance/script
+    grep '\--jumps|-j) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    # grep '[ -z "$JUMPS" ]' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    # grep '"missing required option: --jumps"' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    # grep '^#/ usage: '  $first_rerun_module_dir/freddy/commands/dance/options.sh
+    # grep '^#/ option-variables:' $first_rerun_module_dir/freddy/commands/dance/script
 
     return $?
 }
@@ -70,38 +70,29 @@ validate() {
 
 describe "add-option"
 
-
-it_runs_interactively() {
-    rerun stubbs:add-option --module freddy --command dance <<EOF
-jumps
-jump #num times
-1
-1
-3
-EOF
-
-    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
-
-    validate
-    # Check the command's option assignment
-    OPTIONS=( $(.  $first_rerun_module_dir/freddy/commands/dance/metadata; echo $OPTIONS) )
-    test -n "$OPTIONS"
-    rerun_list_contains "jumps" "${OPTIONS[*]}"
-}
-
 it_runs_fully_optioned() {
-    # --jumps|-j <3>
-    rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --description "jump #num times" \
-        --required true --export true --default 3
+  # --jumps|-j <3>
+  rerun stubbs:add-option \
+    --module "freddy" \
+    --command "dance" \
+    --option "jumps" \
+    --description "jump #num times" \
+    --required "true" \
+    --export "true" \
+    --default 3 \
+    --short "j" \
+    --long "jumps" \
+    --arg "true"
+  
+  cp $first_rerun_module_dir/freddy/commands/dance/options.sh ./freddyoptions.sh
 
-    validate
-    first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
+  validate
+  first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
 
-    # Check the command's option assignment
-    OPTIONS=( $(.  $first_rerun_module_dir/freddy/commands/dance/metadata; echo $OPTIONS) )
-    test -n "$OPTIONS"
-    rerun_list_contains "jumps" "${OPTIONS[*]}"
+  # Check the command's option assignment
+  OPTIONS=( $(.  $first_rerun_module_dir/freddy/commands/dance/metadata; echo $OPTIONS) )
+  test -n "$OPTIONS"
+  rerun_list_contains "jumps" "${OPTIONS[*]}"
 }
 
 it_exports_option_variable() {

@@ -57,18 +57,6 @@ RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
     rerun_die 2 "option name cannot contain whitespace: \"$OPTION\""
 }
 
-# # This option might already be declared.
-# # Confirm the option declaration settings.
-# if [[ -f $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata ]]; then
-#   CURR_DESC=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION DESCRIPTION)
-#   CURR_REQ=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION REQUIRED)
-#   CURR_EXPORT=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION EXPORT) || CURR_EXPORT=false
-#   # Crap hack to avoid quote stripping or eval expansions. 
-#   # Use awk to parse the property values.
-#   CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
-#       $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata)
-# fi
-
 # If short is specified, check it's not already used.
 [ -n "${SHORT:-}" ] && {
     options=$(stubbs_options_with_short "$RERUN_MODULE_HOME_DIR" $SHORT)

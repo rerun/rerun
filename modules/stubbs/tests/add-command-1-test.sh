@@ -30,7 +30,7 @@ validate() {
     test -d $first_rerun_module_dir/freddy/commands/dance
     test -f $first_rerun_module_dir/freddy/commands/dance/metadata
     .  $first_rerun_module_dir/freddy/commands/dance/metadata
-    test -n "$NAME" -a $NAME = dance 
+    test -n "$NAME" -a $NAME = dance
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
     test -f $first_rerun_module_dir/freddy/commands/dance/script
     test -f $first_rerun_module_dir/freddy/tests/functions.sh
@@ -45,20 +45,12 @@ validate() {
 
 describe "add-command"
 
-
-it_runs_interactively() {
-    rerun stubbs:add-command --module freddy <<EOF
-dance
-tell freddy to dance
-EOF
-
-    validate
-}
-
 it_runs_fully_optioned() {
-    rerun stubbs:add-command --module "freddy" \
-        --command dance --description "tell freddy to dance"
+  rerun stubbs:add-command \
+    --module "freddy" \
+    --command "dance" \
+    --description "tell freddy to dance" \
+    --overwrite "false"
 
-    validate
+  validate
 }
-
