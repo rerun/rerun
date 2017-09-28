@@ -3,8 +3,8 @@
 set -e
 
 # Parse the command line arguments
-[ $# = 3 ] || { 
-   echo >&2 "usage: $0 <moddir> <module> <command>" 
+[ $# = 3 ] || {
+   echo >&2 "usage: $0 <moddir> <module> <command>"
    exit 2
 }
 moddir=$1 module=$2 command=$3
@@ -13,11 +13,11 @@ moddir=$1 module=$2 command=$3
 # Read the stubbs function library.
 STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
 [ ! -f "$STUBBS_LIB_DIR/functions.sh" ] && {
-    echo >&2 "Could load stubbs function library: \"$STUBBS_LIB_DIR/functions.sh\""
+    echo >&2 "Couldn't load stubbs function library: \"$STUBBS_LIB_DIR/functions.sh\""
     exit 1
 }
 
-. "$STUBBS_LIB_DIR/functions.sh" || {
+. "$STUBBS_LIB_DIR/functions.sh" generate-options || {
    echo >&2 "Failed reading stubbs function library"
    exit 1
 }
@@ -30,7 +30,7 @@ generate_option_parser() {
     local optVarname=$(stubbs_option_variable $optName)
 	local ARGUMENTS=$(stubbs_option_property $moddir/$module $optName ARGUMENTS)
 	local SHORT=$(stubbs_option_property $moddir/$module $optName SHORT)
-	if [ -n "${SHORT}" ] 
+	if [ -n "${SHORT}" ]
 	then
 		argstring=$(printf ' --%s|-%s' "${optName}"  "${SHORT}")
 	else
@@ -72,7 +72,7 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 # * the command options and their arguments
 #
 # Notes:
-# 
+#
 # * Sets shell variables for any parsed options.
 # * The "-?" help argument prints command usage and will exit 2.
 # * Return 0 for successful option parse.
@@ -120,5 +120,5 @@ done)
 
 
 EOF
-) 
+)
     # generated to stdout

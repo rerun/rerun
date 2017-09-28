@@ -1,53 +1,39 @@
 #!/usr/bin/env bash
-#
-# NAME
-#
+
 #/ command: stubbs:add-option: "add a command option"
-#/ usage: stubbs:add-option [--arg <false>] --command|-c <> [--default|-d <>] --description <> [--export|-e <false>] [--long <>] --module|-m <> --option|-o <> [--required <false>] [--short <>]
+#/ usage: rerun stubbs:add-option [ --arg <false>]  --command|-c <> [ --default|-d <>]  --description <> [ --export <false>] [ --long <>]  --module|-m <>  --option|-o <> [ --required <false>] [ --short <>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: ARG COMMAND DEFAULT DESCRIPTION EXPORT LONG MODULE OPTION REQUIRED SHORT
 
-# Load common functions
-# ---------------------
-
-# Load the function library for this module.
-# This loads rerun functions and those defined for stubbs.
 . $RERUN_MODULE_DIR/lib/functions.sh add-option || { 
-    echo >&2 "failed laoding function library" ; exit 1 ; 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
 }
 
-# Error handling
-# ---------------
+set -o errexit -o nounset -o pipefail
 
-# This script is designed to _fail-fast_.
-
-# Trap errors and exit. The call to `rerun_die` will print the
-# the error message and exit with the error command exit status. 
-
-trap 'rerun_die $? "*** command failed: stubbs:add-option. ***"' ERR
-
-# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
-# so a pipeline return status is the value of the last 
-# (rightmost) command to exit with non-zero status.
-#
-# [set]: http://ss64.com/bash/set.html
-# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
-
-set -o nounset -o pipefail
-
+rerun_options_parse "$@"
 
 # Command implementation
 # ----------------------
 
+# - - -
 
-display_default() {
-    set +u
-    eval local var=\$$1
-    if [[ -n "$var" ]]
-    then  printf " (%s):" "$var" 
-    else  printf ":" 
-    fi
-    set -u
+#
+# functions
+#
+parse_command_name_for_module() {
+  command_name="$2"
+  # Parse if command is named "module:command"
+  local regex='([^:]+)(:)([^:]+)'
+  if [[ $command_name =~ $regex ]]; then
+    MODULE=${BASH_REMATCH[1]}
+    COMMAND=${BASH_REMATCH[3]}
+  else
+    COMMAND="$command_name"
+  fi
+  
+  return 0
 }
-
 
 quote_if_whitespace_string() {
     local string="$*"
@@ -57,158 +43,31 @@ quote_if_whitespace_string() {
     fi
 }
 
-# Get the options
-while [ "$#" -gt 0 ]; do
-    OPT="$1"
-    case "$OPT" in
-        # options without arguments
-	# options with arguments
-	-o|--option)
-	    rerun_option_check "$#" "$1"
-	    OPTION="$2"
-	    shift
-	    ;;
-	--desc*)
-	    rerun_option_check "$#" "$1"
-	    DESCRIPTION="$2"
-	    shift
-	    ;;
-	-c|--command)
-	    rerun_option_check "$#" "$1"
-		# Parse if command is named "module:command"
-	 	regex='([^:]+)(:)([^:]+)'
-		if [[ $2 =~ $regex ]]
-		then
-			MODULE=${BASH_REMATCH[1]}
-			COMMAND=${BASH_REMATCH[3]}
-		else
-	    	COMMAND="$2"		
-	    fi
-	    shift
-	    ;;
-	-m|--module)
-	    rerun_option_check "$#" "$1"
-	    MODULE="$2"
-	    shift
-	    ;;
-	--export|-e)
-	    rerun_option_check "$#" "$1"
-	    EXPORT="$2"
-	    shift
-	    ;;
-	--req*)
-	    rerun_option_check "$#" "$1"
-	    REQ="$2"
-	    shift
-	    ;;
-	--arg*)
-	    rerun_option_check "$#" "$1"
-	    ARGS="$2"
-	    shift
-	    ;;
-	--long)
-	    rerun_option_check "$#" "$1"
-	    LONG="$2"
-	    shift
-	    ;;	
-	--short)
-	    rerun_option_check "$#" "$1"
-	    SHORT="$2"
-	    shift
-	    ;;	
-	-d|--default)
-	    rerun_option_check "$#" "$1"
-	    DEFAULT="$2"
-	    shift
-	    ;;
-        # unknown option
-	-?)
-	    rerun_option_usage
-        exit 2
-	    ;;
-	  # end of options, just arguments left
-	*)
-	    break
-    esac
-    shift
-done
-
-
-[[ -z "${MODULE:-}" ]] && {
-    printf "Module: \n"
-    select MODULE in $(rerun_modules $RERUN_MODULES);
-    do
-	echo "You picked module $MODULE ($REPLY)"
-	break
-    done
-}
+#
+# execution
+#
 
 RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
 
 # check the chosen module exists
 [[ ! -f $RERUN_MODULE_HOME_DIR/metadata ]] && rerun_option_error "module not found: $MODULE"
 
-[[ -z "${COMMAND:-}" ]] && {
-    commands=( $(rerun_commands $RERUN_MODULES $MODULE) )
-    [[ -z ${commands:-} ]] && rerun_die "No commands exist for module: $MODULE"
-    printf "Command: \n"
-    select COMMAND in ${commands[*]}
-    do
-	echo "You picked command $COMMAND ($REPLY)"
-	break
-    done
-}
-
-# Was option argument specified?
-[[ -z "${OPTION:-}" ]] && {
-    printf "Option: \n"
-    read OPTION
-}
+# check option name for whitespace
 [[ "$OPTION" = *[[:space:]]* ]] && {
     rerun_die 2 "option name cannot contain whitespace: \"$OPTION\""
 }
 
-# This option might already be declared.
-# Confirm the option declaration settings.
-if [[ -f $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata ]]
-then
-    CURR_DESC=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION DESCRIPTION)
-    CURR_REQ=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION REQUIRED)
-    CURR_EXPORT=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION EXPORT) || CURR_EXPORT=false
-    # Crap hack to avoid quote stripping or eval expansions. 
-    # Use awk to parse the property values.
-    CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
-        $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata)
-fi
-# Confirm the description.
-[ -z "${DESCRIPTION:-}" ] && {
-    printf "Description%s\n" "$(display_default CURR_DESC)"
-    read DESCRIPTION
-    [[ -n "${CURR_DESC:-}" && -z "$DESCRIPTION" ]] && DESCRIPTION="${CURR_DESC}"
-}
-# Confirm the option requirement.
-[ -z "${REQ:-}" ] && {
-    printf "Required%s\n" "$(display_default CURR_REQ)"
-    select REQ in true false;
-    do	break
-    done
-}
-
-# Confirm the option export requirement.
-[ -z "${EXPORT:-}" ] && {
-    printf "Export%s\n" "$(display_default CURR_EXPORT)"
-    select EXPORT in true false;
-    do	break
-    done
-    [[ -n "${CURR_EXPORT:-}" && -z "$EXPORT" ]] && EXPORT=${CURR_EXPORT}
-}
-
-# Confirm the default value.
-[ -z "${DEFAULT:-}" ] && {
-    printf "Default%s\n" "$(display_default CURR_DEFAULT)"
-    read DEFAULT
-    [[ -n "${CURR_DEFAULT:-}" && -z "$DEFAULT" ]] && DEFAULT="${CURR_DEFAULT}"
-}
+# # This option might already be declared.
+# # Confirm the option declaration settings.
+# if [[ -f $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata ]]; then
+#   CURR_DESC=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION DESCRIPTION)
+#   CURR_REQ=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION REQUIRED)
+#   CURR_EXPORT=$(rerun_property_get $RERUN_MODULE_HOME_DIR/options/$OPTION EXPORT) || CURR_EXPORT=false
+#   # Crap hack to avoid quote stripping or eval expansions. 
+#   # Use awk to parse the property values.
+#   CURR_DEFAULT=$(awk -F= '/DEFAULT/ {print $2}' \
+#       $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata)
+# fi
 
 # If short is specified, check it's not already used.
 [ -n "${SHORT:-}" ] && {
@@ -227,8 +86,8 @@ mkdir -p  $RERUN_MODULE_HOME_DIR/options/$OPTION
 # $(date)
 NAME=$OPTION
 DESCRIPTION=$(quote_if_whitespace_string $DESCRIPTION)
-ARGUMENTS=${ARGS:-true}
-REQUIRED=${REQ:-true}
+ARGUMENTS=${ARG:-true}
+REQUIRED=${REQUIRED:-true}
 SHORT=${SHORT:-}
 LONG=${LONG:-$OPTION}
 DEFAULT=$(quote_if_whitespace_string $DEFAULT)
@@ -243,67 +102,69 @@ rerun_log info "Wrote option metadata: $RERUN_MODULE_HOME_DIR/options/$OPTION/me
 COMMAND_LIST=( ${COMMAND//,/ } )
 for cmd in ${COMMAND_LIST[*]}
 do
-    #
-    # Verify this command exists
-    #
-    [ ! -d $RERUN_MODULE_HOME_DIR/commands/$cmd ] && {
-        echo >&2 "command not found: \"$MODULE:$cmd\".... skipping."
-        continue
-    }
-    #
-    # Update the command metadata.
-    #
-    command_options=( $(rerun_options $RERUN_MODULES $MODULE $cmd) )
-    # Add this OPTION to the list if it is not yet assigned.
-    rerun_list_contains "$OPTION" "${command_options[@]:-}" || {
-        if [[ -z "${command_options:-}" ]]
-        then command_options=( $OPTION ) 
-        else command_options=( ${command_options[*]} $OPTION )
-        fi
-    }
-    command_metadata=$RERUN_MODULE_HOME_DIR/commands/$cmd/metadata
-    stubbs_command_options_write \
-        $RERUN_MODULE_HOME_DIR $cmd \
-        "${command_options[*]}" || rerun_die "Failed generating command metadata"
-    rerun_log info "Updated command metadata:  $command_metadata"
-    #
-    # Generate option parser script.
-    #
-    .  $RERUN_MODULE_DIR/lib/stub/bash/metadata || {
-        rerun_die "error reading  $RERUN_MODULE_DIR/lib/stub/bash/metadata "
-    }
-    [ -z "$OPTIONS_GENERATOR" ] && {
-        rerun_die "required metadata not found: OPTIONS_GENERATOR"
-    }
-    [ -z "$OPTIONS_SCRIPT" ] && {
-       rerun_die "required metadata not found: OPTIONS_SCRIPT"
-    }
-    options_parser=$RERUN_MODULE_HOME_DIR/commands/$cmd/$OPTIONS_SCRIPT
-    $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
-        $(dirname $RERUN_MODULE_HOME_DIR) $MODULE $cmd > $options_parser || {
-        rerun_die "Failed generating options parser."
-    }
-    #
-    # Update the command script header to give it the updated
-    # variable summary and usage info.
-    [ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
-        rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
-    }
-    command_script=$RERUN_MODULE_HOME_DIR/commands/$cmd/$(basename $TEMPLATE_COMMAND_SCRIPT)
-    if [ -f "$command_script" ]
-    then
-        stubbs_script_header \
-            $RERUN_MODULE_HOME_DIR $cmd > ${command_script}.$$ || {
-            rerun_die "Error updating command script header"
-        }
-        mv $command_script.$$ $command_script || {
-            rerun_die "Error updating command script header"
-        }
-        chmod +x $command_script || rerun_die "Failed setting execute bit on command script."
-        rerun_log info "Updated command script header: $command_script"
-    fi
+  #
+  # Verify this command exists
+  #
+  [ ! -d $RERUN_MODULE_HOME_DIR/commands/$cmd ] && {
+      echo >&2 "command not found: \"$MODULE:$cmd\".... skipping."
+      continue
+  }
+  #
+  # Update the command metadata.
+  #
+  command_options=( $(rerun_options $RERUN_MODULES $MODULE $cmd) )
+  # Add this OPTION to the list if it is not yet assigned.
+  rerun_list_contains "$OPTION" "${command_options[@]:-}" || {
+      if [[ -z "${command_options:-}" ]]
+      then command_options=( $OPTION ) 
+      else command_options=( ${command_options[*]} $OPTION )
+      fi
+  }
+  command_metadata=$RERUN_MODULE_HOME_DIR/commands/$cmd/metadata
+  stubbs_command_options_write \
+      $RERUN_MODULE_HOME_DIR $cmd \
+      "${command_options[*]}" || rerun_die "Failed generating command metadata"
+  rerun_log info "Updated command metadata: $command_metadata"
+  #
+  # Generate option parser script.
+  #
+  .  $RERUN_MODULE_DIR/lib/stub/bash/metadata || {
+      rerun_die "error reading  $RERUN_MODULE_DIR/lib/stub/bash/metadata "
+  }
+  [ -z "$OPTIONS_GENERATOR" ] && {
+      rerun_die "required metadata not found: OPTIONS_GENERATOR"
+  }
+  [ -z "$OPTIONS_SCRIPT" ] && {
+     rerun_die "required metadata not found: OPTIONS_SCRIPT"
+  }
+  options_parser=$RERUN_MODULE_HOME_DIR/commands/$cmd/$OPTIONS_SCRIPT
+  $RERUN_MODULE_DIR/lib/stub/bash/$OPTIONS_GENERATOR \
+      $(dirname $RERUN_MODULE_HOME_DIR) $MODULE $cmd > $options_parser || {
+      rerun_die "Failed generating options parser."
+  }
+  rerun_log info "Generated options parser: $options_parser"
+  #
+  # Update the command script header to give it the updated
+  # variable summary and usage info.
+  [ -z "$TEMPLATE_COMMAND_SCRIPT" ] && {
+      rerun_die "required metadata not found: TEMPLATE_COMMAND_SCRIPT"
+  }
+  command_script=$RERUN_MODULE_HOME_DIR/commands/$cmd/$(basename $TEMPLATE_COMMAND_SCRIPT)
+  if [ -f "$command_script" ]
+  then
+      stubbs_script_header \
+          $RERUN_MODULE_HOME_DIR $cmd > ${command_script}.$$ || {
+          rerun_die "Error updating command script header"
+      }
+      mv $command_script.$$ $command_script || {
+          rerun_die "Error updating command script header"
+      }
+      chmod +x $command_script || rerun_die "Failed setting execute bit on command script."
+      rerun_log info "Updated command script header: $command_script"
+  fi
 done
 
-# Done
-exit $?
+# - - -
 
+# Done. Exit with last command exit status.
+exit $?
