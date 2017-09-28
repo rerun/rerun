@@ -56,11 +56,13 @@ validate() {
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
     # Check the option parser
     test -f $first_rerun_module_dir/freddy/commands/dance/options.sh
-    grep '\--jumps|-j) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    # grep '[ -z "$JUMPS" ]' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    # grep '"missing required option: --jumps"' $first_rerun_module_dir/freddy/commands/dance/options.sh
-    # grep '^#/ usage: '  $first_rerun_module_dir/freddy/commands/dance/options.sh
-    # grep '^#/ option-variables:' $first_rerun_module_dir/freddy/commands/dance/script
+    cp $first_rerun_module_dir/freddy/commands/dance/options.sh ./freddyoptions.sh
+    grep '\--jumps) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh ||
+      grep '\--jumps|-j) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    grep '[ -z "$JUMPS" ]' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    grep '"missing required option: --jumps"' $first_rerun_module_dir/freddy/commands/dance/options.sh
+    grep '^#/ usage: '  $first_rerun_module_dir/freddy/commands/dance/options.sh
+    grep '^#/ option-variables:' $first_rerun_module_dir/freddy/commands/dance/script
 
     return $?
 }
@@ -83,8 +85,6 @@ it_runs_fully_optioned() {
     --short "j" \
     --long "jumps" \
     --arg "true"
-  
-  cp $first_rerun_module_dir/freddy/commands/dance/options.sh ./freddyoptions.sh
 
   validate
   first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)

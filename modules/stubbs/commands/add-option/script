@@ -74,7 +74,7 @@ mkdir -p  $RERUN_MODULE_HOME_DIR/options/$OPTION
 # $(date)
 NAME=$OPTION
 DESCRIPTION=$(quote_if_whitespace_string $DESCRIPTION)
-ARGUMENTS=${ARG:-true}
+ARGUMENTS=${ARGS:-true}
 REQUIRED=${REQUIRED:-true}
 SHORT=${SHORT:-}
 LONG=${LONG:-$OPTION}
