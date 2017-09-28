@@ -56,7 +56,6 @@ validate() {
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "jump #num times"
     # Check the option parser
     test -f $first_rerun_module_dir/freddy/commands/dance/options.sh
-    cp $first_rerun_module_dir/freddy/commands/dance/options.sh ./freddyoptions.sh
     grep '\--jumps) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh ||
       grep '\--jumps|-j) rerun_option_check $# $1;' $first_rerun_module_dir/freddy/commands/dance/options.sh
     grep '[ -z "$JUMPS" ]' $first_rerun_module_dir/freddy/commands/dance/options.sh
