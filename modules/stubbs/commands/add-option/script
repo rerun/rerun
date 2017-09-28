@@ -22,14 +22,12 @@ rerun_options_parse "$@"
 # functions
 #
 parse_command_name_for_module() {
-  command_name="$2"
+  command_name="$1"
   # Parse if command is named "module:command"
   local regex='([^:]+)(:)([^:]+)'
   if [[ $command_name =~ $regex ]]; then
     MODULE=${BASH_REMATCH[1]}
     COMMAND=${BASH_REMATCH[3]}
-  else
-    COMMAND="$command_name"
   fi
   
   return 0
@@ -46,6 +44,8 @@ quote_if_whitespace_string() {
 #
 # execution
 #
+
+parse_command_name_for_module $COMMAND
 
 RERUN_MODULE_HOME_DIR=$(rerun_module_exists $MODULE)
 
