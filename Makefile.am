@@ -115,7 +115,9 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
+  modules/stubbs/commands/add-module/options.sh \
 	modules/stubbs/commands/add-module/script \
+  modules/stubbs/commands/add-option/options.sh \
 	modules/stubbs/commands/add-option/script \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/archive/script \
@@ -140,7 +142,8 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-command-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh \
-	modules/stubbs/tests/stubbs-functions-1-test.sh
+	modules/stubbs/tests/stubbs-functions-1-test.sh \
+  modules/stubbs/tests/functions.sh
 
 # put the tests in /usr/libexec/rerun using built in macro
 nobase_dist_pkglibexec_SCRIPTS = \

@@ -9,7 +9,7 @@
 
 # Load the function library for this module.
 # This loads rerun functions and those defined for stubbs.
-. $RERUN_MODULE_DIR/lib/functions.sh || {
+. $RERUN_MODULE_DIR/lib/functions.sh archive || {
     echo >&2 "failed laoding function library" ; exit 1 ;
 }
 
@@ -418,4 +418,3 @@ esac
 
 exit $?
 # Done.
-
