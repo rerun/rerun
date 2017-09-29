@@ -57,17 +57,14 @@ after() {
 
 describe "functional: argument passthrough"
 
-# $ rerun module:command --recognized1 val --unrecognized1 val --recognized2 val --unrecognized2 val
-# $ rerun module:command --recognized1 val --unrecognized1 --recognized2 val --unrecognized2 val
-# $ rerun module:command --recognized1 val --unrecognized1 --unrecognized2 val --recognized2 val --unrecognized3
-# $ rerun module:command --recognized1 --unrecognized1 val --recognized2 val --unrecognized2 val
-
+# $ rerun module:command --recognized1 val --recognized2 val
 it_runs_with_required_options() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --recognized2 "val"
 }
 
+# $ rerun module:command --recognized1 val --unrecognized1 val --recognized2 val --unrecognized2 val
 it_runs_with_two_recognized_and_two_unrecognized_options_all_with_values() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
@@ -76,6 +73,7 @@ it_runs_with_two_recognized_and_two_unrecognized_options_all_with_values() {
     --unrecognized2 "val"
 }
 
+# $ rerun module:command --recognized1 val --unrecognized1 --recognized2 val --unrecognized2 val
 it_runs_with_two_recognized_and_two_unrecognized_options_some_with_values() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
@@ -84,6 +82,7 @@ it_runs_with_two_recognized_and_two_unrecognized_options_some_with_values() {
     --unrecognized2 "val"
 }
 
+# $ rerun module:command --recognized1 val --unrecognized1 --unrecognized2 val --recognized2 val --unrecognized3
 it_runs_with_two_recognized_and_three_unrecognized_options_some_with_values() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
@@ -93,10 +92,19 @@ it_runs_with_two_recognized_and_three_unrecognized_options_some_with_values() {
     --unrecognized3
 }
 
+# $ rerun module:command --recognized1 --unrecognized1 val --unrecognized2 val
+it_fails_with_two_recognized_and_two_unrecognized_options_with_one_missing_option() {
+  rerun "${test_module_name}:" "${test_command_name}" \
+    --recognized1 "val" \
+    --unrecognized1 "val" \
+    --unrecognized2 "val" 2>&1 | grep 'missing required option: --recognized2'
+}
+
+# $ rerun module:command --recognized1 --unrecognized1 val --unrecognized2 val --recognized2
 it_fails_with_two_recognized_and_two_unrecognized_options_with_one_missing_value() {
   rerun "${test_module_name}:" "${test_command_name}" \
-    --recognized1 \
+    --recognized1 "val" \
     --unrecognized1 "val" \
-    --recognized2 "val" \
-    --unrecognized2 "val"
+    --unrecognized2 "val" \
+    --recognized2 2>&1 | grep 'SYNTAX: option requires argument: --recognized2'
 }

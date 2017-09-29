@@ -43,7 +43,7 @@ generate_option_parser() {
     # boolean flag. Check if the arg is "true" because the answers population process declares it.
     printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
   else
-    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
+    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift 2 ;;\n" \
     "$argstring" "$optVarname"
   fi
 }
@@ -90,9 +90,9 @@ printf "          %s\n" "$(generate_option_parser $option)";
 done)
             # end of options, just arguments left
             *)
-              break
+              shift
+              ;;
         esac
-        shift
     done
 
     # Set defaultable options.

@@ -43,7 +43,7 @@ generate_option_parser() {
     # boolean flag. Check if the arg is "true" because the answers population process declares it.
     printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
   else
-    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
+    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift 2 ;;\n" \
     "$argstring" "$optVarname"
   fi
 }
@@ -89,9 +89,9 @@ printf "          %s\n" "$(generate_option_parser $option)";
 done)
             # end of options, just arguments left
             *)
-              break
+              shift
+              ;;
         esac
-        shift
     done
 
     # Set defaultable options.
@@ -110,15 +110,19 @@ done)
 $(for opt in $(echo $options_exported|sort); do
 printf "    export %s\n" $(stubbs_option_variable $opt)
 done)
+    # Make remaining command line options available in $CMD_LINE
+    export _CMD_LINE="\$@"
     #
     return 0
 }
 
 
 # If not already set, initialize the options variables to null.
-$(for option in $(rerun_options $moddir $module $command); do 
-printf ": \${%s:=}\n" "$(stubbs_option_variable $option)"; 
+$(for option in $(rerun_options $moddir $module $command); do
+printf ": \${%s:=}\n" "$(stubbs_option_variable $option)";
 done)
+# Default command line to null if not set
+: \${_CMD_LINE:=}
 
 
 EOF
