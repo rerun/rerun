@@ -114,9 +114,11 @@ rm -rf %{buildroot}
 %{moddir}/commands/add-command/README.md
 %{moddir}/commands/add-command/script
 %{moddir}/commands/add-module/metadata
+%{moddir}/commands/add-module/options.sh
 %{moddir}/commands/add-module/README.md
 %{moddir}/commands/add-module/script
 %{moddir}/commands/add-option/metadata
+%{moddir}/commands/add-option/options.sh
 %{moddir}/commands/add-option/README.md
 %{moddir}/commands/add-option/script
 %{moddir}/commands/archive/metadata
@@ -208,6 +210,7 @@ rm -rf %{buildroot}
 %{moddir}/tests/archive-1-test.sh
 %{moddir}/tests/docs-1-test.sh
 %{moddir}/tests/functional-bash-1-test.sh
+%{moddir}/tests/functions.sh
 %{moddir}/tests/migrate-1-test.sh
 %{moddir}/tests/rm-command-1-test.sh
 %{moddir}/tests/rm-option-1-test.sh
