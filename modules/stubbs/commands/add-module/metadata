@@ -3,4 +3,4 @@
 # Wed Sep 27 23:04:12 CDT 2017
 NAME=add-module
 DESCRIPTION="add a new module"
-OPTIONS="description module template"
+OPTIONS="description module template help"

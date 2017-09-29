@@ -77,6 +77,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/options/file/README.md \
 	modules/stubbs/options/format/metadata \
 	modules/stubbs/options/format/README.md \
+  modules/stubbs/options/help/metadata \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/long/README.md \
 	modules/stubbs/options/module/metadata \
@@ -99,6 +100,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/options/short/README.md \
 	modules/stubbs/options/template/metadata \
 	modules/stubbs/options/template/README.md \
+  modules/stubbs/options/usage/metadata \
 	modules/stubbs/options/version/metadata \
 	modules/stubbs/options/version/README.md \
 	modules/stubbs/stubbs.1 \
@@ -139,6 +141,7 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/tests/archive-1-test.sh \
 	modules/stubbs/tests/docs-1-test.sh \
 	modules/stubbs/tests/functional-bash-1-test.sh \
+  modules/stubbs/tests/functional-bash-2-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-command-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh \

@@ -173,6 +173,7 @@ rm -rf %{buildroot}
 %{moddir}/options/file/README.md
 %{moddir}/options/format/metadata
 %{moddir}/options/format/README.md
+%{moddir}/options/help/metadata
 %{moddir}/options/long/metadata
 %{moddir}/options/long/README.md
 %{moddir}/options/module/metadata
@@ -195,6 +196,7 @@ rm -rf %{buildroot}
 %{moddir}/options/short/README.md
 %{moddir}/options/template/metadata
 %{moddir}/options/template/README.md
+%{moddir}/options/usage/metadata
 %{moddir}/options/version/metadata
 %{moddir}/options/version/README.md
 %{moddir}/README.md
@@ -210,6 +212,7 @@ rm -rf %{buildroot}
 %{moddir}/tests/archive-1-test.sh
 %{moddir}/tests/docs-1-test.sh
 %{moddir}/tests/functional-bash-1-test.sh
+%{moddir}/tests/functional-bash-2-test.sh
 %{moddir}/tests/functions.sh
 %{moddir}/tests/migrate-1-test.sh
 %{moddir}/tests/rm-command-1-test.sh
@@ -258,6 +261,7 @@ rm -rf %{buildroot}
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/export
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/file
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/format
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/help
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/long
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/module
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/modules
@@ -270,6 +274,7 @@ rm -rf %{buildroot}
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/short
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/template
 %dir %{_prefix}/lib/rerun/modules/stubbs/options/version
+%dir %{_prefix}/lib/rerun/modules/stubbs/options/usage
 %dir %{_prefix}/lib/rerun/modules/stubbs/templates
 %dir %{_prefix}/libexec
 %dir %{_prefix}/libexec/rerun

@@ -26,24 +26,26 @@ STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
 # _generate_option_parser_ - Generate an entry inside options.sh
 #
 generate_option_parser() {
-	local optName=$1
-    local optVarname=$(stubbs_option_variable $optName)
-	local ARGUMENTS=$(stubbs_option_property $moddir/$module $optName ARGUMENTS)
-	local SHORT=$(stubbs_option_property $moddir/$module $optName SHORT)
-	if [ -n "${SHORT}" ]
-	then
-		argstring=$(printf ' --%s|-%s' "${optName}"  "${SHORT}")
-	else
-		argstring=$(printf " --%s" "${optName}" )
-    fi
-	if [ "$ARGUMENTS" == "false" ]
-	then
-        # boolean flag. Check if the arg is "true" because the answers population process declares it.
-		printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
-	else
-    	printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
-			"$argstring" "$optVarname"
-	fi
+  local optName=$1
+  local optVarname=$(stubbs_option_variable $optName)
+  local ARGUMENTS=$(stubbs_option_property $moddir/$module $optName ARGUMENTS)
+  local SHORT=$(stubbs_option_property $moddir/$module $optName SHORT)
+  if [ -n "${SHORT}" ]; then
+    argstring=$(printf ' --%s|-%s' "${optName}"  "${SHORT}")
+  else
+    argstring=$(printf " --%s" "${optName}" )
+  fi
+  
+  local USAGE=$(stubbs_option_property $moddir/$module $optName USAGE)
+  if [ "$USAGE" == "true" ]; then
+    printf " %s) rerun_option_usage ;;" "${argstring}"
+  elif [ "$ARGUMENTS" == "false" ]; then
+    # boolean flag. Check if the arg is "true" because the answers population process declares it.
+    printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
+  else
+    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
+    "$argstring" "$optVarname"
+  fi
 }
 
 # list the options that set a default

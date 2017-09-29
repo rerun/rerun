@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: stubbs:add-command: "add command to module"
-#/ usage: rerun stubbs:add-command  --command|-c <>  --description <>  --module|-m <> [ --overwrite <false>] 
+#/ usage: rerun stubbs:add-command  --command|-c <>  --description <>  --module|-m <> [ --overwrite <false>] [ --help|-?] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: COMMAND DESCRIPTION MODULE OVERWRITE
+#/ option-variables: COMMAND DESCRIPTION MODULE OVERWRITE HELP
 
 . $RERUN_MODULE_DIR/lib/functions.sh add-command || { 
   echo >&2 "Failed loading function library." ; exit 1 ; 
