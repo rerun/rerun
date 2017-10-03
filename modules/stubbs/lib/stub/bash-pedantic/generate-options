@@ -85,11 +85,6 @@ rerun_options_parse() {
 $(for option in $(rerun_options $moddir $module $command); do 
 printf "          %s\n" "$(generate_option_parser $option)"; 
 done)
-            # help option
-            -|--*?)
-                rerun_option_usage
-                exit 2
-                ;;
             # end of options, just arguments left
             *)
               break
@@ -127,4 +122,3 @@ done)
 EOF
 ) 
     # generated to stdout
-
