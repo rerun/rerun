@@ -113,7 +113,7 @@ done)
 $(for opt in $(echo $options_exported|sort); do
 printf "    export %s\n" $(stubbs_option_variable $opt)
 done)
-    # Make unrecognized command line options available in $CMD_LINE
+    # Make unrecognized command line options available in \$_CMD_LINE
     if [ \${#unrecognized_args[@]} -gt 0 ]; then
       export _CMD_LINE="\${unrecognized_args[@]}"
     fi
