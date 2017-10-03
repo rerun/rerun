@@ -16,7 +16,7 @@ validate() {
     # Test archive is a plain file
     test -f $archive
     # Test archive is a bash script
-    file $archive | grep "bash"
+    file $archive | grep "bash\|Bourne-Again shell script"
     # Test shebang is correct
     test "$(head -1 $archive)" = '#!/usr/bin/env bash'
     # Test there is a version flag
