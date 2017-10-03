@@ -80,6 +80,8 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 # * Return 0 for successful option parse.
 #
 rerun_options_parse() {
+  
+    unrecognized_args=()
 
     while [ "\$#" -gt 0 ]; do
         OPT="\$1"
@@ -87,8 +89,9 @@ rerun_options_parse() {
 $(for option in $(rerun_options $moddir $module $command); do 
 printf "          %s\n" "$(generate_option_parser $option)"; 
 done)
-            # end of options, just arguments left
+            # unrecognized arguments
             *)
+              unrecognized_args+=("\$OPT")
               shift
               ;;
         esac
@@ -110,8 +113,10 @@ done)
 $(for opt in $(echo $options_exported|sort); do
 printf "    export %s\n" $(stubbs_option_variable $opt)
 done)
-    # Make remaining command line options available in $CMD_LINE
-    export _CMD_LINE="\$@"
+    # Make unrecognized command line options available in $CMD_LINE
+    if [ \${#unrecognized_args[@]} -gt 0 ]; then
+      export _CMD_LINE="\${unrecognized_args[@]}"
+    fi
     #
     return 0
 }
