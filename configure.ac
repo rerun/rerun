@@ -1,4 +1,4 @@
-AC_INIT([rerun], [1.3.8], [rerun-discuss@googlegroups.com],
+AC_INIT([rerun], m4_esyscmd_s([grep ^RERUN_VERSION rerun  | cut -d= -f2]), [rerun-discuss@googlegroups.com],
              [rerun], [https://github.com/rerun/rerun/wiki])
 
 dnl Created by stagr.lee@gmail.com, 27SEP11
