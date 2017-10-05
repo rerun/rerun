@@ -9,5 +9,3 @@ SHORT=
 LONG=overwrite
 DEFAULT=false
 EXPORT=false
-USAGE=false
-

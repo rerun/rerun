@@ -9,5 +9,3 @@ SHORT=c
 LONG=command
 DEFAULT=
 EXPORT=false
-USAGE=false
-

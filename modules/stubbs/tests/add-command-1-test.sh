@@ -17,6 +17,8 @@ before() {
     cat > $first_rerun_module_dir/freddy/metadata <<EOF
 NAME=freddy
 DESCRIPTION=
+OPTIONS=
+GENERATE_HELP=true
 EOF
 }
 
@@ -31,6 +33,7 @@ validate() {
     test -f $first_rerun_module_dir/freddy/commands/dance/metadata
     .  $first_rerun_module_dir/freddy/commands/dance/metadata
     test -n "$NAME" -a $NAME = dance
+    test -n "$GENERATE_HELP" -a "$GENERATE_HELP" = "true"
     test -n "$DESCRIPTION" -a "$DESCRIPTION" = "tell freddy to dance"
     test -f $first_rerun_module_dir/freddy/commands/dance/script
     test -f $first_rerun_module_dir/freddy/tests/functions.sh
@@ -50,7 +53,8 @@ it_runs_fully_optioned() {
     --module "freddy" \
     --command "dance" \
     --description "tell freddy to dance" \
-    --overwrite "false"
+    --overwrite "false" \
+    --generate-help "true"
 
   validate
 }
