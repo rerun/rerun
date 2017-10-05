@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: stubbs:add-option: "add a command option"
-#/ usage: rerun stubbs:add-option [ --arg <true>]  --command|-c <> [ --default|-d <>]  --description <> [ --export <false>] [ --long <>]  --module|-m <>  --option|-o <> [ --required <false>] [ --short <>] [ --usage] [ --help|-?] 
+#/ usage: rerun stubbs:add-option [ --arg <true>]  --command|-c <> [ --default|-d <>]  --description <> [ --export <false>] [ --long <>]  --module|-m <>  --option|-o <> [ --required <false>] [ --short <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: ARG COMMAND DEFAULT DESCRIPTION EXPORT LONG MODULE OPTION REQUIRED SHORT USAGE HELP
+#/ option-variables: ARG COMMAND DEFAULT DESCRIPTION EXPORT LONG MODULE OPTION REQUIRED SHORT
 
 . $RERUN_MODULE_DIR/lib/functions.sh add-option || { 
   echo >&2 "Failed loading function library." ; exit 1 ; 

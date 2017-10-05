@@ -3,4 +3,5 @@
 # Wed Sep 27 19:47:09 CDT 2017
 NAME=add-option
 DESCRIPTION="add a command option"
-OPTIONS="arg command default description export long module option required short usage help"
+OPTIONS="arg command default description export long module option required short"
+GENERATE_HELP=true

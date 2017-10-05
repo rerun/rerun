@@ -9,5 +9,3 @@ SHORT=
 LONG=template
 DEFAULT=
 EXPORT=false
-USAGE=false
-

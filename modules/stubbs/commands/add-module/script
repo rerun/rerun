@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 #/ command: stubbs:add-module: "add a new module"
-#/ usage: rerun stubbs:add-module  --description <>  --module|-m <> [ --template <>] [ --help|-?] 
+#/ usage: rerun stubbs:add-module  --description <>  --module|-m <> [ --template <>] 
 #/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: DESCRIPTION MODULE TEMPLATE HELP
+#/ option-variables: DESCRIPTION MODULE TEMPLATE
 
 . $RERUN_MODULE_DIR/lib/functions.sh add-module || { 
   echo >&2 "Failed loading function library." ; exit 1 ; 

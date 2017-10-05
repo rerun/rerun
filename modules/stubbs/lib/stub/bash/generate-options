@@ -48,6 +48,19 @@ generate_option_parser() {
   fi
 }
 
+#
+# _generate_help_option_
+#
+generate_help_option() {
+  cat <<-EOL
+            # help option
+            -\?|--help)
+                rerun_option_usage
+                exit 2
+                ;;
+EOL
+}
+
 # list the options that set a default
 options_defaulted=$(stubbs_options_matching $moddir/$module $command DEFAULT='.+')
 
@@ -57,6 +70,9 @@ options_required=$(stubbs_options_matching $moddir/$module $command REQUIRED=tru
 
 # list the options that have variables to export
 options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
+
+# get value for print help option
+print_help_option=$(stubbs_command_property $moddir/$module $command PRINT_HELP)
 
 (
     cat <<EOF
@@ -90,6 +106,7 @@ rerun_options_parse() {
 $(for option in $(rerun_options $moddir $module $command); do
 printf "          %s\n" "$(generate_option_parser $option)";
 done)
+$(if [ "$print_help_option" != "false" ]; then generate_help_option; fi)
             # unrecognized arguments
             *)
               unrecognized_args+=("\$OPT")

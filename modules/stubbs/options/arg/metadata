@@ -9,5 +9,3 @@ SHORT=
 LONG=arg
 DEFAULT=true
 EXPORT=false
-USAGE=false
-

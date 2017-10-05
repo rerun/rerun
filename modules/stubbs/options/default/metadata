@@ -9,5 +9,3 @@ SHORT=d
 LONG=default
 DEFAULT=
 EXPORT=false
-USAGE=false
-

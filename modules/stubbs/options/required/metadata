@@ -9,5 +9,3 @@ SHORT=
 LONG=required
 DEFAULT=false
 EXPORT=false
-USAGE=false
-
