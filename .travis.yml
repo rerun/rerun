@@ -1,10 +1,7 @@
 dist: trusty
 sudo: false
 language: c
-install: make get-deps
-compiler:
-  - gcc
-  - clang
+compiler: gcc
 script: ./etc/travis-ci.sh
 notifications:
   irc:
