@@ -1,87 +1,22 @@
 #!/usr/bin/env bash
-#
+
 #/ command: stubbs:add-module: "add a new module"
-#/ usage: stubbs:add-module --module|-m <> --description <>
+#/ usage: rerun stubbs:add-module  --description <>  --module|-m <> [ --template <>] 
+#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
+#/ option-variables: DESCRIPTION MODULE TEMPLATE
 
-# Load common functions
-# ---------------------
-
-# Load the function library for this module.
-# This loads rerun functions and those defined for stubbs.
 . $RERUN_MODULE_DIR/lib/functions.sh add-module || { 
-    echo >&2 "failed loading function library" ; exit 1 ; 
+  echo >&2 "Failed loading function library." ; exit 1 ; 
 }
 
-# Error handling
-# ---------------
+set -o errexit -o nounset -o pipefail
 
-# This script is designed to _fail-fast_.
-
-# Trap errors and exit. The call to `rerun_die` will print the
-# the error message and exit with the error command exit status. 
-
-trap 'rerun_die $? "*** command failed: stubbs:add-module. ***"' ERR
-
-# Run [set] `nounset` to treat unset variables as errors. Set [pipefail]
-# so a pipeline return status is the value of the last 
-# (rightmost) command to exit with non-zero status.
-#
-# [set]: http://ss64.com/bash/set.html
-# [pipefail]: http://www.gnu.org/software/bash/manual/html_node/Pipelines.html
-
-set -o nounset -o pipefail
-
+rerun_options_parse "$@"
 
 # Command implementation
 # ----------------------
 
-#/ rerun-variables: RERUN, RERUN_VERSION, RERUN_MODULES, RERUN_MODULE_DIR
-#/ option-variables: MODULE DESCRIPTION TEMPLATE
-
-
-# Get the options
-while [ "$#" -gt 0 ]; do
-    OPT="$1"
-    case "$OPT" in
-        # options without arguments
-	# options with arguments
-	-m|--module)
-	    rerun_option_check "$#" "$1"
-	    MODULE="$2"
-	    shift
-	    ;;
-	--description)
-	    rerun_option_check "$#" "$1"
-	    DESCRIPTION="$2"
-	    shift
-	    ;;
-	--template)
-	    rerun_option_check "$#" "$1"
-	    TEMPLATE="$2"
-	    shift
-	    ;;
-        # unknown option
-	-?)
-	    rerun_option_usage
-        exit 2
-	    ;;
-	  # end of options, just arguments left
-	*)
-	    break
-    esac
-    shift
-done
-
-# Post processes the options
-[ -z "${MODULE:-}" ] && {
-    echo "Module name: "
-    read MODULE
-}
-
-[ -z "${DESCRIPTION:-}" ] && {
-    echo "Module description: "
-    read DESCRIPTION
-}
+# - - -
 
 STUB=$RERUN_MODULE_DIR/lib/stub/bash
 if [[ -n "${TEMPLATE:-}" ]]
@@ -93,7 +28,7 @@ fi
 
 TEMPLATE_FUNCTION_LIB=$(rerun_property_get $STUB TEMPLATE_FUNCTION_LIB)
 
-COMMAND_SHELL=$(rerun_property_get $STUB COMMAND_SHELL) 
+COMMAND_SHELL=$(rerun_property_get $STUB COMMAND_SHELL)
 
 [[ ! -f  $STUB/$TEMPLATE_FUNCTION_LIB ]] && {
     rerun_die "function library not found:  $STUB/$TEMPLATE_FUNCTION_LIB"
@@ -134,7 +69,7 @@ sed -e "s/@MODULE@/$MODULE/g" \
     rerun_die "Failed creating function library for \"$MODULE\"."
 }
 
-# If --template was specified, reslove its directory path
+# If --template was specified, resolve its directory path
 # and clone its contents into the new module.
 if [[ -n "${TEMPLATE:-}" ]]
 then
@@ -146,5 +81,9 @@ then
     stubbs_module_clone $RERUN_MODULE_HOME_DIR $TEMPLATE_DIR
 fi
 
-# Done
 rerun_log info "Created module structure: $RERUN_MODULE_HOME_DIR."
+
+# - - -
+
+# Done. Exit with last command exit status.
+exit $?

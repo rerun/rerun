@@ -40,7 +40,7 @@ it_builds_a_functional_module() {
     # Create option: freddy:dance --jumps <3>
     rerun stubbs:add-option --module freddy --command dance \
         --option jumps --description "jump #num times" \
-        --required true --export false --default 3    
+        --required true --export false --default 3
 
     test -x $command_script 
  

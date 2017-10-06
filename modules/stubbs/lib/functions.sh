@@ -1,20 +1,28 @@
-#
-# Utiltiy functions used by *stubbs* commands.
+# Shell functions for the stubbs module.
+#/ usage: source RERUN_MODULE_DIR/lib/functions.sh command
 #
 
-#
-# Stubbs functions build on the rerun functions.
-#
-[ ! -f "$RERUN" ] && {
-    rerun_log error "\$RERUN environment variable not set to rerun"
-    exit 1
+# Read rerun's public functions
+. $RERUN || {
+    echo >&2 "ERROR: Failed sourcing rerun function library: \"$RERUN\""
+    return 1
 }
 
-. $RERUN || { 
-    rerun_log error "Failed sourcing functions from rerun: $RERUN" 
-    exit 1 
-}
+# Check usage. Argument should be command name.
+[[ $# = 1 ]] || rerun_option_usage
 
+# Source the option parser script.
+#
+if [[ -r $RERUN_MODULE_DIR/commands/$1/options.sh ]] 
+then
+    . $RERUN_MODULE_DIR/commands/$1/options.sh || {
+        rerun_die "Failed loading options parser."
+    }
+fi
+
+# - - -
+# Your functions declared here.
+# - - -
 
 # _stubbs_metamodules_ - List the stubs by name.
 #
@@ -430,3 +438,7 @@ stubbs_module_clone() {
     done
     return 0
 }
+
+#
+# - - -
+#
