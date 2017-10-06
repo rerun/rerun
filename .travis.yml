@@ -10,6 +10,7 @@ addons:
   apt:
     packages:
       - markdown
+      - fakeroot
       - build-essential
       - devscripts
       - dh-make
