@@ -77,6 +77,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/options/file/README.md \
 	modules/stubbs/options/format/metadata \
 	modules/stubbs/options/format/README.md \
+  modules/stubbs/options/generate-help/metadata \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/long/README.md \
 	modules/stubbs/options/module/metadata \
@@ -115,7 +116,9 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
+  modules/stubbs/commands/add-module/options.sh \
 	modules/stubbs/commands/add-module/script \
+  modules/stubbs/commands/add-option/options.sh \
 	modules/stubbs/commands/add-option/script \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/archive/script \
@@ -137,10 +140,12 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/tests/archive-1-test.sh \
 	modules/stubbs/tests/docs-1-test.sh \
 	modules/stubbs/tests/functional-bash-1-test.sh \
+  modules/stubbs/tests/functional-bash-2-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-command-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh \
-	modules/stubbs/tests/stubbs-functions-1-test.sh
+	modules/stubbs/tests/stubbs-functions-1-test.sh \
+  modules/stubbs/tests/functions.sh
 
 # put the tests in /usr/libexec/rerun using built in macro
 nobase_dist_pkglibexec_SCRIPTS = \

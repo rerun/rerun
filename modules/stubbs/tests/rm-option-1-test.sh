@@ -61,7 +61,7 @@ describe "rm-option"
 it_runs_interactively() {
     # Add option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --desc "number of times to jump" \
+        --option jumps --description "number of times to jump" \
         --default 1 --required false --export false
 
     rerun stubbs:rm-option --module freddy --command dance<<EOF
@@ -75,7 +75,7 @@ EOF
 it_runs_fully_optioned() {
     # Add option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --desc "number of times to jump" \
+        --option jumps --description "number of times to jump" \
         --default 1 --required false --export false
 
     rerun stubbs:rm-option --module freddy --command dance --option jumps
@@ -87,12 +87,12 @@ it_runs_fully_optioned() {
 it_removes_option_after_last_assignment() {
     # Add freddy:dance option "--jumps|-j <1>"
     rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --desc "number of times to jump" \
+        --option jumps --description "number of times to jump" \
         --default 1 --required false --export false
     #
     # Add a second freddy:dance option: "--height|-h <5>"
     rerun stubbs:add-option --module freddy --command dance \
-        --option height --desc "height to jump" \
+        --option height --description "height to jump" \
         --default 5 --required false --export false
     #
     # Check the command's option assignment
@@ -130,7 +130,7 @@ it_removes_option_after_last_assignment() {
 
 it_retains_option_if_assigned_to_command() {
     rerun stubbs:add-option --module freddy --command dance \
-        --option jumps --desc "number of times to jump" \
+        --option jumps --description "number of times to jump" \
         --default 1 --required false --export false
     first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
 
@@ -147,10 +147,10 @@ EOF
 echo "jumps ($JUMPS)"
 EOF
     rerun stubbs:add-option --module freddy --command pop \
-        --option jumps --desc "number of times to jump" \
+        --option jumps --description "number of times to jump" \
         --default 1 --required false --export false
     rerun stubbs:add-option --module freddy --command pop \
-        --option music --desc "music to play" \
+        --option music --description "music to play" \
         --default lockit --required false --export false
     # Remove freddy:pop --jumps
     rerun stubbs:rm-option --module freddy --command pop --option jumps
@@ -162,4 +162,3 @@ EOF
     test ${#OPTIONS[*]} = 1
     test ${OPTIONS[0]} = "jumps"
 }
-

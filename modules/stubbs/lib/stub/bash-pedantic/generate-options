@@ -3,8 +3,8 @@
 set -e
 
 # Parse the command line arguments
-[ $# = 3 ] || { 
-   echo >&2 "usage: $0 <moddir> <module> <command>" 
+[ $# = 3 ] || {
+   echo >&2 "usage: $0 <moddir> <module> <command>"
    exit 2
 }
 moddir=$1 module=$2 command=$3
@@ -13,11 +13,11 @@ moddir=$1 module=$2 command=$3
 # Read the stubbs function library.
 STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
 [ ! -f "$STUBBS_LIB_DIR/functions.sh" ] && {
-    echo >&2 "Could load stubbs function library: \"$STUBBS_LIB_DIR/functions.sh\""
+    echo >&2 "Couldn't load stubbs function library: \"$STUBBS_LIB_DIR/functions.sh\""
     exit 1
 }
 
-. "$STUBBS_LIB_DIR/functions.sh" || {
+. "$STUBBS_LIB_DIR/functions.sh" generate-options || {
    echo >&2 "Failed reading stubbs function library"
    exit 1
 }
@@ -26,24 +26,38 @@ STUBBS_LIB_DIR=$(dirname $(dirname $(dirname $0)))
 # _generate_option_parser_ - Generate an entry inside options.sh
 #
 generate_option_parser() {
-	local optName=$1
-    local optVarname=$(stubbs_option_variable $optName)
-	local ARGUMENTS=$(stubbs_option_property $moddir/$module $optName ARGUMENTS)
-	local SHORT=$(stubbs_option_property $moddir/$module $optName SHORT)
-	if [ -n "${SHORT}" ] 
-	then
-		argstring=$(printf ' --%s|-%s' "${optName}"  "${SHORT}")
-	else
-		argstring=$(printf " --%s" "${optName}" )
-    fi
-	if [ "$ARGUMENTS" == "false" ]
-	then
-        # boolean flag. Check if the arg is "true" because the answers population process declares it.
-		printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
-	else
-    	printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift ;;\n" \
-			"$argstring" "$optVarname"
-	fi
+  local optName=$1
+  local optVarname=$(stubbs_option_variable $optName)
+  local ARGUMENTS=$(stubbs_option_property $moddir/$module $optName ARGUMENTS)
+  local SHORT=$(stubbs_option_property $moddir/$module $optName SHORT)
+  if [ -n "${SHORT}" ]; then
+    argstring=$(printf ' --%s|-%s' "${optName}"  "${SHORT}")
+  else
+    argstring=$(printf " --%s" "${optName}" )
+  fi
+  
+  if [ "$ARGUMENTS" == "false" ]; then
+    # boolean flag. Check if the arg is "true" because the answers population process declares it.
+    #   if so, shift an extra time
+    #   this means "--myswitch true" will swallow the 'true' value from the command line
+    printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ; shift ;;\n" "${argstring}" "$optVarname"
+  else
+    printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift 2 ;;\n" \
+    "$argstring" "$optVarname"
+  fi
+}
+
+#
+# _generate_help_option_
+#
+generate_help_option() {
+  cat <<-EOL
+            # help option
+            -\?|--help)
+                rerun_option_usage
+                exit 2
+                ;;
+EOL
 }
 
 # list the options that set a default
@@ -55,6 +69,9 @@ options_required=$(stubbs_options_matching $moddir/$module $command REQUIRED=tru
 
 # list the options that have variables to export
 options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
+
+# get value for print help option
+print_help_option=$(stubbs_command_property $moddir/$module $command GENERATE_HELP)
 
 (
     cat <<EOF
@@ -72,12 +89,14 @@ options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 # * the command options and their arguments
 #
 # Notes:
-# 
+#
 # * Sets shell variables for any parsed options.
 # * The "-?" help argument prints command usage and will exit 2.
 # * Return 0 for successful option parse.
 #
 rerun_options_parse() {
+  
+    unrecognized_args=()
 
     while [ "\$#" -gt 0 ]; do
         OPT="\$1"
@@ -85,16 +104,13 @@ rerun_options_parse() {
 $(for option in $(rerun_options $moddir $module $command); do 
 printf "          %s\n" "$(generate_option_parser $option)"; 
 done)
-            # help option
-            -|--*?)
-                rerun_option_usage
-                exit 2
-                ;;
-            # end of options, just arguments left
+$(if [ "$print_help_option" != "false" ]; then generate_help_option; fi)
+            # unrecognized arguments
             *)
-              break
+              unrecognized_args+=("\$OPT")
+              shift
+              ;;
         esac
-        shift
     done
 
     # Set defaultable options.
@@ -113,18 +129,23 @@ done)
 $(for opt in $(echo $options_exported|sort); do
 printf "    export %s\n" $(stubbs_option_variable $opt)
 done)
+    # Make unrecognized command line options available in \$_CMD_LINE
+    if [ \${#unrecognized_args[@]} -gt 0 ]; then
+      export _CMD_LINE="\${unrecognized_args[@]}"
+    fi
     #
     return 0
 }
 
 
 # If not already set, initialize the options variables to null.
-$(for option in $(rerun_options $moddir $module $command); do 
-printf ": \${%s:=}\n" "$(stubbs_option_variable $option)"; 
+$(for option in $(rerun_options $moddir $module $command); do
+printf ": \${%s:=}\n" "$(stubbs_option_variable $option)";
 done)
+# Default command line to null if not set
+: \${_CMD_LINE:=}
 
 
 EOF
-) 
+)
     # generated to stdout
-

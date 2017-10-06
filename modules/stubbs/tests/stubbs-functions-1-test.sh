@@ -8,7 +8,7 @@
 # ------------
 first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
 
-. $first_rerun_module_dir/stubbs/lib/functions.sh || exit 1
+. $first_rerun_module_dir/stubbs/lib/functions.sh stubbs-functions-1-test || exit 1
 
 rerun() {
     command $RERUN -M $RERUN_MODULES "$@"
