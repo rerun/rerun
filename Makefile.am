@@ -262,7 +262,7 @@ deb: dist
 	tar xzf rerun_${VERSION}.orig.tar.gz; \
 	cd rerun-${VERSION}; \
 	DEBFULLNAME="rerun-discuss@googlegroups.com"; \
-	yes | dh_make --indep --copyright apache --email rerun-discuss@googlegroups.com 
+	dh_make --yes --indep --copyright apache --email rerun-discuss@googlegroups.com
 	sed -i  -e 's/ unknown$$/ shells/g' \
 		-e 's/ root / stagrlee /g' \
 		-e 's@^Homepage:.*$$@Homepage: http://rerun.github.io/rerun@g' \
