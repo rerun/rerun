@@ -60,7 +60,7 @@ rerun_options_parse "$@"
 # Weird matryoshka doll problem with the setting of LOGNAME/USER on travis.
 # When making the debian package, the deb utility reruns tests but
 # this time the USER/LOGNAME vars are not defined
-[[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && LOGNAME="travis"
+[[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && export LOGNAME="travis"
 
 # Default the templates directory if unset.
 : ${TEMPLATE:=$RERUN_MODULE_DIR/templates}
