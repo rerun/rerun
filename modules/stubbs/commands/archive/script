@@ -57,6 +57,11 @@ rerun_options_parse "$@"
 # Command implementation
 # ----------------------
 
+# Weird matryoshka doll problem with the setting of LOGNAME/USER on travis.
+# When making the debian package, the deb utility reruns tests but
+# this time the USER/LOGNAME vars are not defined
+[[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && LOGNAME="travis"
+
 # Default the templates directory if unset.
 : ${TEMPLATE:=$RERUN_MODULE_DIR/templates}
 
@@ -135,11 +140,6 @@ build_sh_archive() {
 
   # Copy rerun itself to the payload
   cp $RERUN $PAYLOAD/rerun
-
-  # Weird matryoshka doll problem with the setting of LOGNAME/USER on travis.
-  # When making the debian package, the deb utility reruns tests but
-  # this time the USER/LOGNAME vars are not defined
-  [[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && LOGNAME="travis"
 
   # Copy in the extract and launcher scripts used during execution
   for script in $TEMPLATE/{extract,launcher}
