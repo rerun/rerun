@@ -244,7 +244,7 @@ rpm: dist
 		$(builddir)/rpm/SRPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
 	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/rpm/SOURCES/
 	rpmbuild -ba --target noarch \
-                --define "dist rerun" \
+                --define "dist .linux" \
 		--define "major `echo ${VERSION} | cut -d. -f1`" \
 		--define "minor `echo ${VERSION} | cut -d. -f2`" \
 		--define "revision `echo ${VERSION} | cut -d. -f3`" \

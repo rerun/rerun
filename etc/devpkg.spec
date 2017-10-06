@@ -13,6 +13,7 @@
 %endif
 
 %define moddir		%{_prefix}/lib/rerun/modules/stubbs
+%define libexecdir	%{_prefix}/libexec
 
 Name: rerun
 Summary: Rerun is a structured approach to bash scripting
@@ -217,11 +218,11 @@ rm -rf %{buildroot}
 %{moddir}/tests/rm-command-1-test.sh
 %{moddir}/tests/rm-option-1-test.sh
 %{moddir}/tests/stubbs-functions-1-test.sh
-%{_libexecdir}/rerun/tests/functions.sh
-%{_libexecdir}/rerun/tests/rerun-0-test.sh
-%{_libexecdir}/rerun/tests/rerun-1-test.sh
-%{_libexecdir}/rerun/tests/rerun-2-test.sh
-%{_libexecdir}/rerun/tests/rerun-4-test.sh
+%{libexecdir}/rerun/tests/functions.sh
+%{libexecdir}/rerun/tests/rerun-0-test.sh
+%{libexecdir}/rerun/tests/rerun-1-test.sh
+%{libexecdir}/rerun/tests/rerun-2-test.sh
+%{libexecdir}/rerun/tests/rerun-4-test.sh
 
 # not sure if I like RPM5, it requires directories to be listed
 %ifos darwin
