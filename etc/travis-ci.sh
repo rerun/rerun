@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Continuous Integration at https://travis-ci.org/rerun/rerun
 
