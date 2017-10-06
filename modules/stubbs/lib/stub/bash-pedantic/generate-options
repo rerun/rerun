@@ -71,7 +71,7 @@ options_required=$(stubbs_options_matching $moddir/$module $command REQUIRED=tru
 options_exported=$(stubbs_options_matching $moddir/$module $command EXPORT=true)
 
 # get value for print help option
-print_help_option=$(stubbs_command_property $moddir/$module $command PRINT_HELP)
+print_help_option=$(stubbs_command_property $moddir/$module $command GENERATE_HELP)
 
 (
     cat <<EOF
