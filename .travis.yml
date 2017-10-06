@@ -9,11 +9,11 @@ notifications:
 addons:
   apt:
     packages:
-    - markdown
-    - build-essential
-    - devscripts
-    - dh-make
-    - rpm
+      - markdown
+      - build-essential
+      - devscripts
+      - dh-make
+      - rpm
   apt:
     sources:
       - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
