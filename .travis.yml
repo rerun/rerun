@@ -14,7 +14,6 @@ addons:
       - devscripts
       - dh-make
       - rpm
-  apt:
     sources:
       - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
       - sourceline: 'deb-src https://dl.bintray.com/rerun/rerun-deb /'
