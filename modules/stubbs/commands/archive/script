@@ -379,8 +379,12 @@ build_rpm_archive() {
       tar -czf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \
         ${TAREXCL} rerun-${NAME}-${VERSION}
 
-      rm -rf ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
+
+      local junkdir=${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
+      find ${junkdir} -type d -exec chmod 755 {} \;
+      find ${junkdir} -type f -exec chmod 644 {} \;
+      /bin/rm -rf ${junkdir}/SOURCES/rerun-${NAME}-${VERSION}
 
       # Build the RPM:
       rpmbuild -bb \
@@ -403,6 +407,8 @@ build_rpm_archive() {
       rerun_log info "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
+      find ${RPMTOPDIR} -type d -exec chmod 755 {} \;
+      find ${RPMTOPDIR} -type f -exec chmod 644 {} \;
       /bin/rm -rf ${RPMTOPDIR}
     fi
   done
