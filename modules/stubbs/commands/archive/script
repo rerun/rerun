@@ -57,6 +57,11 @@ rerun_options_parse "$@"
 # Command implementation
 # ----------------------
 
+# Weird matryoshka doll problem with the setting of LOGNAME/USER on travis.
+# When making the debian package, the deb utility reruns tests but
+# this time the USER/LOGNAME vars are not defined
+[[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && export LOGNAME="travis"
+
 # Default the templates directory if unset.
 : ${TEMPLATE:=$RERUN_MODULE_DIR/templates}
 
@@ -183,6 +188,8 @@ build_sh_archive() {
   #
   # Clean up the temp directory
   #
+  cd ${CWD}
+  chmod 755 ${PAYLOAD}
   find ${PAYLOAD} -type d -exec chmod 755 {} \;
   find ${PAYLOAD} -type f -exec chmod 644 {} \;
   rm -rf $PAYLOAD
@@ -372,12 +379,17 @@ build_rpm_archive() {
       tar -czf $RPMTOPDIR/SOURCES/rerun-${NAME}-${VERSION}.tar.gz \
         ${TAREXCL} rerun-${NAME}-${VERSION}
 
-      rm -rf ${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
       popd > /dev/null
+
+      local junkdir=${RPMTOPDIR}/SOURCES/rerun-${NAME}-${VERSION}
+      find ${junkdir} -type d -exec chmod 755 {} \;
+      find ${junkdir} -type f -exec chmod 644 {} \;
+      /bin/rm -rf ${junkdir}/SOURCES/rerun-${NAME}-${VERSION}
 
       # Build the RPM:
       rpmbuild -bb \
         --target noarch \
+        --define "dist ${RPMDIST:=.linux}" \
         --define "_topdir ${RPMTOPDIR}" \
         --define "module ${NAME}" \
         --define "desc ${DESCRIPTION}" \
@@ -395,6 +407,8 @@ build_rpm_archive() {
       rerun_log info "Wrote $(basename ${MODULE_DIR}) module rpm : rerun-${NAME}-${VERSION}-${RELEASE}${RPMDIST}.noarch.rpm"
 
       # Clean up the temporary directory:
+      find ${RPMTOPDIR} -type d -exec chmod 755 {} \;
+      find ${RPMTOPDIR} -type f -exec chmod 644 {} \;
       /bin/rm -rf ${RPMTOPDIR}
     fi
   done
