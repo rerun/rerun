@@ -289,19 +289,25 @@ deb: dist
 	cd $(builddir)/deb/rerun-${VERSION}; debuild -us -uc
 	mv $(builddir)/deb/rerun_* ./
 
-release: rpm
+bintray:
+	wget --output-document rerun-bintray.sh https://dl.bintray.com/rerun/rerun-modules/bintray/1.0.3/rerun.sh
+	chmod 755 rerun-bintray.sh
+
+release: rpm deb bin bintray
 	echo "Releasing Rerun"
-	MYSVR="repository-stagrlee.forge.cloudbees.com/release"; \
-	echo -n "Enter cloudbees username and press [ENTER]: "; \
-	read name; \
-	echo -n "Enter cloudbees password and press [ENTER]: "; \
-	read pwd; \
-	for h in ${PACKAGE}-${VERSION}.{zip,tar.gz,tar.bz2}; do \
-	  curl -T $${h} https://$${name}:$${pwd}@$${MYSVR}/sources/${PACKAGE}/ ; \
-	done; \
-	for h in ${PACKAGE}-${VERSION}-1*.rpm; do \
-	  curl -T $${h} https://$${name}:$${pwd}@$${MYSVR}/rpms/${PACKAGE}/ ; \
-	done
+	./rerun-bintray.sh bintray: package-upload-deb --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_all.deb --version ${VERSION}-1 --user $${BINTRAY_USER} --deb_architecture all --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1.debian.tar.gz --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1.dsc --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_amd64.build --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_amd64.changes --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}.orig.tar.gz --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.bin --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.tar.bz2 --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.tar.gz --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.zip --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}-1.linux.noarch.rpm --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}-1.linux.src.rpm --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
+
 
 release-bin: bin
 	echo "Releasing Rerun"

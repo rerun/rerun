@@ -9,14 +9,16 @@ grep '^RERUN_VERSION=' rerun
 
 autoreconf --install
 ./configure
-make check
+mkdir -p tmp
+make DESTDIR=./tmp install
+make distcheck
 
 # make the distributions
 make bin deb rpm
 
-if [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
   # Time to push to bintray
-  echo releaseit
+  make release
 else
   echo "Travis-CI sayz LGTM"
 fi

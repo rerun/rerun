@@ -18,6 +18,7 @@ addons:
       - rpm
       - xmlstarlet
       - jq
+      - wget
     sources:
       - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
       - sourceline: 'deb-src https://dl.bintray.com/rerun/rerun-deb /'
