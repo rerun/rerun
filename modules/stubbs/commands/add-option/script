@@ -80,7 +80,6 @@ SHORT=${SHORT:-}
 LONG=${LONG:-$OPTION}
 DEFAULT=$(quote_if_whitespace_string $DEFAULT)
 EXPORT=$EXPORT
-USAGE=${USAGE:-false}
 
 EOF
 ) > $RERUN_MODULE_HOME_DIR/options/$OPTION/metadata || {

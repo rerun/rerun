@@ -60,7 +60,7 @@ cat <<EOF
 NAME=$COMMAND
 DESCRIPTION="$DESCRIPTION"
 OPTIONS=
-GENERATE_HELP=$GENERATE_HELP
+GENERATE_HELP="${GENERATE_HELP:-true}"
 EOF
 
 ) > $RERUN_MODULE_HOME_DIR/commands/$COMMAND/metadata || rerun_die "Failed creating command metadata."
