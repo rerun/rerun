@@ -91,7 +91,7 @@ it_builds_the_stubbs_module_rpm() {
     rerun stubbs:archive --format rpm --modules stubbs --release 1
     first_rerun_module_dir=$(echo "$RERUN_MODULES" | cut -d: -f1)
 
-    RPM1=rerun-stubbs-$(grep ^VERSION=  ${first_rerun_module_dir}/stubbs/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM1=rerun-stubbs-$(grep ^VERSION=  ${first_rerun_module_dir}/stubbs/metadata | cut -d= -f2)-1${MYDIST:=.linux}.noarch.rpm
     rpm -qi -p ${RPM1} | grep stubbs
     popd
     rm -rf ${TMPDIR}
@@ -125,7 +125,7 @@ it_builds_a_list_of_rpms() {
 
     rerun stubbs:archive --format rpm --modules "freddy dance" --release 1 --version "1.2.3"
 
-    RPM1=rerun-freddy-$(grep ^VERSION=  ${first_rerun_module_dir}/freddy/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
+    RPM1=rerun-freddy-$(grep ^VERSION=  ${first_rerun_module_dir}/freddy/metadata | cut -d= -f2)-1${MYDIST:=.linux}.noarch.rpm
     RPM2=rerun-dance-$(grep ^VERSION=  ${first_rerun_module_dir}/dance/metadata | cut -d= -f2)-1${MYDIST}.noarch.rpm
     rpm -qi -p ${RPM1} | grep freddy
     rpm -qi -p ${RPM2} | grep dance

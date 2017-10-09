@@ -383,6 +383,7 @@ build_rpm_archive() {
       # Build the RPM:
       rpmbuild -bb \
         --target noarch \
+        --define "dist ${RPMDIST:=.linux}" \
         --define "_topdir ${RPMTOPDIR}" \
         --define "module ${NAME}" \
         --define "desc ${DESCRIPTION}" \
