@@ -188,6 +188,7 @@ build_sh_archive() {
   #
   # Clean up the temp directory
   #
+  chmod 755 ${PAYLOAD}
   find ${PAYLOAD} -type d -exec chmod 755 {} \;
   find ${PAYLOAD} -type f -exec chmod 644 {} \;
   rm -rf $PAYLOAD
