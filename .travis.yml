@@ -13,12 +13,15 @@ addons:
       - fakeroot
       - build-essential
       - devscripts
+      - autoconf
+      - automake
       - dh-make
       - libfile-fcntllock-perl
       - rpm
       - xmlstarlet
       - jq
       - wget
+      - zip
     sources:
       - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
       - sourceline: 'deb-src https://dl.bintray.com/rerun/rerun-deb /'

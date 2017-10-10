@@ -1,4 +1,4 @@
-% RERUN(1) RERUN User Manual | @VERSION@
+% RERUN(1) RERUN User Manual | 1.4.x
 
 
 # NAME
@@ -84,7 +84,7 @@ For command line syntax and example usage execute `rerun` using the `--help` fla
 	| '__/ _ \ '__| | | | '_ \
 	| | |  __/ |  | |_| | | | |
 	|_|  \___|_|   \__,_|_| |_|
-	Version: 1.3.6. License: Apache 2.0.
+	Version: 1.4.x. License: Apache 2.0.
 
 	Usage: rerun [-h][-v][-V] [-M <dir>] [module:[command [options]]]
 

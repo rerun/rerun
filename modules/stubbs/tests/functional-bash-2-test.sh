@@ -65,7 +65,7 @@ it_runs_with_required_options() {
 }
 
 # $ rerun module:command --recognized1 val --unrecognized1 val --recognized2 val --unrecognized2 val
-it_runs_with_two_recognized_and_two_unrecognized_options_all_with_values() {
+it_runs_with_2recog_2unrecog_with_vals() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --unrecognized1 "val" \
@@ -74,7 +74,7 @@ it_runs_with_two_recognized_and_two_unrecognized_options_all_with_values() {
 }
 
 # $ rerun module:command --recognized1 val --unrecognized1 --recognized2 val --unrecognized2 val
-it_runs_with_two_recognized_and_two_unrecognized_options_some_with_values() {
+it_runs_with_2recog_2unrecog_some_vals() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --unrecognized1 \
@@ -83,7 +83,7 @@ it_runs_with_two_recognized_and_two_unrecognized_options_some_with_values() {
 }
 
 # $ rerun module:command --recognized1 val --unrecognized1 --unrecognized2 val --recognized2 val --unrecognized3
-it_runs_with_two_recognized_and_three_unrecognized_options_some_with_values() {
+it_runs_with_2recog_3unrecog_some_vals() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --unrecognized1 \
@@ -93,7 +93,7 @@ it_runs_with_two_recognized_and_three_unrecognized_options_some_with_values() {
 }
 
 # $ rerun module:command --recognized1 --unrecognized1 val --unrecognized2 val
-it_fails_with_two_recognized_and_two_unrecognized_options_with_one_missing_option() {
+it_fails_with_1recog_2unrecog_missing_required() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --unrecognized1 "val" \
@@ -101,7 +101,7 @@ it_fails_with_two_recognized_and_two_unrecognized_options_with_one_missing_optio
 }
 
 # $ rerun module:command --recognized1 --unrecognized1 val --unrecognized2 val --recognized2
-it_fails_with_two_recognized_and_two_unrecognized_options_with_one_missing_value() {
+it_fails_with_2recog_2unrecog_missing_val() {
   rerun "${test_module_name}:" "${test_command_name}" \
     --recognized1 "val" \
     --unrecognized1 "val" \
