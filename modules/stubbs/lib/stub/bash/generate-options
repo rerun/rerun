@@ -36,12 +36,11 @@ generate_option_parser() {
     argstring=$(printf " --%s" "${optName}" )
   fi
   
-  local USAGE=$(stubbs_option_property $moddir/$module $optName USAGE)
-  if [ "$USAGE" == "true" ]; then
-    printf " %s) rerun_option_usage ;;" "${argstring}"
-  elif [ "$ARGUMENTS" == "false" ]; then
+  if [ "$ARGUMENTS" == "false" ]; then
     # boolean flag. Check if the arg is "true" because the answers population process declares it.
-    printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ;;\n" "${argstring}" "$optVarname"
+    #   if so, shift an extra time
+    #   this means "--myswitch true" will swallow the 'true' value from the command line
+    printf " %s) %s=true; [[ "\${2:-}" == "true" ]] && shift ; shift ;;\n" "${argstring}" "$optVarname"
   else
     printf " %s) rerun_option_check \$# \$1; %s=\$2 ; shift 2 ;;\n" \
     "$argstring" "$optVarname"

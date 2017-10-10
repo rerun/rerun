@@ -101,8 +101,8 @@ rerun_options_parse() {
     while [ "\$#" -gt 0 ]; do
         OPT="\$1"
         case "\$OPT" in
-$(for option in $(rerun_options $moddir $module $command); do 
-printf "          %s\n" "$(generate_option_parser $option)"; 
+$(for option in $(rerun_options $moddir $module $command); do
+printf "          %s\n" "$(generate_option_parser $option)";
 done)
 $(if [ "$print_help_option" != "false" ]; then generate_help_option; fi)
             # unrecognized arguments
