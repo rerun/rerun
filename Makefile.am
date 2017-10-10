@@ -322,6 +322,6 @@ release-bin: bin
 	echo -n "Enter bintray apikey and press [ENTER]: "; \
 	read BINTRAY_APIKEY; \
 	./rerun bintray:package-upload --user $${BINTRAY_USER:} --apikey $${BINTRAY_APIKEY:} \
-    --org rerun --repo rerun-bin --package rerun --version $(VERSION) --file rerun-$(VERSION).bin
+		--org rerun --repo rerun-bin --package rerun --version $(VERSION) --file rerun-$(VERSION).bin
 
 .PHONY: bin rpm deb test-rerun test-stubbs
