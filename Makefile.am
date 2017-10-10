@@ -77,7 +77,7 @@ nobase_dist_mod_DATA = \
 	modules/stubbs/options/file/README.md \
 	modules/stubbs/options/format/metadata \
 	modules/stubbs/options/format/README.md \
-  modules/stubbs/options/generate-help/metadata \
+	modules/stubbs/options/generate-help/metadata \
 	modules/stubbs/options/long/metadata \
 	modules/stubbs/options/long/README.md \
 	modules/stubbs/options/module/metadata \
@@ -116,9 +116,9 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/bin/Markdown.pl \
 	modules/stubbs/commands/add-command/options.sh \
 	modules/stubbs/commands/add-command/script \
-  modules/stubbs/commands/add-module/options.sh \
+	modules/stubbs/commands/add-module/options.sh \
 	modules/stubbs/commands/add-module/script \
-  modules/stubbs/commands/add-option/options.sh \
+	modules/stubbs/commands/add-option/options.sh \
 	modules/stubbs/commands/add-option/script \
 	modules/stubbs/commands/archive/options.sh \
 	modules/stubbs/commands/archive/script \
@@ -140,12 +140,12 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/tests/archive-1-test.sh \
 	modules/stubbs/tests/docs-1-test.sh \
 	modules/stubbs/tests/functional-bash-1-test.sh \
-  modules/stubbs/tests/functional-bash-2-test.sh \
+	modules/stubbs/tests/functional-bash-2-test.sh \
 	modules/stubbs/tests/migrate-1-test.sh \
 	modules/stubbs/tests/rm-command-1-test.sh \
 	modules/stubbs/tests/rm-option-1-test.sh \
 	modules/stubbs/tests/stubbs-functions-1-test.sh \
-  modules/stubbs/tests/functions.sh
+	modules/stubbs/tests/functions.sh
 
 # put the tests in /usr/libexec/rerun using built in macro
 nobase_dist_pkglibexec_SCRIPTS = \
@@ -177,7 +177,7 @@ uninstall-local:
 # Doc targets
 #
 man:
-	sed "s/@VERSION@/${VERSION}/g" README.md | pandoc -s -w man -o man/man1/rerun.1
+	sed "s/1\.4\.x/$(VERSION)/g" README.md | pandoc -s -w man -o man/man1/rerun.1
 
 #
 # Testing targets
@@ -220,7 +220,7 @@ test-stubbs:
 		chmod u-w $${RERUN_MODULES} $${RERUN_MODULES}/stubbs/tests; \
 	fi
 
-bin: dist
+rerun-$(VERSION).bin:
 	echo "Packaging rerun as a bin..."; \
 	if [[ "$${PWD}x" = "x" ]]; then export PWD="$(shell pwd)"; fi; \
 	if [[ "$(srcdir)" = "/*" ]]; then MYDIR="$(srcdir)"; else MYDIR="$${PWD}/$(srcdir)"; fi; \
@@ -229,8 +229,8 @@ bin: dist
 	export LC_ALL="C"; \
 	echo "    modules at $${RERUN_MODULES}"; \
 	set -e; \
-	$${RERUN} stubbs:archive --modules stubbs --version ${VERSION} --file rerun-${VERSION}.bin; \
-	./rerun-${VERSION}.bin;
+	$${RERUN} stubbs:archive --modules stubbs --version $(VERSION) --file rerun-$(VERSION).bin; \
+	./rerun-$(VERSION).bin;
 
 #unset RERUN_COLOR
 #
@@ -238,30 +238,30 @@ bin: dist
 #
 RELEASE ?= 1
 
-rpm: dist
+rerun-$(VERSION)-1.linux.noarch.rpm:
 	@echo "Packaging rerun as an RPM ..."
 	mkdir -p $(builddir)/rpm/SOURCES $(builddir)/rpm/BUILD $(builddir)/rpm/RPMS \
 		$(builddir)/rpm/SRPMS $(builddir)/rpm/SPECS $(builddir)/rpm/tmp
-	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/rpm/SOURCES/
+	cp -f $(srcdir)/rerun-$(VERSION).tar.gz $(builddir)/rpm/SOURCES/
 	rpmbuild -ba --target noarch \
                 --define "dist .linux" \
-		--define "major `echo ${VERSION} | cut -d. -f1`" \
-		--define "minor `echo ${VERSION} | cut -d. -f2`" \
-		--define "revision `echo ${VERSION} | cut -d. -f3`" \
+		--define "major `echo $(VERSION) | cut -d. -f1`" \
+		--define "minor `echo $(VERSION) | cut -d. -f2`" \
+		--define "revision `echo $(VERSION) | cut -d. -f3`" \
 		--define "_topdir ${PWD}/rpm" \
 		--define "_tmppath ${PWD}/rpm/tmp" \
-		--define "version ${VERSION}" \
+		--define "version $(VERSION)" \
 		--define "release ${RELEASE}" \
 		$(srcdir)/etc/devpkg.spec
 	find $(builddir)/rpm/{RPMS,SRPMS}/ -name "*.rpm" -exec mv {} ./ \;
 
-deb: dist
+rerun_$(VERSION)-1_all.deb:
 	@echo "Packaging rerun as an Debian ..."
 	mkdir -p $(builddir)/deb
-	cp -f $(srcdir)/rerun-${VERSION}.tar.gz $(builddir)/deb/rerun_${VERSION}.orig.tar.gz
+	cp -f $(srcdir)/rerun-$(VERSION).tar.gz $(builddir)/deb/rerun_$(VERSION).orig.tar.gz
 	cd $(builddir)/deb; \
-	tar xzf rerun_${VERSION}.orig.tar.gz; \
-	cd rerun-${VERSION}; \
+	tar xzf rerun_$(VERSION).orig.tar.gz; \
+	cd rerun-$(VERSION); \
 	DEBFULLNAME="rerun-discuss@googlegroups.com"; \
 	dh_make --yes --indep --copyright apache --email rerun-discuss@googlegroups.com
 	sed -i  -e 's/ unknown$$/ shells/g' \
@@ -270,7 +270,7 @@ deb: dist
 		-e 's/^Description:.*$$/Description: Command runner to make remembering procedures easier/g' \
 		-e '/^Depends:.*$$/d' \
 		-e '$$d' \
-		$(builddir)/deb/rerun-${VERSION}/debian/control
+		$(builddir)/deb/rerun-$(VERSION)/debian/control
 	echo -e \
 	" Rerun is a simple command runner that turns loose shell scripts\n" \
 	" into modular automation. Rerun will help you organize your implementation\n" \
@@ -278,42 +278,50 @@ deb: dist
 	" can be archived and delivered as a single executable to facilitate team\n" \
 	" hand offs. Using the stubbs module, rerun will even facilitate\n" \
 	" developing modules using a test-driven development practice.\c" \
-	>> $(builddir)/deb/rerun-${VERSION}/debian/control
+	>> $(builddir)/deb/rerun-$(VERSION)/debian/control
 	sed -i 	-e 's@^Source:.*$$@Source: https://github.com/rerun/rerun@' \
 		-e 's/^Copyright:.*$$/Copyright: 2011-2014, Alex Honor AlexHonor@yahoo.com/' \
 		-e '/likewise for another/d' \
 		-e '/^# /d' \
-		$(builddir)/deb/rerun-${VERSION}/debian/copyright
-	rm -f $(builddir)/deb/rerun-${VERSION}/debian/*\.ex
-	rm -f $(builddir)/deb/rerun-${VERSION}/debian/*\.EX
-	cd $(builddir)/deb/rerun-${VERSION}; debuild -us -uc
+		$(builddir)/deb/rerun-$(VERSION)/debian/copyright
+	rm -f $(builddir)/deb/rerun-$(VERSION)/debian/*\.ex
+	rm -f $(builddir)/deb/rerun-$(VERSION)/debian/*\.EX
+	cd $(builddir)/deb/rerun-$(VERSION); debuild -us -uc
 	mv $(builddir)/deb/rerun_* ./
 
-bintray:
+bin: rerun-$(VERSION).bin
+
+deb: rerun_$(VERSION)-1_all.deb
+
+rpm: rerun-$(VERSION)-1.linux.noarch.rpm
+
+rerun-bintray.sh:
 	wget --output-document rerun-bintray.sh https://dl.bintray.com/rerun/rerun-modules/bintray/1.0.3/rerun.sh
 	chmod 755 rerun-bintray.sh
 
-release: rpm deb bin bintray
-	echo "Releasing Rerun"
-	./rerun-bintray.sh bintray: package-upload-deb --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_all.deb --version ${VERSION}-1 --user $${BINTRAY_USER} --deb_architecture all --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1.debian.tar.gz --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1.dsc --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_amd64.build --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}-1_amd64.changes --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_${VERSION}.orig.tar.gz --version ${VERSION}-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.bin --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.tar.bz2 --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.tar.gz --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}.zip --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}-1.linux.noarch.rpm --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-${VERSION}-1.linux.src.rpm --version ${VERSION} --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
+release: rerun-$(VERSION)-1.linux.noarch.rpm rerun_$(VERSION)-1_all.deb rerun-$(VERSION).bin rerun-bintray.sh
+	@echo "Releasing Rerun"
+	./rerun-bintray.sh bintray: package-upload-deb --apikey $${BINTRAY_KEY} --file rerun_$(VERSION)-1_all.deb --version $(VERSION)-1 --user $${BINTRAY_USER} --deb_architecture all --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_$(VERSION)-1.debian.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_$(VERSION)-1.dsc --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun dist
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_$(VERSION)-1_amd64.build --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_$(VERSION)-1_amd64.changes --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun_$(VERSION).orig.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION).bin --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION).tar.bz2 --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION).tar.gz --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION).zip --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION)-1.linux.noarch.rpm --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_KEY} --file rerun-$(VERSION)-1.linux.src.rpm --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
 
 
 release-bin: bin
-	echo "Releasing Rerun"
+	@echo "Releasing Rerun"
 	echo -n "Enter bintray username and press [ENTER]: "; \
 	read BINTRAY_USER; \
 	echo -n "Enter bintray apikey and press [ENTER]: "; \
 	read BINTRAY_APIKEY; \
 	./rerun bintray:package-upload --user $${BINTRAY_USER} --apikey $${BINTRAY_APIKEY} \
-    --org rerun --repo rerun-bin --package rerun --version ${VERSION} --file rerun-${VERSION}.bin
+    --org rerun --repo rerun-bin --package rerun --version $(VERSION) --file rerun-$(VERSION).bin
+
+.PHONY: bin rpm deb test-rerun test-stubbs
