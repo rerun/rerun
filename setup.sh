@@ -11,14 +11,14 @@ if [[ "clean" == "$1" ]]; then
     make distclean
   fi
 
-  if [[ -d rerun-${RERUN_VERSION} ]]
+  if [[ -d "rerun-${RERUN_VERSION}" ]]
   then
-    find rerun-${RERUN_VERSION} -type d -exec chmod 755 {} \;
+    find "rerun-${RERUN_VERSION}" -type d -exec chmod 755 {} \;
   fi
 
-  rm -f INSTALL ChangeLog Makefile.in aclocal.m4 configure rerun-stubbs*
-  rm -f rerun_${RERUN_VERSION}*
-  rm -rf tmp rerun[-_]${RERUN_VERSION}* autom4te.cache config
+  rm -f INSTALL ChangeLog Makefile.in aclocal.m4 configure rerun-stubbs* rerun-bintray.sh
+  rm -f "rerun_${RERUN_VERSION}*"
+  rm -rf tmp "rerun[-_]${RERUN_VERSION}*" autom4te.cache config
   rm -rf rpm autom4te.cache config tmp deb
 elif [[ "regress" == "$1" ]]; then
   ./setup.sh clean

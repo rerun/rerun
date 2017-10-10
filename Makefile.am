@@ -301,18 +301,18 @@ rerun-bintray.sh:
 
 release: rerun-$(VERSION)-1.linux.noarch.rpm rerun_$(VERSION)-1_all.deb rerun-$(VERSION).bin rerun-bintray.sh
 	@echo "Releasing Rerun"
-	./rerun-bintray.sh bintray: package-upload-deb --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION)-1_all.deb --version $(VERSION)-1 --user $${BINTRAY_USER:} --deb_architecture all --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION)-1.debian.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER:} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION)-1.dsc --version $(VERSION)-1 --user $${BINTRAY_USER:} --org rerun --repo rerun-deb --package rerun dist
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION)-1_amd64.build --version $(VERSION)-1 --user $${BINTRAY_USER:} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION)-1_amd64.changes --version $(VERSION)-1 --user $${BINTRAY_USER:} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun_$(VERSION).orig.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER:} --org rerun --repo rerun-deb --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION).bin --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION).tar.bz2 --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION).tar.gz --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION).zip --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-bin --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION)-1.linux.noarch.rpm --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-rpm --package rerun
-	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY:} --file rerun-$(VERSION)-1.linux.src.rpm --version $(VERSION) --user $${BINTRAY_USER:} --org rerun --repo rerun-rpm --package rerun
+	./rerun-bintray.sh bintray: package-upload-deb --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION)-1_all.deb --version $(VERSION)-1 --user $${BINTRAY_USER} --deb_architecture all --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION)-1.debian.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION)-1.dsc --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun dist
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION)-1_amd64.build --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION)-1_amd64.changes --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun_$(VERSION).orig.tar.gz --version $(VERSION)-1 --user $${BINTRAY_USER} --org rerun --repo rerun-deb --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION).bin --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION).tar.bz2 --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION).tar.gz --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION).zip --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-bin --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION)-1.linux.noarch.rpm --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
+	./rerun-bintray.sh bintray: package-upload --apikey $${BINTRAY_APIKEY} --file rerun-$(VERSION)-1.linux.src.rpm --version $(VERSION) --user $${BINTRAY_USER} --org rerun --repo rerun-rpm --package rerun
 
 
 release-bin: bin
@@ -321,7 +321,7 @@ release-bin: bin
 	read BINTRAY_USER; \
 	echo -n "Enter bintray apikey and press [ENTER]: "; \
 	read BINTRAY_APIKEY; \
-	./rerun bintray:package-upload --user $${BINTRAY_USER:} --apikey $${BINTRAY_APIKEY:} \
+	./rerun bintray:package-upload --user $${BINTRAY_USER} --apikey $${BINTRAY_APIKEY} \
 		--org rerun --repo rerun-bin --package rerun --version $(VERSION) --file rerun-$(VERSION).bin
 
 .PHONY: bin rpm deb test-rerun test-stubbs
