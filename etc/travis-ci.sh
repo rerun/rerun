@@ -20,5 +20,9 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   # Time to push to bintray
   make release
 else
-  echo "Travis-CI sayz LGTM"
+  echo "***************************"
+  echo "***                     ***"
+  echo "*** Travis-CI sayz LGTM ***"
+  echo "***                     ***"
+  echo "***************************"
 fi

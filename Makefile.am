@@ -29,8 +29,9 @@ dist_man_MANS = man/man1/rerun.1
 
 # by convention, automake hates putting data and script files in /usr/lib
 # using something like nobase_dist_pkglib_SCRIPTS.  To get around this
-# we will create our own directory name
-moddir = ${libdir}/${PACKAGE}
+# we will create our own directory name, tried libdir and that didn't 
+# work for debian packages.
+moddir = ${prefix}/lib/${PACKAGE}
 nobase_dist_mod_DATA = \
 	modules/stubbs/README.md \
 	modules/stubbs/commands/add-command/metadata \
