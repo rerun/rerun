@@ -53,7 +53,7 @@ it_runs_fully_optioned() {
     --module "freddy" \
     --command "dance" \
     --description "tell freddy to dance" \
-    --overwrite "false" \
+    --overwrite "true" \
     --generate-help "true"
 
   validate
