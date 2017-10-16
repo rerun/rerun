@@ -41,7 +41,7 @@ TEMPLATE=$STUB/$TEMPLATE_COMMAND_SCRIPT
 CMD_SCRIPT=$RERUN_MODULE_HOME_DIR/commands/$COMMAND/$(basename $TEMPLATE_COMMAND_SCRIPT)
 
 # Generate a boiler plate implementation
-[ ! -f $CMD_SCRIPT -o -n "${OVERWRITE:-}" ] && {
+[ ! -f $CMD_SCRIPT -o "${OVERWRITE:-}" == "true" ] && {
     sed -e "s/@COMMAND@/$COMMAND/g" \
 	-e "s/@MODULE@/$MODULE/g" \
 	-e "s^@DESCRIPTION@^$DESCRIPTION^g" \
@@ -84,7 +84,7 @@ rerun_log info "Wrote options parser: $OPTIONS_PARSER_SCRIPT"
 
 # Generate a unit test script
 mkdir -p $RERUN_MODULE_HOME_DIR/tests || rerun_die "failed creating tests directory"
-[ ! -f $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh -o -n "${OVERWRITE:-}" ] && {
+[ ! -f $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh -o "${OVERWRITE:-}" == "true" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \
 	-e "s/@COMMAND@/$COMMAND/g" \
 	-e "s;@RERUN@;${RERUN};g" \
@@ -92,9 +92,10 @@ mkdir -p $RERUN_MODULE_HOME_DIR/tests || rerun_die "failed creating tests direct
 	$RERUN_MODULE_DIR/templates/test.roundup > $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh || rerun_die
     rerun_log info "Wrote test script: $RERUN_MODULE_HOME_DIR/tests/$COMMAND-1-test.sh"
 }
-[ ! -f $RERUN_MODULE_HOME_DIR/tests/functions.sh -o -n "${OVERWRITE:-}" ] && {
+[ ! -f $RERUN_MODULE_HOME_DIR/tests/functions.sh -o "${OVERWRITE:-}" == "true" ] && {
     sed -e "s/@MODULE@/$MODULE/g" \
 	$RERUN_MODULE_DIR/templates/test.functions.sh > $RERUN_MODULE_HOME_DIR/tests/functions.sh || rerun_die "Failed generating test functions library."
+  rerun_log info "Wrote test function library: $RERUN_MODULE_HOME_DIR/tests/functions.sh"
 }
 
 # - - -
