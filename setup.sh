@@ -17,8 +17,7 @@ if [[ "clean" == "$1" ]]; then
   fi
 
   rm -f INSTALL ChangeLog Makefile.in aclocal.m4 configure rerun-stubbs* rerun-bintray.sh
-  rm -f "rerun_${RERUN_VERSION}*"
-  rm -rf tmp "rerun[-_]${RERUN_VERSION}*" autom4te.cache config
+  rm -rf tmp rerun[-_]${RERUN_VERSION}* autom4te.cache config
   rm -rf rpm autom4te.cache config tmp deb
 elif [[ "regress" == "$1" ]]; then
   ./setup.sh clean

@@ -18,6 +18,11 @@ make bin deb rpm
 
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
   # Time to push to bintray
+  git config --global user.email "travis@travis-ci.org"
+  git config --global user.name "Travis CI"
+  git tag -a "v${RERUN_VERSION}" -m "Travis CI release v${RERUN_VERSION}"
+  git remote add origin-pages https://${GH_TOKEN}@github.com/rerun/rerun.git > /dev/null 2>&1
+  git push origin-pages "v${RERUN_VERSION}"
   make release
 else
   echo "***************************"

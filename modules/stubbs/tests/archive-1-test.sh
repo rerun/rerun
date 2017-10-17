@@ -160,6 +160,7 @@ it_builds_a_list_of_debs() {
     dpkg-deb --info ${DEB2} | grep rerun-dance
     dpkg-deb --contents ${DEB1} | grep "\/\.git$" && exit 1
     dpkg-deb --contents ${DEB1} | grep "\/\.svn$" && exit 1
+    dpkg-deb --contents ${DEB1} | grep "\/usr\/lib\/rerun\/modules\/freddy\/commands\/says\/metadata" || exit 1
     popd
     rm -rf ${TMPDIR} ${first_rerun_module_dir}/freddy ${first_rerun_module_dir}/dance
 }
