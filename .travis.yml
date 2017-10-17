@@ -5,26 +5,27 @@ compiler: gcc
 script: ./etc/travis-ci.sh
 notifications:
   irc:
-    - "irc.freenode.org#rerun"
+  - irc.freenode.org#rerun
 addons:
   apt:
     packages:
-      - markdown
-      - fakeroot
-      - build-essential
-      - devscripts
-      - autoconf
-      - automake
-      - dh-make
-      - libfile-fcntllock-perl
-      - rpm
-      - xmlstarlet
-      - jq
-      - wget
-      - zip
+    - markdown
+    - fakeroot
+    - build-essential
+    - devscripts
+    - autoconf
+    - automake
+    - dh-make
+    - libfile-fcntllock-perl
+    - rpm
+    - xmlstarlet
+    - jq
+    - wget
+    - zip
     sources:
-      - sourceline: 'deb https://dl.bintray.com/rerun/rerun-deb /'
+    - sourceline: deb https://dl.bintray.com/rerun/rerun-deb /
 env:
   global:
-    - secure: "d+/B1oq6oNtDP2Ow4FJE2+JGfhN/r2e/M7RrQFlwPA6KVGkCFK5Gg4cXLjr2\ncGwuGhsjrT1fDkcv4VRZTOFhvT1i2GD8oUwnjmHI1Btj3obeSyCC2XiAHYRS\nvEAYDT/Snu/EeeqD84yxd3BMS4WpjLQxfiY6Xns5XC9HH3BXObI="
-    - BINTRAY_USER=ahonor
+  - secure: "d+/B1oq6oNtDP2Ow4FJE2+JGfhN/r2e/M7RrQFlwPA6KVGkCFK5Gg4cXLjr2\ncGwuGhsjrT1fDkcv4VRZTOFhvT1i2GD8oUwnjmHI1Btj3obeSyCC2XiAHYRS\nvEAYDT/Snu/EeeqD84yxd3BMS4WpjLQxfiY6Xns5XC9HH3BXObI="
+  - BINTRAY_USER=ahonor
+  - secure: XxpcDWr+eJ1KCz10ubiUGPjCw4TqiK2bMbiCWxf7+BC+jq7blXuIqPoIAXQqFoMwTN5pP/t5PNo8hKLeEdq4G+UgpJPUk/xfa5RVkWjL8RYmivpOOx7hHMZ4A6RKvlf9XDdJwWcf31kjQ01Dp1AUQQHMEwaPWHXNp9JWA7vRxe4=
