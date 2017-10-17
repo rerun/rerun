@@ -22,7 +22,7 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   git config --global user.name "Travis CI"
   echo "Tagging version in git"
   eval export $(grep ^RERUN_VERSION= rerun)
-  git tag -a "v${RERUN_VERSION}" -m "Travis CI release v${RERUN_VERSION}"
+  git tag -a "v${RERUN_VERSION}" -m "skip ci - Travis CI release v${RERUN_VERSION}"
   echo "Pushing tag v${RERUN_VERSION}"
   git push --quiet "https://${GH_TOKEN}@github.com/rerun/rerun" --tags > /dev/null 2>&1
   make release
