@@ -218,6 +218,7 @@ rm -rf %{buildroot}
 %{moddir}/tests/rm-command-1-test.sh
 %{moddir}/tests/rm-option-1-test.sh
 %{moddir}/tests/stubbs-functions-1-test.sh
+%{libexecdir}/rerun/travis-ci-modules.sh
 %{libexecdir}/rerun/tests/functions.sh
 %{libexecdir}/rerun/tests/rerun-0-test.sh
 %{libexecdir}/rerun/tests/rerun-1-test.sh
