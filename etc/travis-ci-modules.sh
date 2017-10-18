@@ -21,7 +21,7 @@ sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?S
 export VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
 mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
 myrepodefault="https://${GH_TOKEN}@github.com/rerun-modules/${mymod}"
-GITREPO="https://${GH_TOKEN}@${MY_REPO}"
+[[ -n "${MY_REPO:-}" ]] && GITREPO="https://${GH_TOKEN}@${MY_REPO}"
 
 echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
