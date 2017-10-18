@@ -4,7 +4,7 @@
 # To use this script, make sure you have "if: tag IS empty" in your .travis.yml file or your build will
 # go into an infinite loop!!!   https://github.com/travis-ci/travis-ci/issues/8051
 #
-# Define MY_REPO_URL to be your github URL, defaults to
+# Define MY_REPO to be your github URL minus the https and the token, defaults to
 #     https://${GH_TOKEN}@github.com/rerun-modules/MODULENAME
 #
 # Securely define GH_TOKEN to be your github access token in your .travis.yml 
@@ -21,6 +21,7 @@ sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?S
 export VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
 mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
 myrepodefault="https://${GH_TOKEN}@github.com/rerun-modules/${mymod}"
+GITREPO="https://${GH_TOKEN}@${MY_REPO}"
 
 echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
@@ -83,7 +84,7 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   git config --global user.name "Travis CI"
   git tag -a "v${VERSION}" -m "skip ci - Travis CI release v${VERSION}"
   echo "Pushing tag v${VERSION}"
-  git push --quiet "${MY_REPO_URL:-${myrepodefault}}" --tags > /dev/null 2>&1
+  git push --quiet "${GITREPO:-${myrepodefault}}" --tags > /dev/null 2>&1
 
   echo "Files to publish"
   ls -1 rerun.sh rerun-${mymod}*
