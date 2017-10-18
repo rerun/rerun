@@ -150,7 +150,6 @@ nobase_dist_mod_SCRIPTS = \
 
 # put the tests in /usr/libexec/rerun using built in macro
 nobase_dist_pkglibexec_SCRIPTS = \
-  tests/functions.sh \
   tests/rerun-0-test.sh \
   tests/rerun-1-test.sh \
   tests/rerun-2-test.sh \
@@ -159,6 +158,9 @@ nobase_dist_pkglibexec_SCRIPTS = \
 testdir = ${libexecdir}/${PACKAGE}
 nobase_dist_test_DATA = \
   tests/functions.sh
+
+dist_pkglibexec_SCRIPTS = \
+  etc/travis-ci-modules.sh
 
 # bash completion script into $(sysconfdir)/bash_completion.d/
 # most unix implementations do not set the executable permission
