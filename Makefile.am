@@ -1,5 +1,5 @@
 # Create by stagr.lee@gmail.com 27SEP11
-# copyright DTOSOLUTIONS, 2011
+# copyright rerun.sh, 2017
 
 ## Process this file with automake to produce Makefile.in
 
