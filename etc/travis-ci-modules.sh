@@ -18,7 +18,8 @@ set -eu
 # --------
 # set version patch number to build number from travis
 sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?SetupTravisCorrectly}"',g' metadata
-export VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
+VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
+export VERSION
 mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
 myrepodefault="https://${GH_TOKEN}@github.com/rerun-modules/${mymod}"
 [[ -n "${MY_REPO:-}" ]] && GITREPO="https://${GH_TOKEN}@${MY_REPO}"
@@ -38,7 +39,7 @@ export RERUN_MODULES="${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}"
 
 # Test.
 # --------
-rerun stubbs: test --module ${mymod}
+[[ "${TRAVISCI_SKIP_TESTS:-}" != "true" ]] && rerun stubbs: test --module "${mymod}"
 
 # Build the module.
 # -----------------
@@ -87,7 +88,7 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   git push --quiet "${GITREPO:-${myrepodefault}}" --tags > /dev/null 2>&1
 
   echo "Files to publish"
-  ls -1 rerun.sh rerun-${mymod}*
+  ls -1 rerun.sh "rerun-${mymod}*"
 
   export USER=${BINTRAY_USER:?"Setup Travis with BINTRAY_USER env variable"}
   export APIKEY=${BINTRAY_APIKEY:?"Setup Travis with BINTRAY_APIKEY env variable"}
