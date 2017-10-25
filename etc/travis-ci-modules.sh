@@ -39,7 +39,7 @@ export RERUN_MODULES="${WORK_DIR}:${RERUN_MODULES:-/usr/lib/rerun/modules}"
 
 # Test.
 # --------
-[[ "${TRAVISCI_SKIP_TESTS:-}" == "true" ]] && rerun stubbs: test --module "${mymod}"
+[[ "${TRAVISCI_SKIP_TESTS:-}" != "true" ]] && rerun stubbs: test --module "${mymod}"
 
 # Build the module.
 # -----------------
