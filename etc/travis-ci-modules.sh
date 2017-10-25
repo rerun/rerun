@@ -87,10 +87,8 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   echo "Pushing tag v${VERSION}"
   git push --quiet "${GITREPO:-${myrepodefault}}" --tags > /dev/null 2>&1
 
-  pwd
-  ls
   echo "Files to publish"
-  ls -1 rerun.sh "rerun-${mymod}*"
+  ls -1 rerun.sh "rerun-${mymod}"*
 
   export USER=${BINTRAY_USER:?"Setup Travis with BINTRAY_USER env variable"}
   export APIKEY=${BINTRAY_APIKEY:?"Setup Travis with BINTRAY_APIKEY env variable"}
