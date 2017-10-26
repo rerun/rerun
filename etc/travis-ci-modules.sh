@@ -80,7 +80,7 @@ RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
-  DESCRIPTOR=/tmp/descriptor.txt
+  export DESCRIPTOR=/tmp/descriptor.txt
   cat <<-EOF > "${DESCRIPTOR}"
 	{
 	  "name": "${mymod}",
@@ -95,6 +95,9 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
 	  "public_stats": "false"
 	}
 EOF
+  echo ${DESCRIPTOR}
+  cat ${DESCRIPTOR}
+  echo
 
   echo "Tagging version in git"
   git checkout metadata
