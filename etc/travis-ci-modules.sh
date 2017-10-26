@@ -85,15 +85,14 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
 	{
 	  "name": "${mymod}",
 	  "desc": ${description},
-	  "labels": ["rerun", "shell", "rerun-modules", "bash"],
-	  "licenses": [ ${license} ],
-	  "vcs_url": "https://${MY_REPO}",
+	  "labels": [ "rerun", "shell", "rerun-modules", "bash" ],
+	  "licenses": ${license},
+	  "vcs_url": "https://${MY_REPO}.git",
 	  "website_url": "https://${MY_REPO}",
 	  "issue_tracker_url": "https://${MY_REPO}/issues",
 	  "github_repo": "${MY_REPO#*/}",
-	  "github_release_notes_file": "RELEASE.txt",
-	  "public_download_numbers": false,
-	  "public_stats": false
+	  "public_download_numbers": "false",
+	  "public_stats": "false"
 	}
 EOF
 
