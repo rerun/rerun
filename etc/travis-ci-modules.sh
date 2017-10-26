@@ -19,10 +19,11 @@ set -eu
 # set version patch number to build number from travis
 sed -i -r 's,^VERSION=([0-9]+\.[0-9]+)\.0$,VERSION=\1.'"${TRAVIS_BUILD_NUMBER:?SetupTravisCorrectly}"',g' metadata
 VERSION="$(awk -F= '/VERSION/ {print $2}' metadata)"
+description="$(awk -F= '/DESCRIPTION/ {print $2}' metadata)"
+license="$(awk -F= '/LICENSE/ {print $2}' metadata)"
 export VERSION
 mymod="$(awk -F= '/NAME/ {print $2}' metadata)"
-myrepodefault="https://${GH_TOKEN}@github.com/rerun-modules/${mymod}"
-[[ -n "${MY_REPO:-}" ]] && GITREPO="https://${GH_TOKEN}@${MY_REPO}"
+GITREPO="https://${GH_TOKEN}@${MY_REPO:=github.com/rerun-modules/${mymod}}"
 
 echo "Building version ${VERSION:?"Corrupt metadata file"} of ${mymod:?"Corrupt metadata file"}..."
 # Create a scratch directory and change directory to it.
@@ -79,13 +80,30 @@ RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
+  DESCRIPTOR=/tmp/descriptor.txt
+  cat <<-EOF > "${DESCRIPTOR}"
+	{
+	  "name": "${mymod}",
+	  "desc": ${description},
+	  "labels": ["rerun", "shell", "rerun-modules", "bash"],
+	  "licenses": [ ${license} ],
+	  "vcs_url": "https://${MY_REPO}",
+	  "website_url": "https://${MY_REPO}",
+	  "issue_tracker_url": "https://${MY_REPO}/issues",
+	  "github_repo": "${MY_REPO#*/}",
+	  "github_release_notes_file": "RELEASE.txt",
+	  "public_download_numbers": false,
+	  "public_stats": false
+	}
+EOF
+
   echo "Tagging version in git"
   git checkout metadata
   git config --global user.email "travis@travis-ci.org"
   git config --global user.name "Travis CI"
   git tag -a "v${VERSION}" -m "skip ci - Travis CI release v${VERSION}"
   echo "Pushing tag v${VERSION}"
-  git push --quiet "${GITREPO:-${myrepodefault}}" --tags > /dev/null 2>&1
+  git push --quiet "${GITREPO}" --tags > /dev/null 2>&1
 
   echo "Files to publish"
   ls -1 rerun.sh "rerun-${mymod}"*
@@ -113,6 +131,8 @@ if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; 
   echo "Uploading rpm package ${RPM} to bintray: /${BINTRAY_ORG}/rerun-rpm ..."
   export REPO="rerun-rpm"
   rerun bintray:package-upload --version "${sysver}" --file "${RPM}"
+
+  rm ${DESCRIPTOR}
 
 else
   echo "***************************"
