@@ -80,17 +80,19 @@ RPM=rerun-${mymod}-${sysver}.linux.noarch.rpm
 
 if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
 
+####  Upstream bug in bintray, can't lable repo w/o error!!  -->   "github_repo": "${MY_REPO#*/}",
+####  May be redundant as vcs_url is all that is needed https://stackoverflow.com/questions/43694831
+
   export DESCRIPTOR=/tmp/descriptor.txt
   cat <<-EOF > "${DESCRIPTOR}"
 	{
 	  "name": "${mymod}",
 	  "desc": ${description},
-	  "labels": [ "rerun", "shell", "rerun-modules", "bash" ],
+	  "labels": [ "shell", "bash", "rerun", "rerun-modules" ],
 	  "licenses": ${license},
 	  "vcs_url": "https://${MY_REPO}.git",
 	  "website_url": "https://${MY_REPO}",
 	  "issue_tracker_url": "https://${MY_REPO}/issues",
-	  "github_repo": "${MY_REPO#*/}",
 	  "public_download_numbers": "false",
 	  "public_stats": "false"
 	}
