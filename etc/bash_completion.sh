@@ -196,7 +196,7 @@ rerun:parse:module()
 #
 _rr() {
 	#This disables Readline filename completion when COMPREPLY is empty
-	compopt +o default
+	  compopt +o default
     [ -z "${RERUN_MODULES}" -o ! \( -d "$(echo $RERUN_MODULES|cut -d: -f1)" \) ] && { 
         return 0 ; 
     }
