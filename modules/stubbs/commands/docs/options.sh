@@ -5,16 +5,17 @@
 
 # print USAGE and exit
 rerun_option_error() {
+    local -r message=$1
     if [[ "$RERUN_COLOR" == "true" ]]
-    then echo -e ${red}"SYNTAX: $*"${_red} >&2 
-    else echo "SYNTAX: $*" >&2
+    then echo >&2 -e "${red}" "SYNTAX: $message" "${_red}"  
+    else echo "SYNTAX: $message" >&2
     fi
     exit 2
 }
 
 # print USAGE and exit
 rerun_option_usage() {
-    if [ -f $0 ]
+    if [ -f "$0" ]
     then grep '^#/ usage:' <"$0" | cut -c4- >&2
     else echo "usage: check command for usage." >&2
     fi
@@ -23,7 +24,7 @@ rerun_option_usage() {
 
 # check option has its argument
 rerun_option_check() {
-    [ "$1" -lt 2 ] && rerun_option_error
+    (( "$@" < 2 )) && rerun_option_error "option requires argument"
 }
 
 # options: [name]
@@ -44,11 +45,5 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
-
-# Post processes the options
-[ -z "$MODULE" ] && {
-    echo "Module name: "
-    read MODULE
-}
 
 # If defaultable options variables are unset, set them to their DEFAULT

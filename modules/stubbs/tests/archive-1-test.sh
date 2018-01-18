@@ -52,7 +52,7 @@ it_runs_fully_optioned() {
     rm /tmp/rerun.sh.$$
 }
 
-it_handles_comands_using_quoted_arguments() {
+it_handles_commands_using_quoted_arguments() {
     rerun stubbs:add-module --module freddy --description "none"
     rerun stubbs:add-command --module freddy --command says --description "none"
     rerun stubbs:add-option --module freddy --command says --option msg \

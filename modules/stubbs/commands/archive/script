@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-#
+# shellcheck disable=SC1090
+
 # command: stubbs:archive: "Build a self extracting archive"
 #/ usage: rerun stubbs:archive [ --file|-f <>] [ --format|-f <sh>]  --modules <'*'> [ --release <1>] [ --version <>] [ --template <>]
 
@@ -9,13 +10,13 @@
 
 # Load the function library for this module.
 # This loads rerun functions and those defined for stubbs.
-. $RERUN_MODULE_DIR/lib/functions.sh archive || {
+. "$RERUN_MODULE_DIR/lib/functions.sh" archive || {
     echo >&2 "failed laoding function library" ; exit 1 ;
 }
 
 # Parse the command options
-[ -r $RERUN_MODULE_DIR/commands/archive/options.sh ] && {
-  . $RERUN_MODULE_DIR/commands/archive/options.sh
+[ -r "$RERUN_MODULE_DIR/commands/archive/options.sh" ] && {
+  . "$RERUN_MODULE_DIR/commands/archive/options.sh"
 }
 
 
@@ -63,7 +64,7 @@ rerun_options_parse "$@"
 [[ -z "${LOGNAME:-}" ]] && [[ -z "${USER:-}" ]] && export LOGNAME="travis"
 
 # Default the templates directory if unset.
-: ${TEMPLATE:=$RERUN_MODULE_DIR/templates}
+: "${TEMPLATE:=$RERUN_MODULE_DIR/templates}"
 
 # Possibly default VERSION. 
 mods=( $MODULES )
@@ -71,7 +72,7 @@ if [[ -z "${VERSION:-}" ]]
 then  
   # if there is just one module specified, default it from that module metadata.
   if [[ ${#mods[*]} -eq 1 ]]
-  then VERSION=$(rerun_property_get $RERUN_MODULE_DIR VERSION)
+  then VERSION=$(rerun_property_get "$RERUN_MODULE_DIR" VERSION)
   fi
 fi  
 [[ -z "${VERSION:-}" ]] && rerun_die 2 "version must be specified"
@@ -89,11 +90,11 @@ encode() {
 
     if command -v openssl >/dev/null
     then
-        openssl enc -base64 > $outfile
+        openssl enc -base64 > "$outfile"
         retval=$?
     else
-        uuencode -m -o $outfile $outfile
-        chmod 444 $outfile
+        uuencode -m -o "$outfile" "$outfile"
+        chmod 444 "$outfile"
         retval=$?
     fi
     return $retval
@@ -108,11 +109,11 @@ build_sh_archive() {
   # Prepend current working directory if relative file path.
   [[ ${FILE} == "/"* ]] || FILE=$CWD/$FILE
 
-  [[ ! -d $(dirname ${FILE}) ]] && { echo >&2 "directory not found: $(dirname ${FILE})"; exit 2; }
+  [[ ! -d $(dirname "$FILE") ]] && { echo >&2 "directory not found: $(dirname "$FILE")"; exit 2; }
 
   # create a work directory the archive content
-  export PAYLOAD=`mktemp -d /tmp/rerun.stubbs.archive.XXXXXX` || rerun_die
-
+  PAYLOAD=$(mktemp -d /tmp/rerun.stubbs.archive.XXXXXX) || rerun_die "Failed creating temporary work directory for payload."
+  export PAYLOAD
   if [[ "$(uname -s)" = "Darwin" ]]; then
     # Github issue-166
     TAREXCL="--exclude=\.git --exclude=\.svn --exclude=\.gitignore --exclude=\.hg --exclude=\.hgignore"
@@ -125,41 +126,41 @@ build_sh_archive() {
   #
 
   # Iterate through the the specified modules and add them to payload
-  mkdir -p $PAYLOAD/rerun/modules
+  mkdir -p "$PAYLOAD/rerun/modules"
   for module in $MODULES
   do
-      rerun_module_home_dir=$(rerun_module_exists $module)
+      rerun_module_home_dir=$(rerun_module_exists "$module")
       # Check for a commands subdir to be sure it looks like a module
-      if [ -d $rerun_module_home_dir/commands ]
+      if [[ -d "$rerun_module_home_dir/commands" ]]
       then
-        pushd $rerun_module_home_dir/.. /dev/null
-        tar -c ${TAREXCL} -f - ${module} | ( cd $PAYLOAD/rerun/modules; tar xpf - )
+        pushd "$rerun_module_home_dir/.." > /dev/null
+        tar -c ${TAREXCL} -f - "$module" | ( cd "$PAYLOAD/rerun/modules"; tar xpf - )
         popd >/dev/null
       fi
   done
 
   # Copy rerun itself to the payload
-  cp $RERUN $PAYLOAD/rerun
+  cp "$RERUN" "$PAYLOAD/rerun"
 
   # Copy in the extract and launcher scripts used during execution
   for script in $TEMPLATE/{extract,launcher}
   do
       # replace the template substitution tokens ...
       sed -e "s/@GENERATOR@/stubbs:archive/" \
-          -e "s/@FILE@/$(basename $FILE)/" \
+          -e "s/@FILE@/$(basename "$FILE")/" \
           -e "s/@DATE@/$(date)/" \
           -e "s/@USER@/${USER:-$LOGNAME}/" \
           -e "s/@VERSION@/$VERSION/" \
           -e "s/@RELEASE@/$RELEASE/" \
           -e "s/@DECODER@/$(decoder)/" \
-          $script > $PAYLOAD/$(basename $script)
+          "$script" > "$PAYLOAD/$(basename "$script")"
       # ... and save it to the payload --^
   done
 
   #
   # Archive the content
   #
-  cd $PAYLOAD
+  cd "$PAYLOAD" || rerun_die "Failed to cd to payload directory."
 
   # make the payload.tar file
   tar cf payload.tar launcher extract rerun
@@ -173,7 +174,7 @@ build_sh_archive() {
           # Prepend the extract script to the payload.
           #    and thus turn the thing into a shell script!
           #
-          cat extract payload.tgz.base64 > ${FILE} || rerun_die
+          cat extract payload.tgz.base64 > "$FILE" || rerun_die
       else
           rerun_die "$PAYLOAD/payload.tgz.base64 does not exist"
       fi
@@ -184,15 +185,15 @@ build_sh_archive() {
   #
   # Make the archive executable
   #
-  chmod +x ${FILE}
+  chmod +x "$FILE"
   #
   # Clean up the temp directory
   #
-  cd ${CWD}
-  chmod 755 ${PAYLOAD}
-  find ${PAYLOAD} -type d -exec chmod 755 {} \;
-  find ${PAYLOAD} -type f -exec chmod 644 {} \;
-  rm -rf $PAYLOAD
+  cd "$CWD" || rerun_die
+  chmod 755 "$PAYLOAD"
+  find "$PAYLOAD" -type d -exec chmod 755 {} \;
+  find "$PAYLOAD" -type f -exec chmod 644 {} \;
+  rm -rf "$PAYLOAD"
 
 
   rerun_log info "Wrote self extracting archive script: ${FILE}"
@@ -204,7 +205,7 @@ build_deb_archive() {
 
   for MODULE in ${MODULES}
   do
-    MODULE_DIR=$(rerun_module_exists $MODULE)
+    MODULE_DIR=$(rerun_module_exists "$MODULE")
     [[ -r ${MODULE_DIR}/metadata ]] || rerun_die "Can not find module ${MODULE}"
 
     # Setup a temporary directory to build the deb:
@@ -213,7 +214,7 @@ build_deb_archive() {
     VER="${VERSION}"
     # Source the module metadata:
     unset NAME DESCRIPTION VERSION REQUIRES EXTERNALS
-    . ${MODULE_DIR}/metadata
+    . "${MODULE_DIR}/metadata"
 
     [[ -n ${NAME} ]] || rerun_die "no module name in \"${MODULE_DIR}/metadata\""
     [[ "${NAME}" != "debian" ]] || rerun_die "Illegal module name, debian is a reserved name"
@@ -223,16 +224,16 @@ build_deb_archive() {
     [[ -n ${VERSION} ]] || rerun_die "no version in \"${MODULE_DIR}/metadata\""
 
     # copy the source to the source tarball directory
-    mkdir -p ${DEBTOPDIR}/deb ${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}
-    pushd ${MODULE_DIR} > /dev/null
-    find . | cpio --quiet -pdm ${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}
+    mkdir -p "${DEBTOPDIR}/deb" "${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}"
+    pushd "${MODULE_DIR}" > /dev/null
+    find . | cpio --quiet -pdm "${DEBTOPDIR}/stb/rerun-${NAME}-${VERSION}/${NAME}"
     popd > /dev/null
 
     # build the release tarball filtering out any version control tracking files
-    pushd ${DEBTOPDIR}/stb > /dev/null
+    pushd "${DEBTOPDIR}/stb" > /dev/null
     tar -c -z --exclude-vcs \
-      -f ${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz \
-      rerun-${NAME}-${VERSION}
+      -f "${DEBTOPDIR}/deb/rerun-${NAME}_${VERSION}.orig.tar.gz" \
+      "rerun-${NAME}-${VERSION}"
     popd > /dev/null
 
     # unpack the source in the build directory
