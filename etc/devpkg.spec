@@ -147,7 +147,7 @@ rm -rf %{buildroot}
 %{moddir}/commands/test/README.md
 %{moddir}/commands/test/script
 %{moddir}/lib/docs.css
-%{moddir}/lib/docs.sh
+%{moddir}/lib/docs-functions
 %{moddir}/lib/functions.sh
 %{moddir}/lib/stub/bash/generate-options
 %{moddir}/lib/stub/bash/metadata
