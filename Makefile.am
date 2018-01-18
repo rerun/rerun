@@ -131,7 +131,7 @@ nobase_dist_mod_SCRIPTS = \
 	modules/stubbs/commands/rm-command/script \
 	modules/stubbs/commands/rm-option/script \
 	modules/stubbs/commands/test/script \
-	modules/stubbs/lib/docs.sh \
+	modules/stubbs/lib/docs-functions \
 	modules/stubbs/lib/functions.sh \
 	modules/stubbs/lib/stub/bash/generate-options \
 	modules/stubbs/lib/test.sh \
