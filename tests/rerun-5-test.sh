@@ -40,27 +40,40 @@ it_performs_rerun_log_puts() {
     message="${out[@]:2:${#out[@]}}"
     test "hi there" = "$message"
     test "[info] freddy:dance: hi there" = "${out[*]}"
+}
 
+it_performs_logs_error_to_console() {    
+    . $RERUN
+    erro_level=$RERUN_LOG_ERR_LEVEL
     # Print an error level message and be sure it's not written to stdout.
-    test -z "$(rerun_log_puts console $erro_level freddy:dance "oh no, an error")"
+    test -z "$(rerun_log_puts console "$erro_level" freddy:dance "oh no, an error")"
     # Print the message and redirect stderr to capture the output
-    out=($(rerun_log_puts console $erro_level freddy:dance "oh no, an error" 2>&1))
-    test -n "$out"
+    out=($(rerun_log_puts console "$erro_level" freddy:dance "oh no, an error" 2>&1))
+    test -n "${out[0]}"
+}
+
+it_performs_log_fmt_logfile() {    
+    . $RERUN
 
     # Verify the default format is returned by fmt-logfile action.
     test "$RERUN_LOG_FMT_LOGFILE" = "$(rerun_log fmt-logfile)"
     # Write a message using logfile output.
-    out=($(rerun_log_puts logfile $info_level freddy:dance "hi there"))
+    out=($(rerun_log_puts logfile 1 freddy:dance "hi there"))
     test "5" = "${#out[*]}"        
     test "[info]" = "${out[1]}"
     test "freddy:dance:" = "${out[2]}"
-    message="${out[@]:3:${#out[@]}}"
+    message=${out[*]:3:${#out[*]}}
     test "hi there" = "$message"
+}
+
+it_performs_log_error_level() {    
+    . $RERUN
+    local erro_level=$RERUN_LOG_ERR_LEVEL
 
     # Be sure error message is is written to stderr and not stdout
-    test -z "$(rerun_log_puts logfile $erro_level freddy:dance "oh no, an error")"
-    out=($(rerun_log_puts logfile $erro_level freddy:dance "oh no, an error" 2>&1))
-    test -n "$out"    
+    test -z "$(rerun_log_puts logfile "$erro_level" freddy:dance "oh no, an error")"
+    out=($(rerun_log_puts logfile "$erro_level" freddy:dance "oh no, an error" 2>&1))
+    test -n "${out[*]}"    
 }
 
 it_performs_rerun_log_level() {
