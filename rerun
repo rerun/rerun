@@ -1027,53 +1027,46 @@ rerun_command_execute() {
     local -r command="$2"
     shift; shift; # options are the remaining positional parameters.
     # Default the sudo command string
-    local SUDO_COMMAND="sudo -E"; # Needed for RERUN context variables and perhaps user's too.
+    local -r sudo_command="sudo -E"; # Needed for RERUN context variables and perhaps user's too.
                                   # The security policy may return an error if the user does 
                                   # not have permission to preserve the environment.
 
     RERUN_MODULE_DIR=$(rerun_module_exists "$module") || rerun_syntax_error "module not found: \"$module\""
-    RERUN_COMMAND_DIR=$RERUN_MODULE_DIR/commands/$COMMAND
 
     rerun_script_exists "${RERUN_MODULE_DIR:-}" "$command" || {
         rerun_syntax_error "command not found: \"$module:$command\""
     }
-    local -r RERUN_SHELL=$(which bash)
-    local -r COMMAND_SHELL=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
-    : "${COMMAND_SHELL:=$RERUN_SHELL}"; # default it.
+    bash_shell=$(rerun_property_get "$RERUN_MODULE_DIR" SHELL)
+    : "${command_exec:=$(which bash)}"; # default bash when module metadata does not declare SHELL.
 
-    if [[ -n "${SUDO_USER:-}" ]]
-    then
-        COMMAND_SHELL="$SUDO_COMMAND -u $SUDO_USER $COMMAND_SHELL"
-    fi
-
+    local -r RERUN_COMMAND_DIR=$RERUN_MODULE_DIR/commands/$command
     local -r RERUN_MODULE_VERSION=$(rerun_property_get "$RERUN_MODULE_DIR" VERSION)
-
     local -r script=$(rerun_script_lookup "$RERUN_MODULE_DIR" "$command")
 
     export RERUN RERUN_VERSION RERUN_MODULES RERUN_MODULE_DIR RERUN_MODULE_VERSION RERUN_COMMAND_DIR RERUN_COLOR RERUN_LOG_LEVEL
 
+    local -a invocation_string
+
     if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
-        $COMMAND_SHELL "$RERUN_VERBOSE" "$script" "$@"
-        RERUN_EXITSTATUS=$?
-    elif [[ -x "$script" ]]
-    then
-
-        if [[ -n ${SUDO_USER:-} ]]
-        then
-            $SUDO_COMMAND -u "$SUDO_USER" "$script" "$@"
-            rc=$?
-        else
-            "$script" "$@"
-            rc=$?
-        fi
-        RERUN_EXITSTATUS=$rc
-    else
-        $COMMAND_SHELL "$script" "$@"
-        RERUN_EXITSTATUS=$?
+        bash_shell+=" -v"
     fi
 
-    return "${RERUN_EXITSTATUS}"
+    if [[ -x "$script" ]]
+    then
+        invocation_string=("$script" "$@")
+    else
+        invocation_string=($bash_shell "$script" "$@")
+    fi
+    if [[ -n ${SUDO_USER:-} ]]
+    then
+        invocation_string=("$sudo_command" -u "$SUDO_USER" "${invocation_string[@]}")
+    fi
+    #
+    # Execute the command
+    #
+    "${invocation_string[@]}"
+    return $?
 }
 
 #
