@@ -7,7 +7,7 @@
 # Minimalism is rerun's goal. It will try to stay out of your way
 # yet take care of some of your grunt work.
 #
-#/ usage: rerun [-h][-G][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [--sudo-user|-S <user>] [module:[command [options]]]
+#/ usage: rerun [-h][-G][-x][-v][-V][--version] [--loglevel <>] [-M <dir>] [--answers|-A <file>] [--sudo-user|-S <user>] [module:[command [options]]]
 #
 # __Install__
 # 
@@ -16,12 +16,7 @@
 
 # The rerun version.
 
-RERUN_VERSION=1.4.0
-
-# The default system install directories.
-
-RERUN_DEFAULT_BINDIR="/usr/bin"
-RERUN_DEFAULT_LIBDIR="/usr/lib"
+RERUN_VERSION=1.4.1
 
 
 
@@ -1049,16 +1044,16 @@ rerun_command_execute() {
 
     if [[ -n "${RERUN_VERBOSE:-}" ]]
     then
-        bash_shell+=" -v"
-    fi
-
-    if [[ -x "$script" ]]
-    then
-        invocation_string=("$script" "$@")
+        invocation_string=("$bash_shell" "$RERUN_VERBOSE" "$script" "$@")
     else
-        invocation_string=($bash_shell "$script" "$@")
+        if [[ -x "$script" ]]
+        then
+            invocation_string=("$script" "$@")
+        else
+            invocation_string=($bash_shell "$script" "$@")
+        fi
     fi
-    if [[ -n ${SUDO_USER:-} ]]
+    if [[ -n "${SUDO_USER:-}" ]]
     then
         invocation_string=("$sudo_command" -u "$SUDO_USER" "${invocation_string[@]}")
     fi
@@ -1084,6 +1079,12 @@ if [[ "${BASH_SOURCE:-}" != "$0" && "$0" != "bash" ]]
 then
     return; # Stop sourcing the file here.
 fi
+
+# The default system install directories.
+
+RERUN_DEFAULT_BINDIR="/usr/bin"
+RERUN_DEFAULT_LIBDIR="/usr/lib"
+
 
 #
 # Enable a stringent exeuction environment.
@@ -1350,32 +1351,35 @@ while (( "$#" > 0 )); do
         _rerun_examples "$(basename "$0")"
         exit 0
 	    ;;
-    --banner)  _rerun_banner ; exit 0
+	--banner)  _rerun_banner ; exit 0
 	    ;;
   	-G)
 	    export RERUN_COLOR="true"
 	    ;;
-    -v)
+	-v)
         RERUN_VERBOSE="-vx"
-        ;;        
+	    ;;
+    -x)
+        RERUN_VERBOSE="-x"
+        ;;
   	-V)
 	    RERUN_VERBOSE="-vx"
 	    set -vx
 	    ;;
   	--version)
 	    echo >&2 "$RERUN_VERSION"
-        exit 0
+            exit 0
 	    ;;
 	--man*)
 	    rerun_option_check "$#" "$1"
 	    _rerun_man_page "$2"
 	    exit 0
 	    ;;	
-    --loglevel)
-        rerun_option_check "$#" "$1"
-        rerun_log level "$2"
-        shift
-        ;;
+	--loglevel)
+            rerun_option_check "$#" "$1"
+            rerun_log level "$2"
+            shift
+            ;;
 	-M)
 	    rerun_option_check "$#" "$1"
 	    RERUN_MODULES=$(rerun_path_absolute "$2")
@@ -1387,11 +1391,11 @@ while (( "$#" > 0 )); do
         [[ ! -f $ANSWERS ]] && rerun_syntax_error "answers file not found: $ANSWERS"
 	    shift
 	    ;;
-    -S|--sudo-user)
-        rerun_option_check "$#" "$1"
-        SUDO_USER="$2"
-        shift
-        ;;
+	-S|--sudo-user)
+            rerun_option_check "$#" "$1"
+            SUDO_USER="$2"
+            shift
+            ;;
 	*)
 	    break;# Ignore remaining arguments as they are for the module.
     esac
