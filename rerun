@@ -20,8 +20,8 @@ RERUN_VERSION=1.4.0
 
 # The default system install directories.
 
-DEFAULT_BINDIR="/usr/bin"
-DEFAULT_LIBDIR="/usr/lib"
+RERUN_DEFAULT_BINDIR="/usr/bin"
+RERUN_DEFAULT_LIBDIR="/usr/lib"
 
 
 
@@ -978,10 +978,10 @@ rerun_module_exists() {
         fi
     done
 
-    if [[ "${RERUN_LOCATION:-}" = "${DEFAULT_BINDIR}" \
-        && -f "${DEFAULT_LIBDIR}/rerun/modules/$module/metadata" ]]
+    if [[ "${RERUN_LOCATION:-}" = "${RERUN_DEFAULT_BINDIR}" \
+        && -f "${RERUN_DEFAULT_LIBDIR}/rerun/modules/$module/metadata" ]]
     then
-       echo "${DEFAULT_LIBDIR}/rerun/modules/$module"
+       echo "${RERUN_DEFAULT_LIBDIR}/rerun/modules/$module"
        return 0
     fi
 
@@ -1254,12 +1254,12 @@ _rerun_modules_summary() {
         do
             [[ -f "$module/metadata" ]] && _rerun_module_summary "$module"
         done
-        if [[ ${RERUN_LOCATION:-} = "${DEFAULT_BINDIR}" 
-                && $path_element != "${DEFAULT_LIBDIR}/rerun/modules" ]]
+        if [[ ${RERUN_LOCATION:-} = "${RERUN_DEFAULT_BINDIR}" 
+                && $path_element != "${RERUN_DEFAULT_LIBDIR}/rerun/modules" ]]
         then
             echo
-            printf "%s\n" "$(rerun_color blue "Available modules in \"${DEFAULT_LIBDIR}/rerun/modules\":")"
-            for module in ${DEFAULT_LIBDIR}/rerun/modules/*
+            printf "%s\n" "$(rerun_color blue "Available modules in \"${RERUN_DEFAULT_LIBDIR}/rerun/modules\":")"
+            for module in ${RERUN_DEFAULT_LIBDIR}/rerun/modules/*
             do
                [[ -f "$module/metadata" ]] && _rerun_module_summary "$module"
             done
@@ -1400,7 +1400,7 @@ done
 
 
 # Set the absolute path to this invocation of the rerun script. Drives the Linux FSH usage convention where
-# modules located in ${DEFAULT_LIBDIR}/rerun/modules are appended to the modules in RERUN_MODULES.
+# modules located in ${RERUN_DEFAULT_LIBDIR}/rerun/modules are appended to the modules in RERUN_MODULES.
 RERUN_LOCATION="$(cd "$(dirname "${BASH_SOURCE[0]:-}" )" && pwd)"
 # fix issue #206
 if [[ -x /usr/bin/readlink && "$(uname)" == 'Linux' ]]; then
@@ -1414,9 +1414,9 @@ fi
 
 if [[ -z "${RERUN_MODULES:-}" ]]
 then
-    if [[ "$RERUN_LOCATION" = "${DEFAULT_BINDIR}" ]]
+    if [[ "$RERUN_LOCATION" = "${RERUN_DEFAULT_BINDIR}" ]]
     then
-      RERUN_MODULES="${DEFAULT_LIBDIR}/rerun/modules";
+      RERUN_MODULES="${RERUN_DEFAULT_LIBDIR}/rerun/modules";
     else      
       RERUN_MODULES=${RERUN_LOCATION}/modules; # Set module directory relative to the `rerun` script:
     fi
