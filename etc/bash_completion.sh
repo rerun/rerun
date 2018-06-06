@@ -194,7 +194,9 @@ rerun:parse:module()
 #
 # _rerun - program completion for the `rerun` command.
 #
-_rerun() {
+_rr() {
+	#This disables Readline filename completion when COMPREPLY is empty
+	  compopt +o default
     [ -z "${RERUN_MODULES}" -o ! \( -d "$(echo $RERUN_MODULES|cut -d: -f1)" \) ] && { 
         return 0 ; 
     }
@@ -271,6 +273,11 @@ _rerun() {
                         --*dir*|--logs*)
                             # directory completion
                 	        COMPREPLY=( $(compgen -o dirnames -A directory -- ${cur}) ) ;;
+                        --**path*)
+                            # AD path completion
+                	        compopt -o default; 
+													cd $AD
+												 COMPREPLY=() ;;
                         --module)
                             # module completion
                             modules=$(rerun:modules)
@@ -298,7 +305,7 @@ _rerun() {
     fi
 }
 # register the _rerun completion function
-complete -F _rerun rerun
+complete -F _rr rr
 
 #
 # This is Free Software distributed under the Apache 2 license.
